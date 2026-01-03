@@ -18,8 +18,9 @@ interface Product {
   subImage?: string;
   subImage2?: string;
   subImage3?: string;
+  subImage4?: string; 
   description: string;
-  pricePerM2: number;
+  price: number;
   rating: number;
   reviewCount?: number;
   category: string;
