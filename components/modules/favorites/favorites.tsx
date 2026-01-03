@@ -1,70 +1,118 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import ProductCard from "./productCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Heart } from "lucide-react";
+import { Heart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFavorite } from "@/contexts/favoriteContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Favorites() {
   const { favorites, removeFavorite, loading } = useFavorite();
 
   const FavoriteSkeleton = () => (
-    <div className="flex flex-col gap-3 rounded-xs border border-gray-200 shadow-md p-3">
-      <Skeleton className="w-full h-60 rounded-xs" />
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
+    <div className="flex flex-col space-y-6">
+      <Skeleton className="w-full aspect-[3/4] rounded-none bg-zinc-50" />
+      <div className="space-y-3">
+        <Skeleton className="h-3 w-2/3 bg-zinc-50" />
+        <Skeleton className="h-3 w-1/3 bg-zinc-50" />
       </div>
     </div>
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-2 md:px-20 py-8 md:py-16 mb-12">
-      {/* Başlık yalnızca favori varsa */}
-      {!loading && favorites.length > 0 && (
-        <h2 className="relative text-3xl md:text-4xl font-bold text-gray-800 text-center mb-12 font-serif">
-          <span className="absolute inset-0 -z-10 bg-pink-200 rounded-lg opacity-20 blur-xl"></span>
-          Favorilerim
-        </h2>
-      )}
+    <div className="min-h-screen bg-white text-zinc-900">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20 py-24 md:py-32">
+        {/* Header Section - Minimalist & Editorial */}
+        {!loading && favorites.length > 0 && (
+          <header className="flex flex-col items-start mb-20 border-b border-zinc-100 pb-12">
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="space-y-4"
+            >
+              <span className="text-[10px] uppercase tracking-[0.4em] text-zinc-400 font-light">
+                Kişisel Seçki
+              </span>
+              <h1 className="text-4xl md:text-5xl font-extralight tracking-tight">
+                Favorilerim
+              </h1>
+              <p className="text-zinc-400 text-sm font-light max-w-md">
+                Beğendiğiniz tasarımları tek bir noktada toplayın ve tarzınızı
+                şekillendirin.
+              </p>
+            </motion.div>
+          </header>
+        )}
 
-      {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <FavoriteSkeleton key={i} />
-          ))}
-        </div>
-      ) : favorites.length === 0 ? (
-        <div className="flex flex-col items-center justify-center mt-16 space-y-4 text-gray-500">
-          <Heart className="h-12 w-12 text-gray-400 animate-bounce" />
-          <p className="text-lg font-semibold">Henüz favori ürün eklemediniz</p>
-          <p className="text-sm text-gray-400 text-center px-4">
-            Favorilerinize ürün eklemek için ürünleri keşfedin ve kalp ikonuna
-            tıklayın.
-          </p>
-          <Button
-            variant="outline"
-            className="mt-2 rounded-full"
-            onClick={() => (window.location.href = "/products")}
-          >
-            Ürünleri Keşfet
-          </Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 font-sans">
-          {favorites
-            .filter((productId) => productId != null) // null veya undefined olanları at
-            .map((productId) => (
-              <ProductCard
-                key={productId}
-                id={productId}
-                onRemove={removeFavorite}
-              />
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <FavoriteSkeleton key={i} />
             ))}
-        </div>
-      )}
+          </div>
+        ) : favorites.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-40 text-center"
+          >
+            <div className="mb-10">
+              <Heart strokeWidth={0.5} className="h-16 w-16 text-zinc-200" />
+            </div>
+
+            <div className="space-y-6">
+              <h3 className="text-2xl font-light tracking-tight text-zinc-900">
+                Kürasyonunuz boş görünüyor
+              </h3>
+              <p className="text-zinc-400 max-w-xs mx-auto text-sm font-light leading-relaxed">
+                Henüz hiçbir ürünü favorilerinize eklemediniz. İlham almak için
+                koleksiyonlarımızı inceleyin.
+              </p>
+              <div className="pt-8">
+                <Link href="/products">
+                  <Button
+                    variant="outline"
+                    className="border-zinc-200 text-zinc-950 rounded-none px-8 py-6 text-xs tracking-widest uppercase hover:bg-zinc-950 hover:text-white transition-all duration-500"
+                  >
+                    KOLEKSİYONU GÖR
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          /* Ürün Listesi - Grid Gap Revizesi */
+          <motion.div
+            layout
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-20"
+          >
+            <AnimatePresence mode="popLayout">
+              {favorites
+                .filter((id) => id != null)
+                .map((productId, index) => (
+                  <motion.div
+                    key={productId}
+                    layout
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{
+                      duration: 0.6,
+                      delay: index * 0.05,
+                      ease: [0.19, 1, 0.22, 1],
+                    }}
+                    className="relative"
+                  >
+                    <ProductCard id={productId} onRemove={removeFavorite} />
+                  </motion.div>
+                ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }

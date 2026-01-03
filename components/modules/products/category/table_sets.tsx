@@ -84,7 +84,7 @@ export default function SeatingSets() {
             </span>
           </div>
           <h2 className="text-4xl md:text-6xl luxury-serif italic tracking-tight">
-            Oturma Grupları
+            Oturma Takımları
           </h2>
           <p className="modern-sans text-stone-500 text-sm md:text-base font-light max-w-lg leading-relaxed">
             {filteredProducts.length} seçkin model, dış mekan yaşam alanınızı

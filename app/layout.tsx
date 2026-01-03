@@ -32,7 +32,8 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://balkolux.com"), // Domain adresinizi güncelleyin
 
   title: {
-    default: "BalkoLüx | Lüks Bahçe ve Balkon Mobilyaları – Oturma Takımları, Salıncak ve Barbekü",
+    default:
+      "BalkoLüx | Lüks Bahçe ve Balkon Mobilyaları – Oturma Takımları, Salıncak ve Barbekü",
     template: "%s | BalkoLüx",
   },
 
@@ -82,14 +83,15 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "BalkoLüx | Lüks Bahçe ve Balkon Mobilyaları",
-    description: "Bahçenize zarafet katan oturma grupları ve salıncak modelleri BalkoLüx'te.",
+    description:
+      "Bahçenize zarafet katan oturma grupları ve salıncak modelleri BalkoLüx'te.",
     images: ["/logoicon.png"],
   },
 
   alternates: {
     canonical: "https://balkolux.com",
   },
-  
+
   category: "furniture",
 };
 
@@ -125,7 +127,14 @@ export default function RootLayout({
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        dayOfWeek: [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ],
         opens: "09:00",
         closes: "19:00",
       },
@@ -134,7 +143,10 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="tr" className={`${playfairDisplay.variable} ${geistSans.variable}`}>
+    <html
+      lang="tr"
+      className={`${playfairDisplay.variable} ${geistSans.variable}`}
+    >
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -153,21 +165,43 @@ export default function RootLayout({
           <FavoriteProvider>
             <ClientLayoutWrapper>
               {/* Sayfa içeriği burada render edilir */}
-              <main className="min-h-screen font-sans">
-                {children}
-              </main>
+              <main className="min-h-screen font-sans">{children}</main>
             </ClientLayoutWrapper>
-            
+
             <ScrollToTopButton />
-            
             <Toaster
-              richColors
-              position="top-center" // Mobilya sitelerinde bildirimler genellikle üstte daha şıktır
+              richColors={false}
+              closeButton={false}
+              position="bottom-right"
               toastOptions={{
-                style: { 
-                  borderRadius: '0px', 
-                  fontFamily: 'var(--font-geist-sans)',
-                  border: '1px solid #e5e5e5' 
+                style: {
+                  borderRadius: "0px",
+                  padding: "14px 26px",
+
+                  // Glass surface
+                  background:
+                    "linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.65))",
+                  backdropFilter: "blur(16px) saturate(180%)",
+                  WebkitBackdropFilter: "blur(16px) saturate(180%)",
+
+                  color: "#111111",
+
+                  /* 🔥 ÇERÇEVEYİ TAMAMEN KALDIR */
+                  border: "none",
+                  outline: "none",
+
+                  /* Hafif derinlik (kenar yok) */
+                  boxShadow:
+                    "0 8px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)",
+
+                  fontFamily: "var(--font-geist-sans), sans-serif",
+                  fontSize: "12px",
+                  fontWeight: "500",
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+
+                  minWidth: "260px",
+                  lineHeight: "1.6",
                 },
               }}
             />

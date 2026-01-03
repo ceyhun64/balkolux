@@ -43,8 +43,8 @@ export default function HeroSection() {
   }, [nextSlide]);
 
   return (
-    <div className="relative w-full h-[100vh] min-h-[600px] overflow-hidden">
-      <AnimatePresence >
+    <div className="relative w-full h-[100dvh] overflow-hidden">
+      <AnimatePresence>
         <motion.div
           key={current}
           initial={{ opacity: 0 }}
@@ -119,8 +119,20 @@ export default function HeroSection() {
             onClick={() => setCurrent(i)}
             className="group relative py-4"
           >
-            <div className={`h-[1px] transition-all duration-700 ${current === i ? "w-16 bg-white" : "w-8 bg-white/30 group-hover:bg-white/60"}`} />
-            <span className={`absolute -top-4 left-0 text-[10px] font-medium transition-all ${current === i ? "opacity-100 text-white" : "opacity-0 text-white/50"}`}>
+            <div
+              className={`h-[1px] transition-all duration-700 ${
+                current === i
+                  ? "w-16 bg-white"
+                  : "w-8 bg-white/30 group-hover:bg-white/60"
+              }`}
+            />
+            <span
+              className={`absolute -top-4 left-0 text-[10px] font-medium transition-all ${
+                current === i
+                  ? "opacity-100 text-white"
+                  : "opacity-0 text-white/50"
+              }`}
+            >
               0{i + 1}
             </span>
           </button>
@@ -129,8 +141,12 @@ export default function HeroSection() {
 
       <style jsx global>{`
         @keyframes subtle-zoom {
-          from { transform: scale(1); }
-          to { transform: scale(1.1); }
+          from {
+            transform: scale(1);
+          }
+          to {
+            transform: scale(1.1);
+          }
         }
         .animate-subtle-zoom {
           animation: subtle-zoom 20s infinite alternate ease-in-out;

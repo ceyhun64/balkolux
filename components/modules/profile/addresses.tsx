@@ -2,16 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Sidebar from "./sideBar";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Edit, Trash2, PlusCircle, Save, X } from "lucide-react";
+import { Edit, Trash2, PlusCircle, X, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import AdresForm from "./addressForm";
 
+// ==== Tip Tanımları ====
 interface Address {
   id: number;
   title: string;
@@ -25,7 +23,7 @@ interface Address {
   phone?: string;
   country?: string;
   email?: string;
-  tcno?: string; // 🚨 API'deki tcno alanı eklendi
+  tcno?: string;
 }
 
 interface AddressFormData {
@@ -38,9 +36,9 @@ interface AddressFormData {
   neighborhood: string;
   zip?: string;
   phone?: string;
-  country?: string; // POST API'sinde zorunlu, bu yüzden opsiyonel yapmadım.
+  country?: string;
   email?: string;
-  tcno?: string; // 🚨 API'deki tcno alanı eklendi
+  tcno?: string;
 }
 
 export default function Adreslerim() {
@@ -60,391 +58,239 @@ export default function Adreslerim() {
     neighborhood: "",
     zip: "",
     phone: "",
-    country: "Türkiye", // Varsayılan ülke
+    country: "Türkiye",
     email: "",
-    tcno: "", // 🚨 Varsayılan tcno
+    tcno: "",
   };
 
   const [ekleFormData, setEkleFormData] =
     useState<AddressFormData>(initialFormData);
-
   const [duzenleFormData, setDuzenleFormData] =
     useState<AddressFormData>(initialFormData);
 
-  // 🔹 Adresleri Yükle (GET API'sine göre güncellendi)
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
         const res = await fetch("/api/address", { method: "GET" });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Adresler yüklenemedi.");
-
-        const addressesWithDefaults: Address[] = (data.addresses || []).map(
-          (a: Address) => ({
-            ...a,
-            neighborhood: a.neighborhood || "",
-            zip: a.zip || "",
-            phone: a.phone || "",
-            country: a.country || "Türkiye",
-            tcno: a.tcno || "", // 🚨 tcno varsayılan ataması
-          })
-        );
-        setAdresler(addressesWithDefaults);
+        setAdresler(data.addresses || []);
       } catch (error) {
-        console.error(error);
         toast.error("Adresler yüklenirken bir hata oluştu.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchAddresses();
   }, []);
 
-  // 🔹 Adres Silme (Kodda değişiklik yok, API ile uyumlu)
   const handleSil = async (id: number) => {
     try {
       const res = await fetch(`/api/address/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Adres silinemedi.");
+      if (!res.ok) throw new Error("Silinemedi");
       setAdresler((prev) => prev.filter((a) => a.id !== id));
-      toast.success("Adres başarıyla silindi.");
+      toast.success("Adres silindi.");
     } catch (error) {
-      console.error(error);
-      toast.error("Adres silinirken bir hata oluştu.");
+      toast.error("Silme işlemi başarısız.");
     }
   };
 
-  // 🔹 Yeni Adres Ekle (POST API zorunlu alanlarına göre güncellendi)
   const handleEkleKaydet = async () => {
-    // POST API'sindeki zorunlu alanlar: firstName, lastName, address, district, city, country
     if (
       !ekleFormData.firstName ||
-      !ekleFormData.lastName ||
       !ekleFormData.address ||
-      !ekleFormData.district ||
-      !ekleFormData.city ||
-      !ekleFormData.country
+      !ekleFormData.city
     ) {
-      // 🚨 Zorunlu alan kontrolü API'ye göre ayarlandı
-      toast.error(
-        "Lütfen alıcı adı/soyadı, adres, il, ilçe ve ülke gibi tüm zorunlu alanları doldurun."
-      );
+      toast.error("Lütfen zorunlu alanları doldurun.");
       return;
     }
-
     try {
       const res = await fetch("/api/address", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // FormData'yı olduğu gibi gönderiyoruz
         body: JSON.stringify(ekleFormData),
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Adres eklenemedi.");
-
-      // Yeni eklenen adresin alanlarını varsayılanlarla dolduruyoruz
-      const newAddress: Address = {
-        ...data.address,
-        neighborhood: data.address.neighborhood || "",
-        zip: data.address.zip || "",
-        phone: data.address.phone || "",
-        country: data.address.country || "Türkiye",
-        tcno: data.address.tcno || "", // 🚨 tcno ataması
-      };
-
-      setAdresler((prev) => [newAddress, ...prev]);
-      toast.success("Adres başarıyla eklendi.");
+      if (!res.ok) throw new Error(data.error);
+      setAdresler((prev) => [data.address, ...prev]);
+      toast.success("Yeni adres kaydedildi.");
       setYeniAdresForm(false);
-      setEkleFormData(initialFormData); // Formu temizle
+      setEkleFormData(initialFormData);
     } catch (error) {
-      console.error(error);
-      toast.error("Adres eklenirken bir hata oluştu.");
+      toast.error("Kaydedilemedi.");
     }
   };
 
-  // 🔹 Adres Düzenleme
   const handleDuzenle = (adres: Address) => {
     setDuzenlenenAdres(adres);
-    setDuzenleFormData({
-      title: adres.title,
-      firstName: adres.firstName,
-      lastName: adres.lastName,
-      address: adres.address,
-      district: adres.district,
-      city: adres.city,
-      neighborhood: adres.neighborhood || "",
-      zip: adres.zip || "",
-      phone: adres.phone || "",
-      country: adres.country || "Türkiye",
-      email: adres.email,
-      tcno: adres.tcno || "", // 🚨 tcno değeri
-    });
+    setDuzenleFormData({ ...adres, neighborhood: adres.neighborhood || "" });
     setDuzenleForm(true);
-    setYeniAdresForm(false); // Yeni adres formunu kapat
+    setYeniAdresForm(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // 🔹 Adres Düzenleme Kaydet (PATCH API zorunlu alanlarına göre güncellendi)
   const handleDuzenleKaydet = async () => {
     if (!duzenlenenAdres) return;
-
-    // PATCH API'sindeki alanlar isteğe bağlı olarak gönderilebilir, ancak
-    // kullanıcının formu boş bırakıp kaydetmesini engellemek için mevcut frontend
-    // zorunlu alan kontrolünü kullanıyoruz. Daha temiz bir UX için zorunlu alanlar
-    // POST API'si ile aynı olmalıdır.
-    if (
-      !duzenleFormData.firstName ||
-      !duzenleFormData.lastName ||
-      !duzenleFormData.address ||
-      !duzenleFormData.district ||
-      !duzenleFormData.city ||
-      !duzenleFormData.country
-    ) {
-      // 🚨 Zorunlu alan kontrolü güncellendi
-      toast.error(
-        "Lütfen alıcı adı/soyadı, adres, il, ilçe ve ülke gibi tüm zorunlu alanları doldurun."
-      );
-      return;
-    }
-
     try {
       const res = await fetch(`/api/address/${duzenlenenAdres.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        // FormData'yı olduğu gibi gönderiyoruz
         body: JSON.stringify(duzenleFormData),
       });
-
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Adres güncellenemedi.");
-
-      // Güncellenen adresin alanlarını varsayılanlarla dolduruyoruz
-      const updatedAddress: Address = {
-        ...data.address,
-        neighborhood: data.address.neighborhood || "",
-        zip: data.address.zip || "",
-        phone: data.address.phone || "",
-        country: data.address.country || "Türkiye",
-        tcno: data.address.tcno || "", // 🚨 tcno ataması
-      };
-
+      if (!res.ok) throw new Error(data.error);
       setAdresler((prev) =>
-        prev.map((a) => (a.id === duzenlenenAdres.id ? updatedAddress : a))
+        prev.map((a) => (a.id === duzenlenenAdres.id ? data.address : a))
       );
-      toast.success("Adres başarıyla güncellendi.");
+      toast.success("Adres güncellendi.");
       setDuzenleForm(false);
-      setDuzenlenenAdres(null);
     } catch (error) {
-      console.error(error);
-      toast.error("Adres güncellenirken bir hata oluştu.");
+      toast.error("Güncellenemedi.");
     }
   };
 
-  // 🔸 Skeleton Yükleme (Kodda değişiklik yok)
-  if (loading) {
-    return (
-      <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex flex-1 justify-center items-start px-3 py-16 md:px-8 md:pt-16">
-          <div className="w-full max-w-2xl space-y-6">
-            {[...Array(2)].map((_, i) => (
-              <Card
-                key={i}
-                className="shadow-xl border border-gray-200 rounded-xs bg-white"
-              >
-                <CardContent className="p-6 space-y-3">
-                  <Skeleton className="h-5 w-24" />
-                  <Skeleton className="h-4 w-40" />
-                  <Skeleton className="h-4 w-64" />
-                  <Skeleton className="h-4 w-56" />
-                  <Skeleton className="h-4 w-32" />
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Skeleton className="h-8 w-8 rounded-xs" />
-                    <Skeleton className="h-8 w-8 rounded-xs" />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 🔸 Normal render
   return (
-    <div className="flex flex-col md:flex-row min-h-screen ">
+    <div className="flex flex-col md:flex-row min-h-screen bg-white">
       <Sidebar />
 
-      <div className="flex flex-1 justify-center items-start px-4 md:px-10 py-20 bg-gradient-to-b from-white via-amber-950/10 to-white">
-        <div className="w-full max-w-3xl space-y-10">
-          {/* Başlık */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-          >
-            {/* Sol kısım */}
-            <div className="space-y-2">
-              <h2 className="text-4xl font-bold text-gray-900 tracking-tight">
+      <main className="flex-1 px-6 py-12 md:px-16 lg:px-24">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-extralight tracking-tighter text-zinc-900 uppercase">
                 Adreslerim
-              </h2>
-              <p className="text-gray-600 text-lg">
-                Kayıtlı adreslerinizi buradan yönetin, düzenleyin veya yenisini
-                ekleyin.
+              </h1>
+              <div className="h-[1px] w-12 bg-zinc-900" />
+              <p className="text-[11px] tracking-[0.2em] text-zinc-400 uppercase leading-relaxed">
+                Kayıtlı teslimat ve fatura bilgilerinizi <br /> bu alandan
+                modernize edebilirsiniz.
               </p>
             </div>
 
-            {/* Sağ kısım (buton) */}
             <Button
               onClick={() => {
-                setYeniAdresForm((prev) => !prev);
+                setYeniAdresForm(!yeniAdresForm);
                 setDuzenleForm(false);
                 setEkleFormData(initialFormData);
               }}
-              className=" flex items-center gap-2 border border-gray-300  shadow-sm bg-gradient-to-br from-[#7B0323] to-[#B3133C] text-white hover:text-white/90 px-4 py-2 rounded-full hover:opacity-90 transition"
-              variant="ghost"
+              className="group flex items-center gap-2 rounded-none bg-zinc-900 text-white px-6 py-6 text-[10px] tracking-widest uppercase hover:bg-zinc-800 transition-all"
             >
-              {yeniAdresForm ? (
-                <X size={20} />
-              ) : (
-                <>
-                  <PlusCircle size={20} />
-                  <span className="font-medium">Yeni Adres Ekle</span>
-                </>
-              )}
+              {yeniAdresForm ? <X size={14} /> : <PlusCircle size={14} />}
+              <span>{yeniAdresForm ? "Vazgeç" : "Yeni Adres"}</span>
             </Button>
-          </motion.div>
+          </header>
 
-          {/* Formlar */}
-          <AnimatePresence>
-            {yeniAdresForm && (
+          <AnimatePresence mode="wait">
+            {/* Formlar */}
+            {(yeniAdresForm || duzenleForm) && (
               <motion.div
-                initial={{ opacity: 0, y: -12 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.25 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-20 p-8 border border-zinc-100 bg-zinc-50/30"
               >
-                <Card className="shadow-xl border border-gray-200 bg-white rounded-xs">
-                  <CardContent className="p-8">
-                    <h3 className="text-xl font-semibold mb-6">
-                      Yeni Adres Ekle
-                    </h3>
-                    <AdresForm
-                      formData={ekleFormData}
-                      setFormData={setEkleFormData}
-                      onSave={handleEkleKaydet}
-                    />
-                  </CardContent>
-                </Card>
+                <h3 className="text-xs font-bold tracking-widest uppercase mb-8 text-zinc-800">
+                  {duzenleForm ? "Adresi Güncelle" : "Yeni Bilgiler"}
+                </h3>
+                <AdresForm
+                  formData={duzenleForm ? duzenleFormData : ekleFormData}
+                  setFormData={
+                    duzenleForm ? setDuzenleFormData : setEkleFormData
+                  }
+                  onSave={duzenleForm ? handleDuzenleKaydet : handleEkleKaydet}
+                />
               </motion.div>
             )}
 
-            {duzenleForm && duzenlenenAdres && (
+            {/* Adres Listesi */}
+            {!loading && !yeniAdresForm && !duzenleForm && (
               <motion.div
-                initial={{ opacity: 0, y: -12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.25 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="grid grid-cols-1 gap-12"
               >
-                <Card className="shadow-xl border border-gray-200 bg-white rounded-xs">
-                  <CardContent className="p-8">
-                    <h3 className="text-xl font-semibold mb-6">
-                      {duzenlenenAdres.title} adresini düzenle
-                    </h3>
-                    <AdresForm
-                      formData={duzenleFormData}
-                      setFormData={setDuzenleFormData}
-                      onSave={handleDuzenleKaydet}
-                    />
-                  </CardContent>
-                </Card>
+                {adresler.length > 0 ? (
+                  adresler.map((a) => (
+                    <div
+                      key={a.id}
+                      className="group flex flex-col md:flex-row justify-between items-start border-b border-zinc-100 pb-10 last:border-0 transition-colors"
+                    >
+                      <div className="space-y-4 max-w-lg">
+                        <div className="flex items-center gap-3">
+                          <MapPin size={14} className="text-zinc-400" />
+                          <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-900">
+                            {a.title}
+                          </h3>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-xs font-medium text-zinc-800 uppercase tracking-tight">
+                            {a.firstName} {a.lastName}
+                          </p>
+                          <p className="text-[13px] text-zinc-500 font-light leading-relaxed italic">
+                            {a.address} <br />
+                            {a.neighborhood && `${a.neighborhood}, `}{" "}
+                            {a.district} / {a.city}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] tracking-widest text-zinc-400 uppercase">
+                          <span>{a.phone}</span>
+                          {a.tcno && <span>TC: {a.tcno}</span>}
+                          <span>{a.country}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-4 mt-6 md:mt-0">
+                        <button
+                          onClick={() => handleDuzenle(a)}
+                          className="text-[10px] tracking-[0.2em] uppercase text-zinc-400 hover:text-zinc-900 flex items-center gap-1 transition-all"
+                        >
+                          <Edit size={12} /> Düzenle
+                        </button>
+                        <button
+                          onClick={() => handleSil(a.id)}
+                          className="text-[10px] tracking-[0.2em] uppercase text-zinc-300 hover:text-red-500 flex items-center gap-1 transition-all"
+                        >
+                          <Trash2 size={12} /> Sil
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <EmptyState />
+                )}
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Adresler */}
-          {!yeniAdresForm && !duzenleForm && (
-            <div className="flex flex-col gap-5 font-sans">
-              {adresler.length > 0 ? (
-                adresler.map((a) => (
-                  <Card
-                    key={a.id}
-                    className="
-                    bg-white border border-gray-200 rounded-xs shadow-md 
-                    hover:shadow-lg transition-shadow
-                  "
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start">
-                        {/* Sol Bilgi */}
-                        <div className="space-y-1.5">
-                          <h3 className="text-xl font-semibold text-gray-900">
-                            {a.title}
-                          </h3>
-
-                          <p className="text-gray-700">
-                            {a.firstName} {a.lastName}
-                          </p>
-
-                          <p className="text-gray-600">{a.address}</p>
-
-                          <p className="text-gray-600">
-                            {a.neighborhood && `${a.neighborhood}, `}
-                            {a.district} — {a.city} {a.zip}
-                          </p>
-
-                          {/* 🚨 tcno'yu opsiyonel olarak göster */}
-                          {a.tcno && (
-                            <p className="text-sm text-gray-500">
-                              TC: {a.tcno}
-                            </p>
-                          )}
-
-                          {a.phone && (
-                            <p className="text-gray-600">{a.phone}</p>
-                          )}
-
-                          <p className="text-gray-600">{a.country}</p>
-                        </div>
-
-                        {/* Sağ Butonlar */}
-                        <div className="flex flex-col gap-2">
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleDuzenle(a)}
-                            className="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100"
-                          >
-                            <Edit className="w-5 h-5" />
-                          </Button>
-
-                          <Button
-                            onClick={() => handleSil(a.id)}
-                            className="w-10 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm text-center">
-                  <p className="text-gray-700 text-lg">
-                    Henüz bir adres eklemediniz.
-                  </p>
-                  <p className="text-gray-500 mt-1">
-                    Yeni adres ekleyerek başlayabilirsiniz.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+          {loading && <LoadingSkeleton />}
         </div>
-      </div>
+      </main>
+    </div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="py-20 text-center border-t border-zinc-100">
+      <p className="text-xs tracking-widest text-zinc-400 uppercase mb-4 italic">
+        Kayıtlı adres bulunamadı
+      </p>
+    </div>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-12">
+      {[1, 2].map((i) => (
+        <div key={i} className="border-b border-zinc-100 pb-10">
+          <Skeleton className="h-4 w-32 mb-4 bg-zinc-50" />
+          <Skeleton className="h-20 w-full bg-zinc-50" />
+        </div>
+      ))}
     </div>
   );
 }

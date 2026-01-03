@@ -112,7 +112,7 @@ export default function Products() {
       </div>
 
       {/* Subtle Background Accent */}
-      <div className="absolute top-0 right-0 w-[40%] h-[100%] bg-background -z-10" />
+      <div className="absolute top-0 right-0 w-[40%]   h-[100%] bg-background -z-10" />
     </div>
   );
 }

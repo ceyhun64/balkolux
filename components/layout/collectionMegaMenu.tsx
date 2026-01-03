@@ -2,12 +2,10 @@
 
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, X, PhoneOutgoing, Sparkles } from "lucide-react";
+import { X, ArrowRight } from "lucide-react";
 import Image from "next/image";
 
-// --- TYPES ---
 interface CollectionMegaMenuProps {
   collectionOpen: boolean;
   setCollectionOpen: (isOpen: boolean) => void;
@@ -17,27 +15,36 @@ interface CollectionMegaMenuProps {
 }
 
 const QUICK_LINKS = [
-  { label: "Hakkımızda", href: "/about" },
-  { label: "Mağazalarımız", href: "/stores" },
+  { label: "Hikayemiz", href: "/about" },
+  { label: "Katalog", href: "/catalog" },
   { label: "Blog", href: "/blog" },
   { label: "İletişim", href: "/contact" },
 ];
 
-// --- Sub-Component: Minimal Category Link ---
-function CategoryLink({ item, closeMenu }: { item: { label: string; href: string }; closeMenu: () => void }) {
-  return (
-    <Link
-      href={item.href}
-      onClick={closeMenu}
-      className="group flex items-center justify-between py-3 border-b border-black/5 hover:border-black/20 transition-all"
-    >
-      <span className="text-[15px] font-light tracking-wide text-black/70 group-hover:text-black group-hover:pl-2 transition-all duration-300 uppercase">
-        {item.label}
-      </span>
-      <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-black" />
-    </Link>
-  );
-}
+// Animasyon varyantları
+const containerVariants = {
+  hidden: { opacity: 0, y: "-100%" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.05,
+      delayChildren: 0.2,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: "-100%",
+    transition: { duration: 0.5, ease: [0.7, 0, 0.84, 0] },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
 export default function CollectionMegaMenu({
   collectionOpen,
@@ -49,8 +56,9 @@ export default function CollectionMegaMenu({
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        const isButton = (e.target as HTMLElement).closest('button');
-        if (!isButton) setCollectionOpen(false);
+        if (!(e.target as HTMLElement).closest("button")) {
+          setCollectionOpen(false);
+        }
       }
     };
     if (collectionOpen) document.addEventListener("mousedown", handleClick);
@@ -58,96 +66,153 @@ export default function CollectionMegaMenu({
   }, [collectionOpen, setCollectionOpen]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {collectionOpen && (
         <>
-          {/* Backdrop: Daha şeffaf ve kaliteli blur */}
+          {/* Backdrop: Daha sofistike bir blur efekti */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/10 backdrop-blur-[4px] z-40"
+            className="fixed inset-0 bg-black/5 backdrop-blur-[8px] z-[55]"
             onClick={() => setCollectionOpen(false)}
           />
 
           <motion.div
             ref={ref}
-            initial={{ y: "-100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "-100%" }}
-            transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-            className="fixed top-0 left-0 right-0 bg-white z-50 pt-[100px] pb-12 shadow-2xl"
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed top-0 left-0 right-0 bg-white z-[60] border-b border-zinc-100 shadow-2xl"
           >
-            <div className="max-w-[1440px] mx-auto px-10">
-              
-              <div className="grid grid-cols-12 gap-12">
-                
-                {/* 1. Sol Panel: Başlık ve Hızlı Linkler */}
-                <div className="col-span-3 border-r border-black/5 pr-12">
-                  <div className="flex items-center gap-2 mb-8">
-                    <Sparkles className="w-4 h-4 text-black/40" />
-                    <span className="text-[10px] tracking-[0.4em] font-medium text-black/40 uppercase">Keşfet</span>
+            <div className="max-w-[1600px] mx-auto pt-28 pb-24 px-8 md:px-16 lg:px-24">
+              <div className="grid grid-cols-12 gap-12 lg:gap-24">
+                {/* 1. Bölüm: Yan Navigasyon */}
+                <motion.div
+                  variants={itemVariants}
+                  className="col-span-12 md:col-span-3 flex flex-col justify-between border-r border-zinc-100 pr-12"
+                >
+                  <div>
+                    <h4 className="text-[10px] tracking-[0.4em] text-zinc-400 uppercase font-semibold mb-10">
+                      KEŞFET
+                    </h4>
+                    <nav className="flex flex-col space-y-5">
+                      {QUICK_LINKS.map((link) => (
+                        <Link
+                          key={link.label}
+                          href={link.href}
+                          onClick={() => setCollectionOpen(false)}
+                          className="group flex items-center text-sm text-zinc-600 hover:text-black transition-all duration-300 tracking-tight"
+                        >
+                          <span className="w-0 group-hover:w-4 h-[1px] bg-black mr-0 group-hover:mr-3 transition-all duration-300" />
+                          {link.label}
+                        </Link>
+                      ))}
+                    </nav>
                   </div>
-                  <h2 className="text-3xl font-light tracking-tight mb-10 leading-tight">
-                    BalkoLüx <br /> Menü
-                  </h2>
-                  
-                  <nav className="flex flex-col gap-4">
-                    {QUICK_LINKS.map((link) => (
-                      <Link 
-                        key={link.label} 
-                        href={link.href} 
-                        onClick={() => setCollectionOpen(false)}
-                        className="text-xs tracking-[0.2em] text-black/50 hover:text-black transition-colors uppercase"
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                  </nav>
-                </div>
-
-                {/* 2. Orta Panel: Kategoriler (Grid) */}
-                <div className="col-span-6">
-                  <div className="grid grid-cols-2 gap-x-12 gap-y-2">
-                    {collectionLink.subItems?.map((item, idx) => (
-                      <CategoryLink key={idx} item={item} closeMenu={() => setCollectionOpen(false)} />
-                    ))}
+                  <div className="mt-12">
+                    <p className="text-[11px] text-zinc-400 font-light tracking-widest">
+                      EST. 2026 — BALKOLÜX
+                    </p>
                   </div>
-                </div>
+                </motion.div>
 
-                {/* 3. Sağ Panel: Öne Çıkan Görsel / CTA */}
-                <div className="col-span-3">
-                  <Link 
-                    href="/contact" 
-                    onClick={() => setCollectionOpen(false)}
-                    className="group relative block aspect-[4/5] overflow-hidden rounded-sm bg-gray-100"
+                {/* 2. Bölüm: Ana Koleksiyonlar (Merkez Odak) */}
+                <div className="col-span-12 md:col-span-6">
+                  <motion.h4
+                    variants={itemVariants}
+                    className="text-[10px] tracking-[0.4em] text-zinc-400 uppercase font-semibold mb-10 text-center md:text-left"
                   >
-                    <Image 
-                      src="/categories/default.webp" // Buraya şık bir yaşam alanı görseli koymalısın
-                      alt="İletişim"
+                    KOLEKSİYONLARIMIZ
+                  </motion.h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+                    {collectionLink.subItems?.map((item, idx) => (
+                      <motion.div key={idx} variants={itemVariants}>
+                        <Link
+                          href={item.href}
+                          onClick={() => setCollectionOpen(false)}
+                          className="group relative flex items-center justify-between py-6 border-b border-zinc-50 overflow-hidden"
+                        >
+                          <span className="text-3xl font-light text-zinc-700 hover:text-zinc-700/50 transition-all duration-700 ease-in-out italic">
+                            {item.label}
+                          </span>
+                          <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 text-black stroke-[1px]" />
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Bölüm: Editorial CTA */}
+                <motion.div
+                  variants={itemVariants}
+                  className="col-span-12 md:col-span-3"
+                >
+                  <Link
+                    href="/products"
+                    onClick={() => setCollectionOpen(false)}
+                    className="group relative block w-full aspect-[4/5] overflow-hidden bg-zinc-900"
+                  >
+                    {/* Görsel */}
+                    <Image
+                      src="/megaMenu/megaMenu.webp"
+                      alt="Yeni Koleksiyon"
                       fill
-                      className="object-cover brightness-90 group-hover:scale-105 transition-transform duration-700"
+                      className="object-cover scale-105
+                 transition-all duration-[2000ms] ease-out
+                 group-hover:scale-110 group-hover:opacity-30"
                     />
-                    <div className="absolute inset-0 bg-black/20 flex flex-col justify-end p-6">
-                      <p className="text-white text-xs tracking-widest uppercase mb-2">Özel Projeler</p>
-                      <h4 className="text-white text-xl font-light mb-4 text-balance">Ücretsiz Ölçü ve Tasarım Desteği</h4>
-                      <div className="flex items-center gap-2 text-white">
-                        <span className="text-[10px] font-bold tracking-widest border-b border-white pb-1">BİZE ULAŞIN</span>
-                      </div>
+
+                    {/* Okunabilirlik için gradient overlay */}
+                    <div
+                      className="absolute inset-0
+                 bg-gradient-to-t
+                 from-black/70 via-black/30 to-transparent
+                 transition-opacity duration-700"
+                    />
+
+                    {/* İçerik */}
+                    <div className="absolute bottom-10 left-0 right-0 z-10 flex flex-col items-center text-center px-6">
+                      <span
+                        className="text-[10px] tracking-[0.35em] uppercase font-medium
+                       text-zinc-300 mb-3"
+                      >
+                        Öne Çıkanlar
+                      </span>
+
+                      <h3
+                        className="text-xl font-serif font-light tracking-tight
+                     text-white mb-5 leading-snug"
+                      >
+                        Zamansız Tasarımlar
+                      </h3>
+
+                      <span
+                        className="text-[11px] tracking-[0.25em] uppercase font-medium
+                   text-white border-b border-white/40 pb-1
+                   opacity-0 translate-y-2
+                   group-hover:opacity-100 group-hover:translate-y-0
+                   transition-all duration-700"
+                      >
+                        Şimdi İncele
+                      </span>
                     </div>
                   </Link>
-                </div>
-
+                </motion.div>
               </div>
 
-              {/* Kapatma Butonu: Sağ Alt Köşede Minimal */}
+              {/* Minimal Kapatma Butonu */}
               <button
                 onClick={() => setCollectionOpen(false)}
-                className="absolute top-8 right-10 p-2 hover:rotate-90 transition-all duration-300 opacity-40 hover:opacity-100"
+                className="absolute top-12 right-12 flex items-center gap-3 group"
               >
-                <X className="w-6 h-6 stroke-[1px]" />
+                <span className="text-[10px] tracking-widest text-zinc-600 group-hover:text-zinc-600/50 transition-colors duration-300 uppercase">
+                  Kapat
+                </span>
+                <div className="relative flex items-center justify-center w-10 h-10 border border-zinc-100 rounded-full group-hover:border-black transition-colors duration-500">
+                  <X className="w-4 h-4 text-zinc-600 group-hover:text-zinc-600/50transition-colors duration-300 stroke-[1.5px]" />
+                </div>
               </button>
-
             </div>
           </motion.div>
         </>

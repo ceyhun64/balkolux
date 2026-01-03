@@ -5,163 +5,176 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { Eye, EyeOff, Loader2, ArrowRight } from "lucide-react";
 import { signIn } from "next-auth/react";
-import { Eye, EyeOff, Loader2, Minus } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 
-export default function LoginForm({
-  onLoginSuccess,
-}: {
-  onLoginSuccess?: (u: any) => void;
-}) {
+export default function LoginForm() {
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
       const result = await signIn("credentials", {
         redirect: false,
         email,
         password,
       });
+
       if (result?.error) {
-        toast.error("Giriş Başarısız", {
-          description: "Girdiğiniz bilgiler kayıtlarımızla eşleşmiyor.",
-        });
-        setIsLoading(false);
+        toast.error("E-posta veya şifre hatalı");
         return;
       }
-      if (result?.ok) {
-        toast.success("Erişim Onaylandı", {
-          description: "Yönlendiriliyorsunuz...",
-        });
-        router.push("/");
-      }
-    } catch (error) {
+
+      toast.success("Giriş başarılı");
+      router.push("/");
+    } catch (err) {
+      toast.error("Giriş sırasında bir hata oluştu");
+    } finally {
       setIsLoading(false);
-      toast.error("Bir hata oluştu.");
     }
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-background px-4 py-10 my-20">
-      <div className="w-full max-w-5xl flex flex-col md:flex-row bg-white shadow-[0_40px_100px_-20px_rgba(0,0,0,0.2)] overflow-hidden">
-        {/* Sol Taraf: Editoryal Bölüm */}
-        <div className="w-full md:w-[40%] bg-zinc-900 p-12 flex flex-col justify-between relative text-white">
-          <div className="space-y-8">
-            <div className="w-12 h-[1px] bg-zinc-500" />
-            <div>
-              <h1 className="text-5xl md:text-6xl font-serif leading-[0.9] tracking-tighter">
-                Kişisel <br />
-                <span className="italic text-zinc-500 font-light text-4xl md:text-5xl">
-                  Arşiviniz
-                </span>
-              </h1>
-              <p className="mt-6 text-zinc-400 text-[10px] tracking-[0.25em] leading-relaxed max-w-[220px] uppercase font-medium">
-                Özel kürasyonlara erişim için kimliğinizi doğrulayın.
-              </p>
-            </div>
+    <div className="min-h-screen w-full bg-[#fcfcfc] flex items-center justify-center p-4 md:p-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-[1200px] grid grid-cols-1 lg:grid-cols-12 bg-white shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)] border border-stone-100 overflow-hidden"
+      >
+        {/* SOL: MARKA / EDITORYAL */}
+        <div className="lg:col-span-5 bg-stone-950 p-12 lg:p-16 flex flex-col justify-between text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-stone-900 rounded-full blur-[100px] -mr-32 -mt-32 opacity-50" />
+
+          <div className="relative z-10">
+            <div className="h-[1px] w-12 bg-stone-500 mb-12" />
+
+            <h1 className="text-5xl lg:text-7xl font-serif leading-[0.85] tracking-tighter mb-8">
+              BalkoLüx
+            </h1>
+
+            <p className="text-[10px] tracking-[0.3em] uppercase text-stone-500 font-bold mb-4">
+              Member Access
+            </p>
+
+            <p className="text-sm text-stone-400 font-light leading-relaxed max-w-[260px]">
+              Kişisel arşivinize, favorilerinize ve özel koleksiyonlara erişin.
+            </p>
           </div>
 
-          <div className="mt-20 md:mt-0 space-y-6">
-            <p className="text-[10px] text-zinc-500 tracking-widest uppercase font-bold">
-              Yeni Misiniz?
+          <div className="relative z-10 pt-12 lg:pt-0">
+            <p className="text-[10px] tracking-[0.2em] uppercase text-stone-500 mb-4 font-medium">
+              Henüz hesabınız yok mu?
             </p>
             <Link
               href="/register"
-              className="group flex items-center gap-4 text-zinc-100 text-xs tracking-[0.3em] hover:text-zinc-400 transition-all uppercase"
+              className="group inline-flex items-center gap-6 text-stone-100 hover:text-white transition-all underline-offset-[12px] hover:underline"
             >
-              HESAP OLUŞTUR
-              <div className="w-12 h-[1px] bg-zinc-700 group-hover:w-20 group-hover:bg-zinc-400 transition-all duration-500" />
+              <span className="text-[11px] tracking-[0.4em] uppercase font-bold">
+                Hesap Oluştur
+              </span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-500 text-stone-500" />
             </Link>
           </div>
         </div>
 
-        {/* Sağ Taraf: Minimalist Form */}
-        <div className="w-full md:w-[60%] p-10 md:p-20 bg-white">
-          <form onSubmit={handleLogin} className="space-y-12">
-            {/* E-posta Grubu */}
-            <div className="relative group">
-              <Label
-                htmlFor="email"
-                className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 group-focus-within:text-zinc-900 transition-colors duration-300"
-              >
-                E-posta Adresi
-              </Label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-transparent border-0 border-b border-zinc-200 rounded-none px-0 py-6 text-zinc-900 text-lg shadow-none focus-visible:ring-0 focus-visible:border-zinc-900 transition-all placeholder:text-zinc-300"
-                id="email"
-                placeholder="ornek@balkolux.com"
-                required
-              />
-            </div>
+        {/* SAĞ: LOGIN FORM */}
+        <div className="lg:col-span-7 p-8 md:p-16 lg:p-24 bg-white flex flex-col justify-center">
+          <div className="max-w-md mx-auto w-full">
+            <header className="mb-12">
+              <h2 className="text-[10px] tracking-[0.5em] uppercase text-stone-400 font-bold mb-3">
+                Giriş Yap
+              </h2>
+              <p className="text-3xl font-serif text-stone-900 leading-tight">
+                Kişisel <span className="italic">Arşivinize</span> Erişin
+              </p>
+            </header>
 
-            {/* Şifre Grubu */}
-            <div className="relative group">
-              <div className="flex justify-between items-center">
-                <Label
-                  htmlFor="password"
-                  className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 group-focus-within:text-zinc-900 transition-colors duration-300"
-                >
+            <form onSubmit={handleLogin} className="space-y-12">
+              {/* EMAIL */}
+              <div className="space-y-2">
+                <Label className="block text-[10px] uppercase tracking-[0.25em] text-stone-400">
+                  E-Posta
+                </Label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full bg-transparent border-0 border-b border-stone-200 rounded-none px-3 py-2 text-sm text-stone-900 focus-visible:ring-0 focus-visible:border-stone-900 transition-colors"
+                />
+              </div>
+
+              {/* PASSWORD */}
+              <div className="space-y-2 relative">
+                <Label className="block text-[10px] uppercase tracking-[0.25em] text-stone-400">
                   Şifre
                 </Label>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full bg-transparent border-0 border-b border-stone-200 rounded-none px-3 py-2 pr-10 text-sm text-stone-900 focus-visible:ring-0 focus-visible:border-stone-900 transition-colors"
+                />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-zinc-400 hover:text-zinc-900 transition-colors"
+                  className="absolute right-3 top-[34px] text-stone-900/50 hover:text-stone-900 transition-colors"
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? (
+                    <EyeOff size={14} strokeWidth={1.5} />
+                  ) : (
+                    <Eye size={14} strokeWidth={1.5} />
+                  )}
                 </button>
               </div>
-              <Input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent border-0 border-b border-zinc-200 rounded-none px-0 py-6 text-zinc-900 text-lg shadow-none focus-visible:ring-0 focus-visible:border-zinc-900 transition-all"
-                id="password"
-                required
-              />
-            </div>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-6">
-              <Link
-                href="/forgot-password"
-                className="text-[10px] text-zinc-400 hover:text-zinc-900 transition-colors uppercase tracking-[0.2em] font-medium"
-              >
-                Şifremi Hatırlat
-              </Link>
-
+              {/* BUTTON */}
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="relative overflow-hidden bg-zinc-900 text-white hover:bg-black px-12 h-16 rounded-none transition-all duration-300 group shadow-lg"
+                className="w-full h-16 bg-stone-950 text-white hover:bg-black rounded-none transition-all duration-500 group relative overflow-hidden"
               >
-                <span className="relative z-10 flex items-center gap-4 text-[10px] uppercase tracking-[0.4em] font-bold">
+                <div className="relative z-10 flex items-center justify-center gap-4">
                   {isLoading ? (
                     <Loader2 className="animate-spin" size={18} />
                   ) : (
-                    "Giriş Yap"
+                    <>
+                      <span className="text-[11px] uppercase tracking-[0.4em] font-bold">
+                        Giriş Yap
+                      </span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    </>
                   )}
-                </span>
+                </div>
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
               </Button>
-            </div>
-          </form>
+            </form>
 
-          {/* Alt Bilgi */}
-          <div className="mt-24 flex justify-between items-center text-[9px] text-zinc-400 tracking-[0.3em] uppercase border-t border-zinc-100 pt-8">
-            <span className="font-semibold text-zinc-900">© 2026 BalkoLüx</span>
-            <span className="italic">Küratörlük & Arşiv</span>
+            <footer className="mt-16 pt-8 border-t border-stone-50 flex justify-between items-center">
+              <span className="text-[9px] uppercase tracking-widest font-bold text-stone-900">
+                © 2026 BalkoLüx
+              </span>
+              <Link
+                href="/forgot-password"
+                className="text-[9px] uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors"
+              >
+                Şifremi Unuttum
+              </Link>
+            </footer>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

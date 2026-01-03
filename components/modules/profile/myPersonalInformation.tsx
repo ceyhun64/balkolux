@@ -7,9 +7,6 @@ import { Button } from "@/components/ui/button";
 import Sidebar from "./sideBar";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { User, Mail, Save } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface UserData {
@@ -24,30 +21,25 @@ interface FormData {
   lastName: string;
   phone: string;
   email: string;
-  countryCode?: string;
 }
 
 export default function KisiselBilgilerim() {
-  const isMobile = useIsMobile();
   const [user, setUser] = useState<UserData | null>(null);
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
-    countryCode: "90",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // --- Kullanıcı verisini API'den çek ---
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await fetch("/api/user", { method: "GET" });
-        if (!res.ok) throw new Error("Kullanıcı bilgileri alınamadı");
+        if (!res.ok) throw new Error("Hata");
         const data = await res.json();
-
         const userData = data.user;
         setUser(userData);
         setFormData({
@@ -55,24 +47,19 @@ export default function KisiselBilgilerim() {
           lastName: userData.surname || "",
           phone: userData.phone?.replace("+90", "") || "",
           email: userData.email || "",
-          countryCode: "90",
         });
-      } catch (error) {
-        console.error(error);
-        toast.error("Kullanıcı bilgileri yüklenemedi.");
+      } catch {
+        toast.error("Bilgiler yüklenemedi.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchUser();
   }, []);
 
-  // --- Bilgileri Güncelle ---
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-
     try {
       const res = await fetch("/api/user", {
         method: "PATCH",
@@ -80,131 +67,66 @@ export default function KisiselBilgilerim() {
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
-          phone: formData.phone
-            ? `+${formData.countryCode}${formData.phone}`
-            : null,
+          phone: formData.phone ? `+90${formData.phone}` : null,
         }),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Güncelleme başarısız oldu");
-        return;
-      }
-
-      toast.success("Bilgiler başarıyla güncellendi!");
-      setUser(data.user);
-    } catch (error) {
-      console.error(error);
-      toast.error("Bir hata oluştu. Lütfen tekrar deneyin.");
+      if (!res.ok) throw new Error();
+      toast.success("Değişiklikler kaydedildi.");
+    } catch {
+      toast.error("Güncellenemedi.");
     } finally {
       setSaving(false);
     }
   };
 
-  // --- Skeleton Ekranı ---
-  if (loading)
-    return (
-      <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-        <Sidebar />
-        <div className="flex flex-1 justify-center items-start px-3 py-16 md:px-8 md:pt-16">
-          <div className="w-full max-w-2xl space-y-6">
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-56" />
-              <Skeleton className="h-4 w-80" />
-            </div>
-            <Card className="shadow-xl border border-gray-200 rounded-xs overflow-hidden bg-white">
-              <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="space-y-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-10 w-full rounded-xs" />
-                  </div>
-                ))}
-                <div className="md:col-span-2 mt-6">
-                  <Skeleton className="h-10 w-48 rounded-xs" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
+  if (loading) return <PersonalLoadingSkeleton />;
 
-  if (!user)
-    return (
-      <div className="flex items-center justify-center min-h-screen text-red-600">
-        Yetkisiz Erişim
-      </div>
-    );
-
-  // --- Normal İçerik ---
   return (
-    <div className="flex flex-col md:flex-row min-h-screen ">
-      <Sidebar />
+    <div className="min-h-screen bg-white">
+      <div className="flex flex-col md:flex-row max-w-[1600px] mx-auto">
+        <Sidebar />
 
-      <div className="flex flex-1 justify-center items-start px-4 py-14 md:px-10 md:pt-20 bg-gradient-to-b from-white via-amber-950/10 to-white">
-        <div className="w-full max-w-3xl space-y-10">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center md:text-left space-y-2"
-          >
-            <h2 className="text-4xl font-extrabold tracking-tight text-gray-900">
-              Kişisel Bilgilerim
-            </h2>
-            <p className="text-gray-600 text-lg">
-              Profil bilgilerinizi buradan güncelleyebilirsiniz
-            </p>
-          </motion.div>
+        <main className="flex-1 px-6 py-16 md:px-16 md:py-24">
+          <div className="max-w-2xl">
+            {/* Minimal Header */}
+            <header className="mb-16 space-y-3">
+              <span className="text-[10px] tracking-[0.4em] text-zinc-400 uppercase font-light">
+                Hesap Ayarları
+              </span>
+              <h1 className="text-4xl font-extralight tracking-tight text-zinc-900">
+                Kişisel Bilgiler
+              </h1>
+            </header>
 
-          {/* Modern Card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="backdrop-blur-xl bg-white/60 shadow-2xl border border-white/40 rounded-xs"
-          >
-            <CardContent className="p-10">
-              <form
-                className="grid grid-cols-1 md:grid-cols-2 gap-8 font-sans"
-                onSubmit={handleSave}
-              >
+            <form onSubmit={handleSave} className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
                 {/* Ad */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label
                     htmlFor="firstName"
-                    className="text-gray-700 font-medium"
+                    className="text-[11px] uppercase tracking-widest text-zinc-500 font-light"
                   >
-                    <span className="text-red-500">*</span> Ad
+                    Ad
                   </Label>
-                  <div className="relative group">
-                    <User
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-500"
-                      size={20}
-                    />
-                    <Input
-                      id="firstName"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
-                      }
-                      className="pl-12 py-3 rounded-xl border-gray-300 group-hover:border-rose-300 focus:ring-2 focus:ring-rose-300"
-                      required
-                    />
-                  </div>
+                  <Input
+                    id="firstName"
+                    value={formData.firstName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
+                    className="border-0 border-b border-zinc-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-zinc-900 transition-colors bg-transparent placeholder:text-zinc-300 h-10"
+                    placeholder="Adınız"
+                    required
+                  />
                 </div>
 
                 {/* Soyad */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label
                     htmlFor="lastName"
-                    className="text-gray-700 font-medium"
+                    className="text-[11px] uppercase tracking-widest text-zinc-500 font-light"
                   >
-                    <span className="text-red-500">*</span> Soyad
+                    Soyad
                   </Label>
                   <Input
                     id="lastName"
@@ -212,80 +134,83 @@ export default function KisiselBilgilerim() {
                     onChange={(e) =>
                       setFormData({ ...formData, lastName: e.target.value })
                     }
-                    className="py-3 rounded-xl border-gray-300 hover:border-rose-300 focus:ring-2 focus:ring-rose-300"
+                    className="border-0 border-b border-zinc-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-zinc-900 transition-colors bg-transparent placeholder:text-zinc-300 h-10"
+                    placeholder="Soyadınız"
                     required
                   />
                 </div>
 
+                {/* E-posta (Disabled) */}
+                <div className="space-y-3">
+                  <Label
+                    htmlFor="email"
+                    className="text-[11px] uppercase tracking-widest text-zinc-500 font-light opacity-50"
+                  >
+                    E-Posta Adresi
+                  </Label>
+                  <Input
+                    id="email"
+                    value={formData.email}
+                    disabled
+                    className="border-0 border-b border-zinc-100 rounded-none px-0 bg-transparent text-zinc-400 cursor-not-allowed h-10"
+                  />
+                </div>
+
                 {/* Telefon */}
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-gray-700 font-medium">
+                <div className="space-y-3">
+                  <Label
+                    htmlFor="phone"
+                    className="text-[11px] uppercase tracking-widest text-zinc-500 font-light"
+                  >
                     Telefon
                   </Label>
-                  <div className="flex rounded-xl border border-gray-300 bg-white overflow-hidden hover:border-rose-300 transition">
-                    <div className="flex items-center justify-center px-4 text-sm text-gray-600 bg-gray-100 border-r">
-                      +{formData.countryCode}
-                    </div>
+                  <div className="relative">
+                    <span className="absolute left-0 top-2 text-sm text-zinc-400 font-light">
+                      +90
+                    </span>
                     <Input
                       id="phone"
-                      type="tel"
-                      placeholder="5xx xxx xx xx"
-                      className="flex-1 border-none focus:ring-0 px-4"
                       value={formData.phone}
                       onChange={(e) =>
                         setFormData({ ...formData, phone: e.target.value })
                       }
+                      className="border-0 border-b border-zinc-200 rounded-none pl-10 pr-0 focus-visible:ring-0 focus-visible:border-zinc-900 transition-colors bg-transparent h-10"
+                      placeholder="5xx xxx xx xx"
                     />
                   </div>
                 </div>
+              </div>
 
-                {/* E-posta */}
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700 font-medium">
-                    <span className="text-red-500">*</span> E-posta
-                  </Label>
-                  <div className="relative">
-                    <Mail
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-500"
-                      size={20}
-                    />
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      disabled
-                      className="bg-gray-100 text-gray-500 cursor-not-allowed pl-12 py-3 rounded-xl"
-                    />
-                  </div>
-                </div>
+              <div className="pt-8">
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  className="bg-zinc-950 hover:bg-zinc-800 text-white rounded-none px-12 py-6 text-[10px] tracking-[0.2em] uppercase transition-all duration-500 disabled:opacity-50"
+                >
+                  {saving ? "GÜNCELLENİYOR..." : "DEĞİŞİKLİKLERİ KAYDET"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
 
-                {/* Kaydet Butonu */}
-                <div className="md:col-span-2 flex justify-start mt-4">
-                  <Button
-                    type="submit"
-                    className="flex items-center gap-3 px-8 py-3 text-lg rounded-full shadow-lg bg-gradient-to-br from-[#7B0323] to-[#B3133C] hover:opacity-90 transition"
-                    disabled={saving}
-                  >
-                    {saving ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 1,
-                          ease: "linear",
-                        }}
-                      >
-                        <Save size={18} className="text-white" />
-                      </motion.div>
-                    ) : (
-                      <Save size={18} className="text-white" />
-                    )}
-                    {saving ? "Kaydediliyor..." : "Kaydet"}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </motion.div>
+function PersonalLoadingSkeleton() {
+  return (
+    <div className="flex max-w-[1600px] mx-auto min-h-screen">
+      <Skeleton className="w-64 md:w-72 h-screen rounded-none bg-zinc-50" />
+      <div className="flex-1 px-16 py-24 space-y-12">
+        <Skeleton className="h-12 w-64 bg-zinc-50" />
+        <div className="grid grid-cols-2 gap-12">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="space-y-4">
+              <Skeleton className="h-3 w-20 bg-zinc-50" />
+              <Skeleton className="h-10 w-full bg-zinc-50" />
+            </div>
+          ))}
         </div>
       </div>
     </div>

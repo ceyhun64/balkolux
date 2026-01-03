@@ -1,167 +1,209 @@
 "use client";
 
 import Link from "next/link";
-import { LogIn, UserPlus, User, MapPin, Package, X } from "lucide-react";
+import {
+  LogIn,
+  UserPlus,
+  User,
+  MapPin,
+  Package,
+  X,
+  ChevronRight,
+  LogOut,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface UserMegaMenuProps {
   user: { name?: string; email?: string } | null;
+  setUser: (user: { name?: string; email?: string } | null) => void;
   userMenuOpen: boolean;
   setUserMenuOpen: (open: boolean) => void;
-  scrolled: boolean;
   pathname: string;
 }
 
 export default function UserMegaMenu({
   user,
+  setUser,
   userMenuOpen,
   setUserMenuOpen,
-  scrolled,
-  pathname,
 }: UserMegaMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  /** ESC ve dışarı tıklama kapatma */
+  // ESC ve dışarı tıklama kapatma
   useEffect(() => {
     if (!userMenuOpen) return;
-
-    const handleClick = (e: MouseEvent) => {
-      const isUserButton = (e.target as HTMLElement).closest(
-        '[data-id="user-button"]'
-      );
-      if (
-        !isUserButton &&
-        menuRef.current &&
-        !menuRef.current.contains(e.target as Node)
-      ) {
-        setUserMenuOpen(false);
-      }
-    };
-
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setUserMenuOpen(false);
     };
-
-    document.addEventListener("mousedown", handleClick);
     document.addEventListener("keydown", handleEsc);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("keydown", handleEsc);
-    };
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [userMenuOpen, setUserMenuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUser(null);
+      toast.error("Çıkış yaptınız."); // 🔹 Toast ekledik
+      router.push("/");
+    } catch (err) {
+      console.error("Çıkış yapılamadı", err);
+      toast.error("Çıkış sırasında bir hata oluştu."); // 🔹 Hata toast
+    }
+  };
 
   const mainItems = user
     ? [
-        { label: "Profilim", href: "/profile", icon: User },
-        { label: "Siparişlerim", href: "/profile/orders", icon: Package },
-        { label: "Adreslerim", href: "/profile/addresses", icon: MapPin },
+        { label: "Profil Bilgilerim", href: "/profile", icon: User },
+        { label: "Sipariş Geçmişi", href: "/profile/orders", icon: Package },
+        { label: "Adres Defteri", href: "/profile/addresses", icon: MapPin },
       ]
     : [];
 
-  const isHomePage = pathname === "/";
-
-  const topbarOffset = isHomePage
-    ? scrolled
-      ? "top-[70px] md:top-[85px]"
-      : "top-[135px] md:top-[160px]" // TopBar Var (Ana Sayfa)
-    : scrolled
-    ? "top-[70px] md:top-[85px]"
-    : "top-[82px] md:top-[98px]"; // TopBar Yok (Diğer Sayfalar)
   return (
     <AnimatePresence>
       {userMenuOpen && (
-        <motion.div
-          ref={menuRef}
-          initial={{ opacity: 0, y: 10, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 10, scale: 0.98 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className={`fixed  md:right-20 z-40 w-full  md:w-100 
-          backdrop-blur-xl bg-white/90 border border-gray-200 shadow-xl rounded-xs p-6
-           ${topbarOffset}`}
-        >
-          {/* Header */}
-          <div className="flex justify-between items-center pb-3 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {user ? "Hesabım" : "Hoş Geldiniz"}
-            </h3>
+        <>
+          {/* Backdrop: Hafif ve Modern */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setUserMenuOpen(false)}
+            className="fixed inset-0 bg-black/10 backdrop-blur-sm z-[100]"
+          />
 
-            <button
-              onClick={() => setUserMenuOpen(false)}
-              className="p-2 rounded-full hover:bg-gray-100 transition"
-            >
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
+          {/* Sheet (Sağ Panel) */}
+          <motion.div
+            ref={menuRef}
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed top-0 right-0 h-full w-full max-w-[400px] bg-white z-[101] shadow-2xl flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center px-8 py-10">
+              <span className="text-[10px] tracking-[0.4em] text-zinc-400 uppercase font-bold">
+                {user ? "Hesabınız" : "Giriş Paneli"}
+              </span>
+              <button
+                onClick={() => setUserMenuOpen(false)}
+                className="group p-2 -mr-2 outline-none"
+              >
+                <X className="w-5 h-5 text-zinc-400 group-hover:text-black transition-colors duration-300 stroke-[1.5px]" />
+              </button>
+            </div>
 
-          {/* --- Authenticated User --- */}
-          {user ? (
-            <div className="mt-4 flex flex-col gap-4">
-              {/* User Card */}
-              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                <div className="p-3 bg-[#7B0323]/10 rounded-full">
-                  <User className="w-6 h-6 text-[#7B0323]" />
-                </div>
-
-                <div>
-                  <p className="font-semibold text-gray-900">
-                    {user.name || "Misafir Kullanıcı"}
-                  </p>
-                  {user.email && (
-                    <p className="text-sm text-gray-600">{user.email}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Menu Items */}
-              <div className="flex flex-col gap-1">
-                {mainItems.map((item, i) => (
-                  <Link
-                    key={i}
-                    href={item.href}
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
+            <div className="flex-1 px-8 overflow-y-auto">
+              {user ? (
+                /* --- Authenticated User --- */
+                <div className="space-y-12">
+                  {/* User Info */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="flex flex-col gap-1"
                   >
-                    <item.icon className="w-5 h-5 text-gray-700" />
-                    <span className="text-gray-800 font-medium">
-                      {item.label}
+                    <h2 className="text-3xl font-light text-zinc-900 italic font-serif leading-tight">
+                      {user.name || "Kullanıcı"}
+                    </h2>
+                    <p className="text-xs text-zinc-400 tracking-wider font-light">
+                      {user.email}
+                    </p>
+                  </motion.div>
+
+                  {/* Menu Links */}
+                  <nav className="space-y-1">
+                    {mainItems.map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + i * 0.1 }}
+                      >
+                        <Link
+                          href={item.href}
+                          onClick={() => setUserMenuOpen(false)}
+                          className="group flex items-center justify-between py-5 border-b border-zinc-50"
+                        >
+                          <div className="flex items-center gap-4">
+                            <item.icon className="w-4 h-4 text-zinc-400 group-hover:text-black transition-colors" />
+                            <span className="text-sm text-zinc-600 group-hover:text-black transition-colors tracking-tight">
+                              {item.label}
+                            </span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-zinc-300 group-hover:translate-x-1 transition-all" />
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </nav>
+
+                  <button
+                    className="flex items-center gap-3 text-xs text-zinc-400 hover:text-red-800 transition-colors pt-4 group"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="group-hover:tracking-widest transition-all">
+                      Güvenli Çıkış Yap
                     </span>
-                  </Link>
-                ))}
-              </div>
+                  </button>
+                </div>
+              ) : (
+                /* --- Guest --- */
+                <div className="space-y-10">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <p className="text-xl font-light text-zinc-800 leading-relaxed font-serif italic">
+                      Kişiselleştirilmiş bir deneyim için oturum açın veya
+                      aramıza katılın.
+                    </p>
+                  </motion.div>
+
+                  <div className="flex flex-col gap-4 pt-6">
+                    <Link
+                      href="/login"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="w-full flex items-center justify-center py-4 bg-black text-white text-xs tracking-[0.2em] uppercase hover:bg-zinc-800 transition-all duration-500"
+                    >
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Giriş Yap
+                    </Link>
+
+                    <Link
+                      href="/register"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="w-full flex items-center justify-center py-4 border border-zinc-200 text-black text-xs tracking-[0.2em] uppercase hover:border-black transition-all duration-500"
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Hesap Oluştur
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
-          ) : (
-            /* --- Guest --- */
-            <div className="flex flex-col gap-4 mt-4">
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Üyelik oluşturarak avantajlardan yararlanın veya giriş yaparak
-                işlemlerinizi yönetin.
+
+            {/* Footer */}
+            <div className="p-8 bg-zinc-50">
+              <p className="text-[9px] text-zinc-400 tracking-[0.2em] leading-relaxed uppercase">
+                Yardıma mı ihtiyacınız var? <br />
+                <Link
+                  href="/contact"
+                  className="text-black border-b border-zinc-300"
+                >
+                  Müşteri Hizmetleri
+                </Link>
               </p>
-
-              <Link
-                href="/login"
-                onClick={() => setUserMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3
-                bg-[#7B0323] text-white rounded-full shadow hover:bg-[#C70039] transition"
-              >
-                <LogIn className="w-5 h-5" />
-                Giriş Yap
-              </Link>
-
-              <Link
-                href="/register"
-                onClick={() => setUserMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3
-                border border-gray-300 rounded-full text-gray-800 hover:bg-gray-50 transition font-medium"
-              >
-                <UserPlus className="w-5 h-5" />
-                Hemen Kayıt Ol
-              </Link>
             </div>
-          )}
-        </motion.div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );

@@ -150,7 +150,7 @@ export default function Footer() {
       </div>
 
       {/* Alt Bar: Copyright & Logos */}
-      <div className="bg-white py-6 border-t border-stone-100">
+      <div className="bg-white py-3 border-t border-stone-100">
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex-1 text-[9px] uppercase tracking-[0.2em] text-stone-400">

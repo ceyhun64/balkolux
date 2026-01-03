@@ -1,48 +1,35 @@
 "use client";
 
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
 import { Heart } from "lucide-react";
 import Link from "next/link";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useFavorite } from "@/contexts/favoriteContext";
+import { motion } from "framer-motion";
 
 interface ProductData {
   id: number;
   title: string;
-  pricePerM2: number;
+  price: number;
   mainImage: string;
   subImage?: string;
-  subImage2?: string;
-  subImage3?: string;
-  room?: string;
+  category: string;
 }
 
 interface ProductCardProps {
   id: number;
-  onRemove?: (productId: number) => void; // opsiyonel, Favorites sayfası için
+  onRemove?: (productId: number) => void;
 }
-
-const roomColors: Record<string, string> = {
-  Salon: "bg-gray-500",
-  "Çocuk Odası": "bg-pink-500",
-  Mutfak: "bg-green-500",
-  "Yatak Odası": "bg-purple-500",
-  "Oturma Odası": "bg-orange-500",
-  Banyo: "bg-cyan-500",
-  Tümü: "bg-blue-500",
-};
 
 export default function ProductCard({ id, onRemove }: ProductCardProps) {
   const [product, setProduct] = useState<ProductData | null>(null);
-  const [currentImage, setCurrentImage] = useState("");
-  const imageRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Favorite context
-  const { favorites, addFavorite, removeFavorite, isFavorited } = useFavorite();
+  const { isFavorited, addFavorite, removeFavorite } = useFavorite();
   const favorited = isFavorited(id);
 
-  // Ürünü çek
+  // Veriyi API'den çekme (Eski mantık korundu)
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -50,7 +37,6 @@ export default function ProductCard({ id, onRemove }: ProductCardProps) {
         if (!res.ok) return;
         const data: { product: ProductData } = await res.json();
         setProduct(data.product);
-        setCurrentImage(data.product.mainImage);
       } catch (err) {
         console.error("Ürün çekme hatası:", err);
       }
@@ -58,7 +44,7 @@ export default function ProductCard({ id, onRemove }: ProductCardProps) {
     fetchProduct();
   }, [id]);
 
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -70,79 +56,97 @@ export default function ProductCard({ id, onRemove }: ProductCardProps) {
     }
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageRef.current || !product) return;
-    const { top, height } = imageRef.current.getBoundingClientRect();
-    const relativeY = event.clientY - top;
-
-    const segment1 = height * 0.33;
-    const segment2 = height * 0.66;
-    let nextImage = product.mainImage;
-
-    if (relativeY < segment1) nextImage = product.subImage || product.mainImage;
-    else if (relativeY < segment2)
-      nextImage = product.subImage2 || product.mainImage;
-    else nextImage = product.subImage3 || product.mainImage;
-
-    if (nextImage !== currentImage) setCurrentImage(nextImage);
-  };
-
-  const handleMouseLeave = () => {
-    if (product) setCurrentImage(product.mainImage);
-  };
-
   if (!product) return null;
 
+  // İkinci tasarımdaki fiyat hesaplama mantığı
+  const discount = 30; // Sabit veya API'den gelebilir
+  const oldPrice = Math.round(product.price * 1.43);
+
   return (
-    <Card className="p-0 m-0 rounded-xs overflow-hidden hover:shadow-2xl transition-shadow duration-500 w-full relative">
+    <div
+      className="group relative w-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <Link href={`/products/${product.id}`}>
-        <CardContent className="flex flex-col p-0 m-0 relative">
-          {product.room && (
-            <span
-              className={`absolute top-1 right-1 md:top-3 md:right-3 text-white text-xs font-extralight px-2 py-1 rounded-xs shadow-md z-2 ${
-                roomColors[product.room] || "bg-gray-500"
-              }`}
-            >
-              {product.room}
-            </span>
-          )}
-
-          <div
-            ref={imageRef}
-            className="relative w-full aspect-square cursor-pointer"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
+        {/* Ana Konteyner: 5/3 oranı */}
+        <div className="relative aspect-[5/3] w-full overflow-hidden bg-white">
+          {/* Favori Butonu */}
+          <button
+            onClick={handleFavoriteClick}
+            className="absolute top-4 right-4 z-20 transition-all duration-300"
           >
-            <Image
-              src={currentImage}
-              alt={product.title}
-              width={350}
-              height={350}
-              className="object-cover w-full h-full"
+            <Heart
+              className={`h-5 w-5 ${
+                favorited ? "fill-stone-800 text-stone-800" : "text-stone-400"
+              }`}
+              strokeWidth={1.2}
             />
-          </div>
+          </button>
 
-          <div className="p-4 relative">
-            <p className="text-xs md:text-sm font-medium text-gray-900 transition-colors group-hover:text-red-600">
-              {product.title}
-            </p>
-            <p className="text-gray-600 text-xs md:text-sm">
-              {product.pricePerM2}₺ / m²
-            </p>
-
-            <button
-              className="absolute top-4 right-2 p-1 rounded-full bg-white hover:bg-red-50 transition"
-              onClick={toggleFavorite}
-            >
-              <Heart
-                className={`h-4 w-4 transition-colors duration-300 ${
-                  favorited ? "text-red-500" : "text-gray-300"
-                }`}
+          {/* Animasyonlu Resim Alanı */}
+          <motion.div
+            className="flex h-full w-[200%]"
+            animate={{ x: isHovered && product.subImage ? "-50%" : "0%" }}
+            transition={{ duration: 0.8, ease: [0.6, 0.01, -0.05, 0.95] }}
+          >
+            {/* İlk Resim */}
+            <div className="relative h-full w-1/2 p-2">
+              <Image
+                src={product.mainImage}
+                alt={product.title}
+                fill
+                className="object-contain"
+                priority
               />
-            </button>
+            </div>
+
+            {/* İkinci Resim (SubImage yoksa MainImage gösterilir) */}
+            <div className="relative h-full w-1/2 p-2">
+              <Image
+                src={product.subImage || product.mainImage}
+                alt={`${product.title} detay`}
+                fill
+                className="object-contain"
+              />
+            </div>
+          </motion.div>
+
+          {/* Quick Look Overlay */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center p-4 pointer-events-none">
+            <div className="bg-white/95 backdrop-blur-sm w-full py-3 text-center text-[10px] font-bold tracking-[0.2em] uppercase text-stone-900 border border-stone-100 shadow-sm">
+              Detayları Keşfet
+            </div>
           </div>
-        </CardContent>
+        </div>
+
+        {/* İçerik Alanı */}
+        <div className="py-5 flex flex-col items-start space-y-1.5">
+          <div className="flex justify-between items-start w-full">
+            <span className="text-[9px] uppercase tracking-[0.4em] text-stone-400 font-bold">
+              {product.category}
+            </span>
+            {discount > 0 && (
+              <span className="text-[10px] font-sans font-bold text-amber-800">
+                -%{discount}
+              </span>
+            )}
+          </div>
+
+          <h3 className="text-[14px] font-sans text-stone-800 tracking-tight leading-snug">
+            {product.title}
+          </h3>
+
+          <div className="flex items-baseline gap-2 pt-1 font-sans">
+            <span className="text-sm font-semibold text-stone-900">
+              {product.price.toLocaleString("tr-TR")} TL
+            </span>
+            <span className="text-[10px] text-stone-400 line-through font-light">
+              {oldPrice.toLocaleString("tr-TR")} TL
+            </span>
+          </div>
+        </div>
       </Link>
-    </Card>
+    </div>
   );
 }
