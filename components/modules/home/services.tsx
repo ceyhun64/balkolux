@@ -58,7 +58,7 @@ const CardItem = ({ icon: Icon, title, desc, index }: any) => (
 export default function ShopServices() {
   return (
     <section className="py-24">
-      <div className="max-w-8xl mx-auto border border-stone-100  shadow-sm">
+      <div className="max-w-8xl mx-auto   shadow-sm">
         {/* Üst Başlık Alanı */}
         <div className="py-20 px-6 text-center border-b border-stone-100 ">
           <div className="inline-block px-4 py-1 mb-6 border border-amber-200/50 rounded-full">

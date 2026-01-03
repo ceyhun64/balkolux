@@ -1,15 +1,14 @@
 import Navbar from "@/components/layout/navbar";
-import Drapes from "@/components/modules/products/category/drapes";
+import SeatingSets from "@/components/modules/products/category/seating_sets";
 import Footer from "@/components/layout/footer";
 import Banner from "@/components/modules/home/banner";
 
-export default function DrapesPage() {
+export default function SeatingSetsPage() {
   return (
     <div>
       <Navbar />
-      <Drapes />
-            <Banner />
-      
+      <SeatingSets />
+      <Banner />
       <Footer />
     </div>
   );

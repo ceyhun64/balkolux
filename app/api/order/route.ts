@@ -10,12 +10,6 @@ interface BasketItem {
   unitPrice: number;
   category?: string; // ürün kategorisi
   quantity?: number; // ürün adedi
-  note?: string | null; // sepet notu
-  profile?: string | null;
-  width?: number | null;
-  height?: number | null;
-  m2?: number | null;
-  device?: string | null;
 }
 
 interface Address {
@@ -260,12 +254,6 @@ export async function POST(req: NextRequest) {
             quantity: Number(item.quantity || 1),
             unitPrice: Number(item.unitPrice || 0),
             totalPrice: Number(item.totalPrice || 0),
-            note: item.note,
-            profile: item.profile,
-            width: item.width,
-            height: item.height,
-            m2: item.m2,
-            device: item.device,
           })),
         },
         addresses: {

@@ -1,15 +1,14 @@
 import Navbar from "@/components/layout/navbar";
-import Wooden from "@/components/modules/products/category/wooden";
+import Umbrella from "@/components/modules/products/category/umbrella";
 import Footer from "@/components/layout/footer";
 import Banner from "@/components/modules/home/banner";
 
-export default function WoodenPage() {
+export default function UmbrellaPage() {
   return (
     <div>
       <Navbar />
-      <Wooden />
-            <Banner />
-      
+      <Umbrella />
+      <Banner />
       <Footer />
     </div>
   );

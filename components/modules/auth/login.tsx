@@ -6,179 +6,160 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2, Minus } from "lucide-react";
 import { toast } from "sonner";
 
-interface LoginFormProps {
-  onLoginSuccess?: (user: { name?: string; email?: string }) => void;
-}
-
-export default function LoginForm({ onLoginSuccess }: LoginFormProps) {
+export default function LoginForm({
+  onLoginSuccess,
+}: {
+  onLoginSuccess?: (u: any) => void;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
       const result = await signIn("credentials", {
         redirect: false,
         email,
         password,
       });
-
-      setIsLoading(false);
-
       if (result?.error) {
-        toast.error("Email veya şifre hatalı"); // ❌ Hata toast
+        toast.error("Giriş Başarısız", {
+          description: "Girdiğiniz bilgiler kayıtlarımızla eşleşmiyor.",
+        });
+        setIsLoading(false);
         return;
       }
-
       if (result?.ok) {
-        toast.success("Giriş başarılı!"); // ✅ Başarı toast
-
-        const loggedInUser = { email };
-        if (onLoginSuccess) onLoginSuccess(loggedInUser);
-
-        // Favorileri veritabanına ekle
-        const localFavs: number[] = JSON.parse(
-          localStorage.getItem("favorites") || "[]"
-        );
-        if (localFavs.length > 0) {
-          await Promise.all(
-            localFavs.map((productId) =>
-              fetch("/api/favorites", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId }),
-                credentials: "include",
-              })
-            )
-          );
-          localStorage.removeItem("favorites");
-        }
-
-        // Guest cart
-        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        if (guestCart.length > 0) {
-          await Promise.all(
-            guestCart.map((item: any) =>
-              fetch("/api/cart", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(item),
-                credentials: "include",
-              })
-            )
-          );
-          localStorage.removeItem("guestCart");
-        }
-
-          router.push("/"); // yönlendirme
+        toast.success("Erişim Onaylandı", {
+          description: "Yönlendiriliyorsunuz...",
+        });
+        router.push("/");
       }
     } catch (error) {
-      console.error(error);
-      toast.error("Giriş sırasında bir hata oluştu"); // ❌ Hata toast
       setIsLoading(false);
+      toast.error("Bir hata oluştu.");
     }
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-white px-4 my-24 md:mt-0 ">
-      <div className="w-full max-w-5xl grid md:grid-cols-2 border-gray-200 rounded-xs overflow-hidden">
-        {/* Sol taraf - Giriş */}
-        <div className="p-2 md:p-10 flex flex-col justify-center h-full">
-          <h2 className="text-xl md:text-4xl font-serif font-extrabold mb-8">
-            Giriş Yap
-          </h2>
+    <div className="w-full min-h-screen flex items-center justify-center bg-background px-4 py-10 my-20">
+      <div className="w-full max-w-5xl flex flex-col md:flex-row bg-white shadow-[0_40px_100px_-20px_rgba(0,0,0,0.2)] overflow-hidden">
+        {/* Sol Taraf: Editoryal Bölüm */}
+        <div className="w-full md:w-[40%] bg-zinc-900 p-12 flex flex-col justify-between relative text-white">
+          <div className="space-y-8">
+            <div className="w-12 h-[1px] bg-zinc-500" />
+            <div>
+              <h1 className="text-5xl md:text-6xl font-serif leading-[0.9] tracking-tighter">
+                Kişisel <br />
+                <span className="italic text-zinc-500 font-light text-4xl md:text-5xl">
+                  Arşiviniz
+                </span>
+              </h1>
+              <p className="mt-6 text-zinc-400 text-[10px] tracking-[0.25em] leading-relaxed max-w-[220px] uppercase font-medium">
+                Özel kürasyonlara erişim için kimliğinizi doğrulayın.
+              </p>
+            </div>
+          </div>
 
-          <form onSubmit={handleLogin}>
-            <div className="mb-4">
+          <div className="mt-20 md:mt-0 space-y-6">
+            <p className="text-[10px] text-zinc-500 tracking-widest uppercase font-bold">
+              Yeni Misiniz?
+            </p>
+            <Link
+              href="/register"
+              className="group flex items-center gap-4 text-zinc-100 text-xs tracking-[0.3em] hover:text-zinc-400 transition-all uppercase"
+            >
+              HESAP OLUŞTUR
+              <div className="w-12 h-[1px] bg-zinc-700 group-hover:w-20 group-hover:bg-zinc-400 transition-all duration-500" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Sağ Taraf: Minimalist Form */}
+        <div className="w-full md:w-[60%] p-10 md:p-20 bg-white">
+          <form onSubmit={handleLogin} className="space-y-12">
+            {/* E-posta Grubu */}
+            <div className="relative group">
               <Label
                 htmlFor="email"
-                className="text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 group-focus-within:text-zinc-900 transition-colors duration-300"
               >
-                E-posta
+                E-posta Adresi
               </Label>
               <Input
-                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-transparent border-0 border-b border-zinc-200 rounded-none px-0 py-6 text-zinc-900 text-lg shadow-none focus-visible:ring-0 focus-visible:border-zinc-900 transition-all placeholder:text-zinc-300"
+                id="email"
+                placeholder="ornek@balkolux.com"
                 required
-                className="mt-1 rounded-xs border border-gray-200 focus:border-black focus:ring-0"
               />
             </div>
 
-            <div className="mb-6 relative">
-              <Label
-                htmlFor="password"
-                className="text-xs font-semibold text-gray-600 uppercase tracking-wide"
-              >
-                Şifre
-              </Label>
+            {/* Şifre Grubu */}
+            <div className="relative group">
+              <div className="flex justify-between items-center">
+                <Label
+                  htmlFor="password"
+                  className="text-[10px] uppercase tracking-[0.3em] text-zinc-400 group-focus-within:text-zinc-900 transition-colors duration-300"
+                >
+                  Şifre
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-zinc-400 hover:text-zinc-900 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               <Input
-                id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-transparent border-0 border-b border-zinc-200 rounded-none px-0 py-6 text-zinc-900 text-lg shadow-none focus-visible:ring-0 focus-visible:border-zinc-900 transition-all"
+                id="password"
                 required
-                className="mt-1 rounded-xs border border-gray-200 focus:border-black focus:ring-0"
               />
-              <button
-                type="button"
-                className="absolute right-3 mt-4.5  inset-y-0 flex items-center text-gray-400 hover:text-gray-600 transition"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
             </div>
 
-            <Link
-              href="/forgot-password"
-              className="mt-2 text-sm font-semibold hover:underline block text-right"
-            >
-              Şifrenizi mi unuttunuz?
-            </Link>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-6">
+              <Link
+                href="/forgot-password"
+                className="text-[10px] text-zinc-400 hover:text-zinc-900 transition-colors uppercase tracking-[0.2em] font-medium"
+              >
+                Şifremi Hatırlat
+              </Link>
 
-            <Button
-              type="submit"
-              className={`w-full rounded-full bg-[#7B0323] hover:bg-[#7B0323]/90 text-white py-6 text-lg font-semibold mt-4 ${
-                isLoading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              disabled={isLoading}
-            >
-              {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
-            </Button>
-
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="relative overflow-hidden bg-zinc-900 text-white hover:bg-black px-12 h-16 rounded-none transition-all duration-300 group shadow-lg"
+              >
+                <span className="relative z-10 flex items-center gap-4 text-[10px] uppercase tracking-[0.4em] font-bold">
+                  {isLoading ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : (
+                    "Giriş Yap"
+                  )}
+                </span>
+              </Button>
+            </div>
           </form>
-        </div>
 
-        {/* Sağ taraf - Kayıt */}
-        <div
-          className="p-2 md:p-10 md:mt-0 mt-4 flex flex-col justify-center h-full
-                  border-t md:border-t-0 md:border-l border-[#7B0323]"
-        >
-          <h2 className="text-xl md:text-4xl font-serif font-extrabold mb-8 mt-10 md:mt-0">
-            Yeni misiniz?
-          </h2>
-          <p className="text-gray-600 mb-6 font-['Mozilla_Headline']">
-            Bizimle hesap oluşturun ve şunları yapabilirsiniz:
-          </p>
-          <ul className="list-disc list-inside space-y-1 text-gray-700 mb-8 font-['Mozilla_Headline']">
-            <li>Daha hızlı alışveriş yapabilirsiniz</li>
-            <li>Birden fazla teslimat adresi kaydedebilirsiniz</li>
-            <li>Sipariş geçmişinize erişebilirsiniz</li>
-            <li>Yeni siparişleri takip edebilirsiniz</li>
-            <li>İstek listenize ürün kaydedebilirsiniz</li>
-          </ul>
-          <Button className="w-full rounded-full bg-black hover:bg-gray-900 text-white py-6 text-lg font-semibold">
-            <Link href="/register">Hesap Oluştur</Link>
-          </Button>
+          {/* Alt Bilgi */}
+          <div className="mt-24 flex justify-between items-center text-[9px] text-zinc-400 tracking-[0.3em] uppercase border-t border-zinc-100 pt-8">
+            <span className="font-semibold text-zinc-900">© 2026 BalkoLüx</span>
+            <span className="italic">Küratörlük & Arşiv</span>
+          </div>
         </div>
       </div>
     </div>

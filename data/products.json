@@ -1,133 +1,107 @@
 [
   {
-    "id": 1,
-    "title": "Klasik Düz Perde",
+    "title": "Modern Kumaş Kanepe",
     "mainImage": "/products/1.webp",
     "subImage": "/products/2.webp",
     "subImage2": "/products/3.webp",
     "subImage3": "/products/4.webp",
     "subImage4": "/products/5.webp",
-
-    "price": 150.0,
-    "rating": 4.0,
+    "price": 1500,
+    "rating": 4,
     "reviewCount": 25,
-    "category": "Fon",
-    "subCategory": "klasik",
-    "description": "Şık ve modern düz kesim perde. Her mekana kolayca uyum sağlar.",
-    "roomId": 1
+    "category": "Oturma Takımları",
+    "subCategory": "Kanepe",
+    "description": "Modern tasarımı ve dayanıklı kumaşıyla uzun süreli konfor sunan şık kanepe modeli."
   },
   {
-    "id": 2,
-    "title": "Blackout Perde",
+    "title": "Köşe Koltuk Takımı",
     "mainImage": "/products/6.webp",
     "subImage": "/products/7.webp",
     "subImage2": "/products/8.webp",
-    "price": 150.0,
-    "rating": 4.0,
+    "price": 3200,
+    "rating": 4,
     "reviewCount": 25,
-    "category": "Zebra Perde",
-    "subCategory": "blackout",
-    "description": "Işığı tamamen kesen özel kumaşı sayesinde yatak odaları ve sinema odaları için idealdir.",
-    "roomId": 3
+    "category": "Oturma Takımları",
+    "subCategory": "Köşe Koltuk",
+    "description": "Geniş oturma alanı sunan, salonlar için ideal köşe koltuk takımı."
   },
   {
-    "id": 3,
-    "title": "Keten Görünümlü Perde",
+    "title": "TV Ünitesi",
+    "mainImage": "/products/20.webp",
+    "subImage": "/products/21.jpg",
+    "price": 1700,
+    "rating": 4,
+    "reviewCount": 15,
+    "category": "Oturma Takımları",
+    "subCategory": "TV Ünitesi",
+    "description": "Modern çizgileri ve geniş depolama alanıyla salon dekorasyonunu tamamlar."
+  },
+  {
+    "title": "Orta Sehpa",
+    "mainImage": "/products/21.webp",
+    "subImage": "/products/22.webp",
+    "price": 850,
+    "rating": 4,
+    "reviewCount": 22,
+    "category": "Oturma Takımları",
+    "subCategory": "Sehpa",
+    "description": "Dayanıklı malzemesi ve şık tasarımıyla oturma alanları için ideal orta sehpa."
+  },
+  {
+    "title": "Ahşap Yemek Masası",
     "mainImage": "/products/9.webp",
     "subImage": "/products/10.webp",
     "subImage2": "/products/11.webp",
     "subImage3": "/products/12.webp",
-
-    "price": 150.0,
-    "rating": 4.0,
+    "price": 2100,
+    "rating": 4,
     "reviewCount": 25,
-    "category": "Plise",
-    "subCategory": "keten",
-    "description": "Doğal keten dokusunu andıran modern tasarımıyla sıcak ve huzurlu bir ortam sunar.",
-    "roomId": 3
+    "category": "Masa Takımları",
+    "subCategory": "Yemek Masası",
+    "description": "Doğal ahşap dokusu ve sağlam yapısıyla uzun ömürlü yemek masası."
   },
   {
-    "id": 4,
-    "title": "Desenli Salon Perdesi",
+    "title": "Yemek Odası Sandalyesi",
     "mainImage": "/products/13.webp",
     "subImage": "/products/14.webp",
-
-    "price": 150.0,
-    "rating": 4.0,
+    "price": 650,
+    "rating": 4,
     "reviewCount": 25,
-    "category": "Dikey Perde",
-    "subCategory": "desenli",
-    "description": "Oturma odalarına şıklık ve hareket kazandıran estetik desenlere sahip salon perdesi.",
-    "roomId": 1
+    "category": "Masa Takımları",
+    "subCategory": "Sandalye",
+    "description": "Ergonomik tasarımı ve konforlu oturumu ile yemek alanları için ideal sandalye."
   },
   {
-    "id": 5,
-    "title": "Özel Ölçü Fon Perde",
-    "mainImage": "/products/15.webp",
-    "subImage": "/products/16.webp",
-
-    "price": 150.0,
-    "rating": 4.0,
-    "reviewCount": 25,
-    "category": "Stor Perde",
-    "subCategory": "fon",
-    "description": "Kalın dokulu, dekoratif yan fon olarak kullanılan özel ölçü fon perdesi.",
-    "roomId": 1
-  },
-  {
-    "id": 6,
-    "title": "Çocuk Odası Perdesi",
+    "title": "Bahçe Salıncağı",
     "mainImage": "/products/17.webp",
     "subImage": "/products/18.jpg",
-
-    "price": 150.0,
-    "rating": 4.2,
+    "price": 1900,
+    "rating": 4,
     "reviewCount": 20,
-    "category": "Tüller",
-    "subCategory": "çocuk",
-    "description": "Canlı renkleri ve eğlenceli desenleriyle çocuk odalarına neşe katan perde modeli.",
-    "roomId": 4
+    "category": "Salıncak",
+    "subCategory": "Bahçe Salıncağı",
+    "description": "Bahçe ve teraslar için dayanıklı, konforlu salıncak modeli."
   },
   {
-    "id": 7,
-    "title": "Tül Perde",
+    "title": "Bahçe Şezlongu",
+    "mainImage": "/products/15.webp",
+    "subImage": "/products/16.webp",
+    "price": 2800,
+    "rating": 4,
+    "reviewCount": 25,
+    "category": "Şezlong",
+    "subCategory": "Bahçe Şezlongu",
+    "description": "Güneşlenme alanları için ergonomik ve dayanıklı şezlong."
+  },
+  {
+    "title": "Bahçe Barbeküsü",
     "mainImage": "/products/18.webp",
     "subImage": "/products/19.webp",
-
-    "price": 150.0,
-    "rating": 4.5,
+    "price": 4500,
+    "rating": 5,
     "reviewCount": 30,
-    "category": "Ahşap Jaluzi",
-    "subCategory": "tül",
-    "description": "Işığı yumuşak bir şekilde süzen, ferah ve zarif bir tül perde modeli.",
-    "roomId": 2
-  },
-  {
-    "id": 8,
-    "title": "Zebra Perde",
-    "mainImage": "/products/20.webp",
-    "subImage": "/products/21.jpg",
-
-    "price": 150.0,
-    "rating": 3.9,
-    "reviewCount": 15,
-    "category": "Metal Jaluzi",
-    "subCategory": "zebra",
-    "description": "Hem tül hem güneşlik olarak kullanılabilen, pratik mekanizmalı zebra perde.",
-    "roomId": 1
-  },
-  {
-    "id": 9,
-    "title": "Stor Perde",
-    "mainImage": "/products/21.webp",
-    "subImage": "/products/22.webp",
-
-    "price": 150.0,
-    "rating": 4.1,
-    "reviewCount": 22,
-    "category": "Perde Aksesuarları",
-    "subCategory": "stor",
-    "description": "Kolay kullanım ve montaj sağlayan modern stor perde modeli.",
-    "roomId": 5
+    "category": "Barbekü",
+    "subCategory": "Kömürlü Barbekü",
+    "description": "Bahçe keyfini tamamlayan, dayanıklı ve pratik barbekü modeli."
   }
 ]

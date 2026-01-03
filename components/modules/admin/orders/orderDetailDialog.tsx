@@ -118,26 +118,6 @@ export default function OrderDetailDialog({
               />
               <div className="flex-1 min-w-0 text-sm space-y-0.5">
                 <p className="font-medium truncate">{item.product.title}</p>
-
-                {item.profile && (
-                  <p className="text-gray-500 text-xs">
-                    Profil: {item.profile}
-                  </p>
-                )}
-                {item.width && item.height && (
-                  <p className="text-gray-500 text-xs">
-                    Genişlik x Yükseklik: {item.width}x{item.height} cm
-                  </p>
-                )}
-                {item.m2 && (
-                  <p className="text-gray-500 text-xs">m²: {item.m2}</p>
-                )}
-                {item.device && (
-                  <p className="text-gray-500 text-xs">Aparat: {item.device}</p>
-                )}
-                {item.note && (
-                  <p className="text-gray-500 text-xs">Not: {item.note}</p>
-                )}
               </div>
             </div>
           ))}
@@ -165,10 +145,12 @@ export default function OrderDetailDialog({
                   <p>Tc. No: {addr.tcno}</p>
 
                   <p>Adres: {addr.address}</p>
-                  <p>
-                  Ülke: {addr.country}
-                  </p>
-                  {addr.district && <p>Şehir-İlçe: {addr.city}/{addr.district}</p>}
+                  <p>Ülke: {addr.country}</p>
+                  {addr.district && (
+                    <p>
+                      Şehir-İlçe: {addr.city}/{addr.district}
+                    </p>
+                  )}
                   {addr.zip && <p>ZIP: {addr.zip}</p>}
                   {addr.phone && <p>Telefon: {addr.phone}</p>}
                 </div>

@@ -5,7 +5,7 @@ import prisma from "@/lib/db";
 interface ProductData {
   id: number;
   title: string;
-  pricePerM2: number;
+  price: number;
   rating?: number;
   reviewCount?: number;
   description?: string;
@@ -13,6 +13,7 @@ interface ProductData {
   subImage?: string;
   subImage2?: string;
   subImage3?: string;
+  subImage4?: string;
   category: string;
   subCategory?: string;
   room?: string;
@@ -27,14 +28,14 @@ export async function GET(
 
     const products = await prisma.product.findMany({
       where: { categoryId: Number(categoryId) },
-      include: { category: true, subCategory: true, room: true },
+      include: { category: true, subCategory: true,  },
       orderBy: { createdAt: "desc" },
     });
 
     const productsData: ProductData[] = products.map((p) => ({
       id: p.id,
       title: p.title,
-      pricePerM2: p.pricePerM2,
+      price: p.price,
       rating: p.rating,
       reviewCount: p.reviewCount ?? undefined,
       description: p.description,
@@ -42,9 +43,9 @@ export async function GET(
       subImage: p.subImage ?? undefined,
       subImage2: p.subImage2 ?? undefined,
       subImage3: p.subImage3 ?? undefined,
+      subImage4: p.subImage4 ?? undefined,
       category: p.category.name,
       subCategory: p.subCategory?.name ?? undefined,
-      room: p.room?.name ?? undefined,
     }));
 
     return NextResponse.json({ products: productsData }, { status: 200 });

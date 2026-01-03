@@ -1,13 +1,13 @@
 import Navbar from "@/components/layout/navbar";
-import Sheer from "@/components/modules/products/category/sheer";
+import TableSets from "@/components/modules/products/category/table_sets";
 import Footer from "@/components/layout/footer";
 import Banner from "@/components/modules/home/banner";
 
-export default function SheerPage() {
+export default function TableSetsPage() {
   return (
     <div>
       <Navbar />
-      <Sheer />
+      <TableSets />
             <Banner />
       
       <Footer />

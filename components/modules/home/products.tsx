@@ -46,7 +46,7 @@ export default function Products() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white px-6 py-24">
+      <div className="min-h-screen bg-zinc-50 px-6 py-24">
         <div className="max-w-[1400px] mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -112,7 +112,7 @@ export default function Products() {
       </div>
 
       {/* Subtle Background Accent */}
-      <div className="absolute top-0 right-0 w-[40%] h-[100%] bg-[#F9F9F8] -z-10" />
+      <div className="absolute top-0 right-0 w-[40%] h-[100%] bg-background -z-10" />
     </div>
   );
 }

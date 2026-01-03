@@ -33,16 +33,10 @@ interface ProductSeed {
   description: string;
   category: string;
   subCategory?: string;
-  roomId?: number;
 }
 
 // 🏷 Category interface
 interface CategorySeed {
-  name: string;
-}
-
-// 🏠 Room interface
-interface RoomSeed {
   name: string;
 }
 
@@ -87,16 +81,12 @@ async function seedAdmin() {
 //
 async function seedCategories() {
   const mainCategories: string[] = [
-    "Dikey Perde",
-    "Ahşap Jaluzi",
-    "Metal Jaluzi",
-    "Perde Aksesuarları",
-    "Stor Perde",
-    "Zebra Perde",
-    "Rüstik",
-    "Tüller",
-    "Fon",
-    "Plise",
+    "Oturma Takımları",
+    "Masa Takımları",
+    "Salıncak",
+    "Şezlong",
+    "Şemsiye",
+    "Barbekü",
   ];
 
   for (const name of mainCategories) {
@@ -108,31 +98,6 @@ async function seedCategories() {
   }
 
   console.log("✅ Kategori seed tamamlandı.");
-}
-
-//
-// 🏠 ROOM SEED
-//
-async function seedRooms() {
-  const rooms: string[] = [
-    "Salon",
-    "Mutfak",
-    "Yatak Odası",
-    "Banyo",
-    "Çocuk Odası",
-    "Oturma Odası",
-    "Ofis"
-  ];
-
-  for (const name of rooms) {
-    const exists = await prisma.room.findFirst({ where: { name } });
-    if (!exists) {
-      const room: RoomSeed = { name };
-      await prisma.room.create({ data: room });
-    }
-  }
-
-  console.log("✅ Room seed tamamlandı.");
 }
 
 //
@@ -163,12 +128,6 @@ async function seedProducts() {
         })
       : null;
 
-    let roomRecord = null;
-    if (p.roomId) {
-      roomRecord = await prisma.room.findUnique({ where: { id: p.roomId } });
-      if (!roomRecord) console.log(`⚠️ Room bulunamadı: ID ${p.roomId}`);
-    }
-
     await prisma.product.create({
       data: {
         title: p.title,
@@ -183,7 +142,6 @@ async function seedProducts() {
         description: p.description,
         categoryId: category.id,
         subCategoryId: subCategory?.id ?? null,
-        roomId: roomRecord?.id ?? null,
       },
     });
 
@@ -199,7 +157,6 @@ async function seedProducts() {
 async function main() {
   await seedAdmin();
   await seedCategories();
-  await seedRooms();
   await seedProducts();
 }
 

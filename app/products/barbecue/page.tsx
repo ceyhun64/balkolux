@@ -1,15 +1,15 @@
 import Navbar from "@/components/layout/navbar";
-import Vertical from "@/components/modules/products/category/vertical";
+import Barbecue from "@/components/modules/products/category/barbecue";
 import Footer from "@/components/layout/footer";
 import Banner from "@/components/modules/home/banner";
 
-export default function VerticalPage() {
+export default function BarbecuePage() {
   return (
     <div>
       <Navbar />
-      <Vertical />
-            <Banner />
-      
+      <Barbecue />
+      <Banner />
+
       <Footer />
     </div>
   );

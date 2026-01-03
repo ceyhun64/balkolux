@@ -89,7 +89,7 @@ export default function CollectionMegaMenu({
                     <span className="text-[10px] tracking-[0.4em] font-medium text-black/40 uppercase">Keşfet</span>
                   </div>
                   <h2 className="text-3xl font-light tracking-tight mb-10 leading-tight">
-                    BalkoLüx <br /> Koleksiyonu
+                    BalkoLüx <br /> Menü
                   </h2>
                   
                   <nav className="flex flex-col gap-4">

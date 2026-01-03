@@ -1,15 +1,15 @@
 import Navbar from "@/components/layout/navbar";
-import Accessories from "@/components/modules/products/category/accessories";
+import Swing from "@/components/modules/products/category/swing";
 import Footer from "@/components/layout/footer";
 import Banner from "@/components/modules/home/banner";
 
-export default function AccessoriesPage() {
+export default function SwingPage() {
   return (
     <div>
       <Navbar />
-      <Accessories />
-      <Banner />
-
+      <Swing />
+            <Banner />
+      
       <Footer />
     </div>
   );

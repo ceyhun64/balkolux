@@ -8,11 +8,6 @@ import { authOptions } from "@/lib/auth";
 interface CartItemRequestBody {
   productId: number;
   quantity?: number;
-  note?: string | null;
-  profile?: string;
-  width?: number;
-  height?: number;
-  device?: string;
 }
 
 export async function GET(req: Request) {
@@ -42,25 +37,14 @@ export async function POST(req: Request) {
   try {
     const body: CartItemRequestBody = await req.json();
 
-    const {
-      productId,
-      quantity = 1,
-      note = null,
-      profile = "",
-      width = 0,
-      height = 0,
-      device = "vidali",
-    } = body; // m² hesaplama
+    const { productId, quantity = 1 } = body;
 
-    const m2 = width && height ? Math.max(1, (width * height) / 10000) : 1; // ✅ Aynı ürünü, profil, aparat ve not bilgileriyle kontrol et
 
     const existing = await prisma.cartItem.findFirst({
       where: {
         userId: Number(session.user.id),
         productId,
-        profile,
-        device,
-        note,
+      
       },
     });
 
@@ -79,12 +63,7 @@ export async function POST(req: Request) {
         userId: Number(session.user.id),
         productId,
         quantity,
-        note,
-        profile,
-        width,
-        height,
-        m2,
-        device,
+    
       },
       include: { product: true },
     });

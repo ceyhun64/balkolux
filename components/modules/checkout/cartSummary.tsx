@@ -25,47 +25,33 @@ import {
   Truck,
 } from "lucide-react";
 
-// KDV Oranı
 const KDV_RATE = 0.1; // %10
 
 interface Product {
   id: number;
   title: string;
-  pricePerM2: number;
+  price: number; // Prisma: Int/Float
   mainImage: string;
-  oldPrice?: number;
 }
 
 interface BasketItem {
   id: number;
   product: Product;
   quantity: number;
-  note?: string | null;
-  profile?: string;
-  width?: number;
-  height?: number;
-  device?: string;
 }
 
 interface BasketSummaryCardProps {
-  basketItemsData?: BasketItem[];
-  subTotal?: number;
   selectedCargoFee: number;
-  totalPrice?: number;
 }
 
 export default function BasketSummaryCard({
-  basketItemsData = [],
-  subTotal = 0,
-  selectedCargoFee,
-  totalPrice = 0,
+  selectedCargoFee = 0,
 }: BasketSummaryCardProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [guestItems, setGuestItems] = useState<GuestCartItem[]>([]);
   const [basketItems, setBasketItems] = useState<BasketItem[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Giriş durumunu kontrol et
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -73,14 +59,12 @@ export default function BasketSummaryCard({
         const data = await res.json();
         setIsLoggedIn(!!data.user);
       } catch (error) {
-        console.error("Oturum kontrolü başarısız:", error);
         setIsLoggedIn(false);
       }
     };
     checkLoginStatus();
   }, []);
 
-  // Cart verisini yükle
   useEffect(() => {
     if (isLoggedIn === null) return;
 
@@ -90,30 +74,22 @@ export default function BasketSummaryCard({
           const res = await fetch("/api/cart");
           if (res.ok) {
             const data = await res.json();
-            const items: BasketItem[] = data.map((item: any, i: number) => ({
-              id: i,
+            // Prisma CartItem modelinden gelen veriyi eşle
+            const items: BasketItem[] = data.map((item: any) => ({
+              id: item.id,
               product: {
                 id: item.product.id,
                 title: item.product.title,
-                pricePerM2: item.product.pricePerM2,
+                price: item.product.price,
                 mainImage: item.product.mainImage,
-                oldPrice: item.product.oldPrice,
               },
               quantity: item.quantity,
-              note: item.note ?? undefined,
-              profile: item.profile,
-              width: item.width,
-              height: item.height,
-              device: item.device,
             }));
             setBasketItems(items);
             setGuestItems([]);
-          } else {
-            setBasketItems([]);
           }
         } catch (err) {
           console.error("Cart fetch error:", err);
-          setBasketItems([]);
         }
       } else {
         const localCart = getCart();
@@ -124,304 +100,177 @@ export default function BasketSummaryCard({
 
     fetchCart();
 
-    const handleCartUpdated = () => {
-      fetchCart();
-    };
+    const handleCartUpdated = () => fetchCart();
     window.addEventListener("cartUpdated", handleCartUpdated);
-    return () => {
-      window.removeEventListener("cartUpdated", handleCartUpdated);
-    };
+    return () => window.removeEventListener("cartUpdated", handleCartUpdated);
   }, [isLoggedIn]);
 
-  // Gösterilecek ürünleri belirle
-  const itemsToRender =
-    isLoggedIn && basketItems.length > 0
-      ? basketItems
-      : guestItems.map((item, i) => ({
-          id: i,
-          product: {
-            id: item.productId,
-            title: item.title,
-            pricePerM2: item.pricePerM2,
-            mainImage: item.image,
-          },
-          quantity: item.quantity,
-          note: item.note ?? undefined,
-          profile: item.profile,
-          width: item.width,
-          height: item.height,
-          device: item.device,
-        }));
+  const itemsToRender = isLoggedIn
+    ? basketItems
+    : guestItems.map((item, i) => ({
+        id: i,
+        product: {
+          id: item.productId,
+          title: item.title,
+          price: item.price,
+          mainImage: item.image,
+        },
+        quantity: item.quantity,
+      }));
 
-  // M² hesaplama - minimum 1 m²
-  const calculateArea = (width?: number, height?: number): number => {
-    if (!width || !height) return 1;
-    const area = (width * height) / 10000;
-    return area < 1 ? 1 : area;
-  };
-
-  // Ara toplamı hesapla
-  const calculatedSubTotal = itemsToRender.reduce((acc, item) => {
-    const area = calculateArea(item.width, item.height);
-    return acc + item.product.pricePerM2 * area * item.quantity;
-  }, 0);
-
-  // KDV'yi hesapla
+  // Basitleştirilmiş Hesaplamalar
+  const calculatedSubTotal = itemsToRender.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
+    0
+  );
   const calculatedKdv = calculatedSubTotal * KDV_RATE;
-
-  // Toplamı hesapla
-  const calculatedTotal = calculatedSubTotal + calculatedKdv;
-
-  const getItemDetails = (item: BasketItem): string[] => {
-    const details: string[] = [];
-    if (item.note) details.push(`Not: "${item.note}"`);
-    if (item.profile) details.push(`Profil: ${item.profile}`);
-    if (item.width && item.height) {
-      const realArea = (item.width * item.height) / 10000;
-      const pricingArea = calculateArea(item.width, item.height);
-
-      if (realArea < 1) {
-        details.push(
-          `${item.width} x ${item.height} cm (${realArea.toFixed(
-            2
-          )} m² → 1.00 m²)`
-        );
-      } else {
-        details.push(
-          `${item.width} x ${item.height} cm (${pricingArea.toFixed(2)} m²)`
-        );
-      }
-
-      if (item.device) details.push(`Aparat: ${item.device}`);
-    }
-    return details;
-  };
+  const calculatedTotal = calculatedSubTotal + calculatedKdv + selectedCargoFee;
 
   if (isLoggedIn === null) {
     return (
       <Card className="sticky top-6">
-        <CardContent className="py-8">
-          <div className="flex flex-col items-center justify-center gap-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="text-sm text-gray-500">Sepet yükleniyor...</p>
-          </div>
+        <CardContent className="py-8 flex flex-col items-center justify-center gap-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="text-sm text-gray-500">Yükleniyor...</p>
         </CardContent>
       </Card>
     );
   }
 
-  if (!itemsToRender || itemsToRender.length === 0) {
+  if (itemsToRender.length === 0) {
     return (
       <Card className="sticky top-6">
-        <CardContent className="py-12">
-          <div className="flex flex-col items-center justify-center gap-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-              <ShoppingCart className="w-8 h-8 text-gray-400" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-900 mb-1">Sepetiniz Boş</p>
-              <p className="text-sm text-gray-500">
-                Alışverişe başlamak için ürün ekleyin
-              </p>
-            </div>
-            <Link href="/" className="w-full">
-              <Button className="w-full">Alışverişe Başla</Button>
-            </Link>
-          </div>
+        <CardContent className="py-12 text-center">
+          <ShoppingCart className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="font-medium text-gray-900">Sepetiniz Boş</p>
+          <Link href="/" className="mt-4 block">
+            <Button className="w-full">Ürünlere Göz At</Button>
+          </Link>
         </CardContent>
       </Card>
     );
   }
 
   const displayedItems = isExpanded ? itemsToRender : itemsToRender.slice(0, 3);
-  const hasMoreItems = itemsToRender.length > 3;
 
   return (
-    <Card className="sticky top-6 shadow-lg border-2">
-      <CardHeader className="space-y-2 pb-4">
+    <Card className="sticky top-6 shadow-xl border-t-4 border-t-blue-600">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-blue-600" />
-            Sipariş Özeti
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ShoppingCart className="w-5 h-5" /> Sipariş Özeti
           </CardTitle>
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 rounded-full">
-            <Package className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-600">
-              {itemsToRender.length} Ürün
-            </span>
-          </div>
+          <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+            {itemsToRender.length} Ürün
+          </span>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Ürün Listesi */}
-        <div className="space-y-3 max-h-[340px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-          {displayedItems.map((item) => {
-            const product: Product = item.product;
-            const details = getItemDetails(item);
-            const area = calculateArea(item.width, item.height);
-            const itemPrice = product.pricePerM2 * area * item.quantity;
-
-            return (
-              <div
-                key={item.id}
-                className="flex gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200"
-              >
-                {/* Ürün Görseli */}
-                <div className="relative w-15 h-20 bg-white rounded-md flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-200 group">
-                  <Image
-                    src={product.mainImage}
-                    alt={product.title}
-                    width={64}
-                    height={64}
-                    className="object-contain transition-transform group-hover:scale-110"
-                  />
-               
-                </div>
-
-                {/* Ürün Bilgileri */}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-gray-900 line-clamp-2 mb-1">
-                    {product.title}
-                  </p>
-                  {details.length > 0 && (
-                    <div className="text-xs text-gray-600 space-y-0.5">
-                      {details.map((detail, idx) => (
-                        <p key={idx} className="line-clamp-1">
-                          {detail}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Fiyat */}
-                <div className="text-right flex flex-col items-end justify-center">
-                  <span className="text-base font-bold text-gray-900">
-                    ₺{itemPrice.toFixed(2)}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    ₺{product.pricePerM2}/m²
-                  </span>
-                </div>
+        <div className="space-y-3">
+          {displayedItems.map((item) => (
+            <div
+              key={item.id}
+              className="flex gap-3 p-2 rounded-lg bg-gray-50 border border-gray-100"
+            >
+              <div className="relative w-12 h-12 bg-white rounded overflow-hidden flex-shrink-0 border">
+                <Image
+                  src={item.product.mainImage}
+                  alt={item.product.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
-            );
-          })}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold truncate">
+                  {item.product.title}
+                </p>
+                <p className="text-xs text-gray-500">{item.quantity} Adet</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold">
+                  ₺{(item.product.price * item.quantity).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Daha Fazla Göster Butonu */}
-        {hasMoreItems && (
+        {itemsToRender.length > 3 && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="w-full py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+            className="w-full text-xs font-semibold text-blue-600 py-1"
           >
             {isExpanded
-              ? "Daha Az Göster ↑"
-              : `+${itemsToRender.length - 3} Ürün Daha Göster ↓`}
+              ? "Daha Az Göster"
+              : `+${itemsToRender.length - 3} Ürün Daha`}
           </button>
         )}
 
-        <Separator className="my-4" />
+        <Separator />
 
-        {/* Fiyat Detayları */}
-        <div className="space-y-3">
-          {/* Ara Toplam */}
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 flex items-center gap-1.5">
-              <Receipt className="w-4 h-4" />
-              Ara Toplam
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500 flex items-center gap-1">
+              <Receipt className="w-4 h-4" /> Ara Toplam
             </span>
-            <span className="text-base font-semibold text-gray-900">
+            <span className="font-medium">
               ₺{calculatedSubTotal.toFixed(2)}
             </span>
           </div>
-
-          {/* Kargo */}
-          <div className="flex justify-between items-center bg-green-50 -mx-6 px-6 py-3 border-y border-green-100">
-            <span className="text-sm text-green-800 flex items-center gap-1.5 font-medium">
-              <Truck className="w-4 h-4" />
-              Kargo Ücreti
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500 flex items-center gap-1">
+              <Truck className="w-4 h-4" /> Kargo
             </span>
-            <span className="text-base font-bold text-green-700">
+            <span
+              className={
+                selectedCargoFee === 0
+                  ? "text-green-600 font-bold"
+                  : "font-medium"
+              }
+            >
               {selectedCargoFee === 0
                 ? "ÜCRETSİZ"
                 : `₺${selectedCargoFee.toFixed(2)}`}
             </span>
           </div>
-
-          {/* KDV */}
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 flex items-center gap-1.5">
-              <TrendingUp className="w-4 h-4" />
-              KDV (%10)
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500 flex items-center gap-1">
+              <TrendingUp className="w-4 h-4" /> KDV (%10)
             </span>
-            <span className="text-base font-semibold text-gray-900">
-              ₺{calculatedKdv.toFixed(2)}
-            </span>
+            <span className="font-medium">₺{calculatedKdv.toFixed(2)}</span>
           </div>
         </div>
 
-        <Separator className="my-4" />
-
-        {/* Genel Toplam */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 -mx-6 px-6 py-5 rounded-b-lg">
+        <div className="bg-slate-900 text-white p-4 rounded-xl mt-4">
           <div className="flex justify-between items-center">
-            <div className="text-white">
-              <p className="text-xs font-medium mb-1 opacity-90">
-                Ödenecek Tutar
+            <div>
+              <p className="text-[10px] uppercase tracking-wider opacity-70">
+                Toplam Ödenecek
               </p>
-              <p className="text-3xl font-bold tracking-tight">
+              <p className="text-2xl font-bold">
                 ₺{calculatedTotal.toFixed(2)}
               </p>
-              <p className="text-xs mt-1 opacity-75">(KDV Dahil)</p>
             </div>
-            <CheckCircle2 className="w-10 h-10 text-white opacity-90" />
+            <CheckCircle2 className="w-8 h-8 text-blue-400" />
           </div>
         </div>
 
-        {/* Bilgilendirme */}
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex gap-2 -mx-6 mx-6">
-          <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-          <div className="text-xs text-amber-800">
-            <p className="font-medium mb-1">Önemli Bilgiler</p>
-            <ul className="space-y-1">
-              <li>• Fiyatlara KDV dahildir</li>
-              <li>• Ödeme sonrası siparişiniz onaylanacaktır</li>
-              <li>• Kargo ücretsizdir</li>
-            </ul>
-          </div>
+        <div className="bg-blue-50 p-3 rounded-lg flex gap-2">
+          <Info className="w-4 h-4 text-blue-600 shrink-0" />
+          <p className="text-[11px] text-blue-800">
+            Siparişiniz onaylandıktan sonra 24 saat içerisinde kargoya verilir.
+          </p>
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-3 pt-4 border-t">
-        {/* Sepeti Düzenle */}
+      <CardFooter className="flex flex-col gap-2 border-t pt-4">
         <Link href="/cart" className="w-full">
-          <Button
-            variant="outline"
-            className="w-full h-11 border-2 hover:bg-gray-50 font-medium group"
-          >
+          <Button variant="outline" className="w-full group">
             <Edit3 className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
             Sepeti Düzenle
           </Button>
         </Link>
-
-        {/* Güvenli Ödeme Badge */}
-        <div className="flex items-center justify-center gap-3 text-xs text-gray-500 pt-2">
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-            <span>Güvenli Ödeme</span>
-          </div>
-          <span>•</span>
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-            <span>256-bit SSL</span>
-          </div>
-          <span>•</span>
-          <div className="flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
-            <span>PCI DSS</span>
-          </div>
-        </div>
       </CardFooter>
     </Card>
   );

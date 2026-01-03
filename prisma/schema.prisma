@@ -62,14 +62,8 @@ model CartItem {
   userId    Int? // nullable, guest cart için
   productId Int
   quantity  Int      @default(1)
-  note      String?
-  profile   String
-  width     Float
-  height    Float
-  m2        Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  device    String?
   product   product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId], map: "CartItem_productId_fkey")
@@ -118,18 +112,12 @@ model Order {
 }
 
 model OrderItem {
-  id         Int     @id @default(autoincrement())
+  id         Int   @id @default(autoincrement())
   orderId    Int
   productId  Int
   quantity   Int
   unitPrice  Float
   totalPrice Float
-  note       String?
-  profile    String?
-  width      Float?
-  height     Float?
-  m2         Float?
-  device     String?
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product product @relation(fields: [productId], references: [id])
@@ -194,12 +182,6 @@ model SubCategory {
   @@map("sub_category")
 }
 
-model Room {
-  id       Int       @id @default(autoincrement())
-  name     String
-  products product[] // bir oda -> birden fazla ürün
-}
-
 model product {
   id          Int     @id @default(autoincrement())
   title       String
@@ -218,10 +200,6 @@ model product {
 
   subCategoryId Int?
   subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
-
-  // 🆕 ROOM RELATION
-  roomId Int?
-  room   Room? @relation(fields: [roomId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

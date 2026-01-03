@@ -63,7 +63,7 @@ export default function HeroSection() {
               priority
             />
             {/* Minimal Overlay: Sadece metnin okunabilirliği için soft bir geçiş */}
-            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-0 bg-black/10" />
           </div>
 
           {/* İçerik Alanı */}

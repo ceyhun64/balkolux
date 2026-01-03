@@ -1,4 +1,3 @@
-// Updated CartItem component with mobile image on the left
 "use client";
 
 import React from "react";
@@ -20,80 +19,78 @@ export default function CartItem({
   onDecrease,
   onRemove,
 }: CartItemProps) {
-  const { product, quantity, note, profile, device, width, height, m2 } = item;
-  const finalPrice = (product.pricePerM2 || 0) * (m2 || 1) * quantity;
+  const { product, quantity } = item;
+  
+  // ✅ Yeni sadeleştirilmiş fiyat hesabı (Fiyat * Adet)
+  const finalPrice = (product.price || 0) * quantity;
 
   return (
-    <div className="flex flex-row sm:flex-row w-full gap-4 sm:gap-6 p-4 sm:p-6 bg-white rounded-xs border border-gray-100 shadow-md hover:shadow-lg transition-shadow font-sans">
-      {/* Product Image */}
-      <div className="relative w-24 h-30 md:w-28 md:h-32 flex-shrink-0 rounded-xs overflow-hidden">
+    <div className="flex flex-row w-full gap-4 sm:gap-6 p-4 sm:p-6 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all font-sans">
+      {/* Ürün Görseli */}
+      <div className="relative w-24 h-24 md:w-32 md:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
         <Image
           src={product.mainImage}
           alt={product.title}
           fill
-          className="object-cover"
+          className="object-contain p-2"
           unoptimized
         />
       </div>
 
-      {/* Product Info */}
-      <div className="flex-1 flex flex-col justify-between">
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <h3 className="font-medium text-sm sm:text-base text-gray-900 truncate">
-            {product.title}
-          </h3>
-          <button
-            onClick={onRemove}
-            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-          >
-            <Trash2 className="h-5 w-5 sm:h-6 sm:w-6" />
-          </button>
+      {/* Ürün Bilgileri */}
+      <div className="flex-1 flex flex-col justify-between py-1">
+        <div>
+          {/* Başlık ve Silme Butonu */}
+          <div className="flex justify-between items-start">
+            <h3 className="font-semibold text-sm sm:text-lg text-gray-900 leading-tight">
+              {product.title}
+            </h3>
+            <button
+              onClick={onRemove}
+              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+              aria-label="Ürünü Sil"
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Birim Fiyat Bilgisi */}
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Birim Fiyat: ₺{(product.price || 0).toLocaleString("tr-TR")}
+          </p>
         </div>
 
-        {/* Product Details */}
-        <div className="mt-1 text-xs sm:text-sm text-gray-600 space-y-1">
-          {note && <p className="truncate">Not: {note}</p>}
-          {profile && <p className="truncate">Profil: {profile}</p>}
-          {device && <p className="truncate">Aparat: {device}</p>}
-          {width && height && (
-            <p className="truncate">
-              Ölçü: {width}cm x {height}cm (m²: {m2})
-            </p>
-          )}
-        </div>
-
-        {/* Quantity & Price */}
-        <div className="mt-3 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3">
-          {/* Quantity Controls */}
-          <div className="flex items-center border border-gray-300 rounded-md overflow-hidden text-sm">
+        {/* Alt Kısım: Adet Kontrolü ve Toplam Fiyat */}
+        <div className="mt-4 flex flex-row justify-between items-end">
+          {/* Adet Kontrolleri */}
+          <div className="flex items-center border border-gray-200 rounded-full bg-gray-50 p-1">
             <button
               onClick={onDecrease}
               disabled={quantity <= 1}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-40"
+              className="p-1.5 text-gray-600 hover:bg-white rounded-full transition-colors disabled:opacity-30"
             >
-              <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+              <Minus className="h-4 w-4" />
             </button>
-            <span className="w-8 text-center font-medium text-gray-900 text-sm sm:text-base">
+            <span className="w-10 text-center font-bold text-gray-900 text-sm sm:text-base">
               {quantity}
             </span>
             <button
               onClick={onIncrease}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+              className="p-1.5 text-gray-600 hover:bg-white rounded-full transition-colors"
             >
-              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+              <Plus className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Price & Edit */}
-          <div className="flex flex-col items-start sm:items-end text-left sm:text-right text-sm sm:text-base mt-1 sm:mt-0">
-            <span className="font-bold text-gray-900">
-              ₺{finalPrice.toFixed(2)}
+          {/* Fiyat ve Düzenle */}
+          <div className="flex flex-col items-end">
+            <span className="font-extrabold text-[#7B0323] text-base sm:text-xl">
+              ₺{finalPrice.toLocaleString("tr-TR")}
             </span>
             <Link href={`/products/${product.id}`}>
-              <button className="flex items-center text-gray-500 hover:text-gray-800 mt-1 text-xs sm:text-sm transition-colors">
-                <span className="mr-1">Düzenle</span>
-                <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+              <button className="flex items-center text-gray-400 hover:text-gray-700 mt-1 text-xs transition-colors group">
+                <span className="mr-1 group-hover:underline">Ürüne Git</span>
+                <Edit className="h-3 w-3" />
               </button>
             </Link>
           </div>

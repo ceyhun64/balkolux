@@ -76,7 +76,7 @@ export default function YeniUrunlerCarousel() {
   }
 
   return (
-    <div className=" py-24 lg:py-32 overflow-hidden">
+    <div className="bg-background py-24 lg:py-32 overflow-hidden">
       <div className="container mx-auto px-6 relative">
         
         {/* Header - Asimetrik ve Modern */}

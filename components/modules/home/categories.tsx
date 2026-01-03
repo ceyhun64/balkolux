@@ -14,8 +14,8 @@ interface CategoryData {
 }
 
 const initialCategories: CategoryData[] = [
-  { id: 1, name: "OTURMA TAKIMLARI", image: "/categories/livingroom.webp", href: "/products/seating" },
-  { id: 2, name: "MASA TAKIMLARI", image: "/categories/table.webp", href: "/products/tables" },
+  { id: 1, name: "OTURMA TAKIMLARI", image: "/categories/livingroom.webp", href: "/products/seating_sets" },
+  { id: 2, name: "MASA TAKIMLARI", image: "/categories/table.webp", href: "/products/table_sets" },
   { id: 3, name: "ŞEZLONG ÇEŞİTLERİ", image: "/categories/sunlounger.webp", href: "/products/loungers" },
   { id: 4, name: "SALINCAK ÇEŞİTLERİ", image: "/categories/swing.jpg", href: "/products/swings" },
 ];
@@ -29,7 +29,7 @@ export default function CategoriesSection() {
   }, []);
 
   return (
-    <section className=" py-20 md:py-32">
+    <section className=" bg-background py-20 md:py-32">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         
         {/* Minimal Başlık Alanı */}

@@ -1,13 +1,13 @@
 import Navbar from "@/components/layout/navbar";
-import Roller from "@/components/modules/products/category/roller";
+import Sunbed from "@/components/modules/products/category/sunbed";
 import Footer from "@/components/layout/footer";
 import Banner from "@/components/modules/home/banner";
 
-export default function RollerPage() {
+export default function SunbedPage() {
   return (
     <div>
       <Navbar />
-      <Roller />
+      <Sunbed />
             <Banner />
       
       <Footer />

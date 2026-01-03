@@ -27,12 +27,11 @@ import CollectionMegaMenu from "./collectionMegaMenu";
 import UserMegaMenu from "./userMegaMenu";
 
 export default function Navbar() {
+  const pathname = usePathname() || "/";
+  const isHomePage = pathname === "/"; // Ana sayfa kontrolü
+
   const links = [
-    {
-      label: "Anasayfa",
-      href: "/",
-      icon: LayoutGrid,
-    },
+    { label: "Anasayfa", href: "/", icon: LayoutGrid },
     {
       label: "Menu",
       href: "/products",
@@ -46,42 +45,22 @@ export default function Navbar() {
         { label: "Barbekü", href: "/products/accessories" },
       ],
     },
-    {
-      label: "Hakkımızda",
-      href: "/about",
-      icon: Sparkles,
-    },
-    {
-      label: "Bize Ulaşın",
-      href: "/contact",
-      icon: PhoneOutgoing,
-    },
-    {
-      label: "S.S.S",
-      href: "/faq",
-      icon: MessageCircleQuestion,
-    },
-    {
-      label: "Moda Blog",
-      href: "/blog",
-      icon: Feather,
-    },
+    { label: "Hakkımızda", href: "/about", icon: Sparkles },
+    { label: "Bize Ulaşın", href: "/contact", icon: PhoneOutgoing },
+    { label: "S.S.S", href: "/faq", icon: MessageCircleQuestion },
+    { label: "Moda Blog", href: "/blog", icon: Feather },
   ];
 
   const collectionLink = links.find((l) => l.label === "Menu")!;
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [collectionOpen, setCollectionOpen] = useState(false);
-  const pathname = usePathname() || "/";
   const router = useRouter();
-  const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(
     null
   );
-  const cartDropdownRef = useRef<{ open: () => void }>(null);
   const { favorites } = useFavorite();
 
   useEffect(() => {
@@ -99,18 +78,12 @@ export default function Navbar() {
         setFavoriteCount(0);
       }
     };
-
     fetchFavorites();
-
-    const handleFavoriteChange = (e: any) => {
+    const handleFavoriteChange = (e: any) =>
       setFavoriteCount((prev) => prev + e.detail);
-    };
-
     window.addEventListener("favoriteChanged", handleFavoriteChange);
-
-    return () => {
+    return () =>
       window.removeEventListener("favoriteChanged", handleFavoriteChange);
-    };
   }, []);
 
   useEffect(() => {
@@ -118,13 +91,8 @@ export default function Navbar() {
       try {
         const res = await fetch("/api/account/check");
         const data = await res.json();
-        if (data.user) {
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
+        setUser(data.user || null);
       } catch (error) {
-        console.error("Kullanıcı kontrolü hatası:", error);
         setUser(null);
       }
     };
@@ -135,8 +103,9 @@ export default function Navbar() {
     if (!user) {
       const updateCart = () => {
         const count = getGuestCartCount();
-        const event = new CustomEvent("cartCountUpdated", { detail: count });
-        window.dispatchEvent(event);
+        window.dispatchEvent(
+          new CustomEvent("cartCountUpdated", { detail: count })
+        );
       };
       updateCart();
       window.addEventListener("cartUpdated", updateCart);
@@ -146,25 +115,28 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
-
     window.addEventListener("scroll", handleScroll);
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // --- Görsel Tasarım ---
+  // Renk Mantığı
+  const getNavbarBg = () => {
+    if (scrolled) return "bg-zinc-800/50 backdrop-blur-2xl py-3 shadow-sm";
+
+    // Scroll edilmediğinde:
+    return isHomePage
+      ? "bg-transparent backdrop-blur-xs py-6" // Ana sayfada şeffaf
+      : "bg-zinc-700/50 backdrop-blur-2xl py-6 sticky"; // Diğer sayfalarda zinc-700
+  };
+
   return (
     <>
       <nav
         className={`
           fixed top-0 left-0 right-0 z-50 
           transition-all duration-500 ease-in-out
-          ${
-            scrolled
-              ? "bg-zinc-800/50 backdrop-blur-2xl py-3 shadow-sm"
-              : "bg-transparent backdrop-blur-xs py-6"
-          }
           text-white
+          ${getNavbarBg()}
         `}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between">
@@ -192,12 +164,12 @@ export default function Navbar() {
                 />
               </div>
               <span className="text-[11px] tracking-[0.3em] font-light hidden lg:block uppercase">
-                Koleksiyon
+                Menü
               </span>
             </button>
           </div>
 
-          {/* 2. ORTA: Logo (Daha dengeli) */}
+          {/* 2. ORTA: Logo */}
           <div className="flex-shrink-0">
             <Link
               href="/"
@@ -216,12 +188,10 @@ export default function Navbar() {
 
           {/* 3. SAĞ: Minimal Aksiyonlar */}
           <div className="flex-1 flex items-center justify-end gap-2 md:gap-5">
-            {/* Arama - Sadece İkon */}
             <button className="p-2.5 hover:bg-white/10 rounded-full transition-colors group">
               <Search className="h-5 w-5 stroke-[1.5px] group-hover:scale-110 transition-transform" />
             </button>
 
-            {/* Favoriler */}
             <Link
               href="/favorites"
               className="relative p-2.5 hover:bg-white/10 rounded-full transition-colors group"
@@ -232,11 +202,10 @@ export default function Navbar() {
                 }`}
               />
               {favorites.length > 0 && (
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-[#004d00]" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-zinc-800" />
               )}
             </Link>
 
-            {/* Kullanıcı */}
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="p-2.5 hover:bg-white/10 rounded-full transition-colors group"
@@ -244,14 +213,12 @@ export default function Navbar() {
               <User className="h-5 w-5 stroke-[1.5px] group-hover:scale-110 transition-transform" />
             </button>
 
-            {/* Sepet (CartDropdown içeriği bozulmadı) */}
             <div className="pl-2 ml-2 border-l border-white/10">
               <CartDropdown />
             </div>
           </div>
         </div>
 
-        {/* Çok İnce Estetik Çizgi */}
         <div
           className={`absolute bottom-0 left-0 right-0 h-[1px] bg-white/5 transition-opacity ${
             scrolled ? "opacity-100" : "opacity-0"
@@ -259,13 +226,11 @@ export default function Navbar() {
         />
       </nav>
 
-      {/* Mega Menü Bileşenleri (Propslar Korundu) */}
       <CollectionMegaMenu
         collectionOpen={collectionOpen}
         setCollectionOpen={setCollectionOpen}
         collectionLink={collectionLink}
       />
-
       <UserMegaMenu
         user={user}
         userMenuOpen={userMenuOpen}
@@ -273,7 +238,6 @@ export default function Navbar() {
         scrolled={scrolled}
         pathname={pathname}
       />
-
       <MobileNavSheet
         isOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}

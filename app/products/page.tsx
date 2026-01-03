@@ -4,7 +4,7 @@ import Banner from "@/components/modules/home/banner";
 import Testimonials from "@/components/layout/testimonial";
 import Footer from "@/components/layout/footer";
 
-export default function AllProductspage() {
+export default function AllProductsPage() {
   return (
     <div>
       <Navbar />

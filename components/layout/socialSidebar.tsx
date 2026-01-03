@@ -93,7 +93,7 @@ export default function SocialSidebar() {
       <motion.button
         onClick={toggleSidebar}
         whileTap={{ scale: 0.92 }}
-        className="p-3 rounded-full bg-[#7B0323] border-2 border-white hover:bg-[#7B0323] transition-colors text-white"
+        className="p-3 rounded-full bg-zinc-800 border-2 border-white hover:bg-zinc-800/50 transition-colors text-white"
         style={{ marginTop: isOpen ? 12 : 0 }}
         aria-label={isOpen ? "Kapat" : "Aç"}
       >

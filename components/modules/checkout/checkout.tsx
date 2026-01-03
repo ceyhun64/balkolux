@@ -47,7 +47,7 @@ interface User {
 interface Product {
   id: number;
   title: string;
-  pricePerM2: number;
+  price: number;
   mainImage: string;
   oldPrice?: number;
   category: string;
@@ -57,12 +57,6 @@ interface CartItem {
   id: number;
   product: Product;
   quantity: number;
-  note?: string | null;
-  profile?: string;
-  width?: number;
-  height?: number;
-  device?: string;
-  m2?: number;
 }
 
 interface UserUser {
@@ -107,12 +101,6 @@ export default function PaymentPage() {
   const [newAddressForm, setNewAddressForm] = useState(initialAddressForm);
   const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
-
-  const calculateArea = (width?: number, height?: number): number => {
-    if (!width || !height) return 1;
-    const area = (width * height) / 10000;
-    return area < 1 ? 1 : area;
-  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -166,9 +154,8 @@ export default function PaymentPage() {
 
   const subTotal = useMemo(() => {
     return cartItems.reduce((acc, item) => {
-      const area = calculateArea(item.width, item.height);
-      const itemPrice = item.product.pricePerM2 * area;
-      return acc + itemPrice * item.quantity;
+      const itemPrice = item.product.price * item.quantity;
+      return acc + itemPrice;
     }, 0);
   }, [cartItems]);
 
@@ -302,11 +289,6 @@ export default function PaymentPage() {
             body: JSON.stringify({
               productId: item.productId,
               quantity: item.quantity || 1,
-              note: item.note || null,
-              profile: item.profile || "",
-              width: item.width || 0,
-              height: item.height || 0,
-              device: item.device || "vidali",
             }),
           });
         }
@@ -440,22 +422,18 @@ export default function PaymentPage() {
       const billingAddress = { ...shippingAddress };
 
       const basketItemsFormatted = cartItems.map((item) => {
-        const area = calculateArea(item.width, item.height);
-        const unitPrice = item.product.pricePerM2 * area;
+        const unitPrice = item.product.price;
+        const totalPrice = unitPrice * item.quantity;
+
         return {
           id: item.product.id.toString(),
           name: item.product.title,
-          category1: item.product.category,
+          category1: item.product.category || "Genel",
           itemType: "PHYSICAL",
-          price: unitPrice.toFixed(2),
+          price: unitPrice.toFixed(2), // Birim fiyat (Iyzico "price" olarak bekler)
           quantity: item.quantity,
-          profile: item.profile,
-          width: item.width,
-          height: item.height,
-          m2: area,
-          device: item.device,
           unitPrice: unitPrice.toFixed(2),
-          totalPrice: (unitPrice * item.quantity).toFixed(2),
+          totalPrice: totalPrice.toFixed(2),
         };
       });
 
@@ -542,8 +520,6 @@ export default function PaymentPage() {
       </div>
     );
   }
-
- 
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 font-sans">
@@ -664,12 +640,7 @@ export default function PaymentPage() {
 
               {/* Basket Summary */}
               <div className="bg-white rounded-lg shadow-md">
-                <BasketSummaryCard
-                  basketItemsData={cartItems}
-                  subTotal={subTotal}
-                  selectedCargoFee={selectedCargoFee}
-                  totalPrice={totalPrice}
-                />
+                <BasketSummaryCard selectedCargoFee={selectedCargoFee} />
               </div>
 
               {/* Help Section */}

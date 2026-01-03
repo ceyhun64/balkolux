@@ -3,71 +3,80 @@
 export interface GuestCartItem {
   productId: number;
   title: string;
-  pricePerM2: number;
+  price: number; // Prisma modelinizde 'Int price' olduğu için buna uyarladık
   image: string;
   quantity: number;
-  m2?: number;
-  width?: number;
-  height?: number;
-  profile?: string;
-  device?: string;
-  note?: string; // ⚠️ null değil, sadece undefined olabilir
+  category?: string;
 }
+
 const CART_KEY = "guestCart";
 
+// Sepeti getir
 export const getCart = (): GuestCartItem[] => {
   if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-  } catch {
+    const data = localStorage.getItem(CART_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error("Sepet okunurken hata oluştu:", error);
     return [];
   }
 };
 
+// Sepeti kaydet ve diğer bileşenleri bilgilendir
 export const saveCart = (cart: GuestCartItem[]) => {
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  window.dispatchEvent(new CustomEvent("cartUpdated"));
+  if (typeof window !== "undefined") {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    // Navbar gibi bileşenlerin anlık güncellenmesi için custom event tetikler
+    window.dispatchEvent(new CustomEvent("cartUpdated"));
+  }
 };
 
+// Sepete ürün ekle
 export const addToGuestCart = (
   product: Omit<GuestCartItem, "quantity">,
   quantity = 1
 ) => {
   const cart = getCart();
   const existing = cart.find((item) => item.productId === product.productId);
+
   if (existing) {
     existing.quantity += quantity;
   } else {
     cart.push({ ...product, quantity });
   }
+
   saveCart(cart);
 };
 
+// Sepetteki ürün miktarını güncelle (+1 veya -1 için delta kullanılır)
 export const updateGuestCartQuantity = (productId: number, delta: number) => {
   const cart = getCart();
-  const item = cart.find((c) => c.productId === productId);
-  if (item) item.quantity = Math.max(1, item.quantity + delta);
-  saveCart(cart);
+  const index = cart.findIndex((c) => c.productId === productId);
+
+  if (index !== -1) {
+    cart[index].quantity = Math.max(1, cart[index].quantity + delta);
+    saveCart(cart);
+  }
 };
 
+// Sepetten ürün çıkar
 export const removeFromGuestCart = (productId: number) => {
   const newCart = getCart().filter((c) => c.productId !== productId);
   saveCart(newCart);
 };
 
+// Sepetteki toplam ürün çeşidi sayısını getir
 export const getGuestCartCount = (): number => {
   if (typeof window === "undefined") return 0;
-  const data = localStorage.getItem("guestCart");
-  if (!data) return 0;
-  try {
-    const items = JSON.parse(data);
-    return items.length || 0;
-  } catch {
-    return 0;
-  }
+  const cart = getCart();
+  return cart.length;
 };
 
+// Sepeti tamamen temizle
 export const clearGuestCart = () => {
-  localStorage.removeItem(CART_KEY);
-  window.dispatchEvent(new CustomEvent("cartUpdated"));
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(CART_KEY);
+    window.dispatchEvent(new CustomEvent("cartUpdated"));
+  }
 };

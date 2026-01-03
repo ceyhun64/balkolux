@@ -16,7 +16,6 @@ export async function GET(
       include: {
         category: true,
         subCategory: true,
-        room: true,
       },
     });
 
@@ -30,7 +29,6 @@ export async function GET(
           ...product,
           category: product.category.name,
           subCategory: product.subCategory?.name ?? null,
-          room: product.room?.name ?? null,
         },
       },
       { status: 200 }
@@ -68,6 +66,7 @@ export async function DELETE(
     await deleteFile(existingProduct.subImage);
     await deleteFile(existingProduct.subImage2);
     await deleteFile(existingProduct.subImage3);
+    await deleteFile(existingProduct.subImage4);
 
     const product = await prisma.product.delete({
       where: { id: Number(id) },
@@ -96,9 +95,10 @@ export async function PUT(
     const subFile = formData.get("subImageFile") as File | null;
     const subFile2 = formData.get("subImage2File") as File | null;
     const subFile3 = formData.get("subImage3File") as File | null;
+    const subFile4 = formData.get("subImage4File") as File | null;
 
     const title = formData.get("title")?.toString();
-    const pricePerM2 = parseFloat(formData.get("pricePerM2") as string);
+    const price = parseFloat(formData.get("price") as string);
     const rating = parseInt(formData.get("rating") as string);
     const reviewCount = formData.get("reviewCount")
       ? parseInt(formData.get("reviewCount") as string)
@@ -106,10 +106,7 @@ export async function PUT(
 
     const mainCategoryName = formData.get("category") as string;
     const subCategoryName = formData.get("subCategory") as string | null;
-    const roomName = formData.get("room") as string | null;
     const description = formData.get("description")?.toString() || "";
-
-   
 
     if (!mainCategoryName) {
       return NextResponse.json(
@@ -141,18 +138,6 @@ export async function PUT(
         );
       }
       subCategoryId = subCategory.id;
-    }
-
-    let roomId: number | undefined = undefined;
-    if (roomName && roomName !== "null") {
-      const room = await prisma.room.findFirst({ where: { name: roomName } });
-      if (!room) {
-        return NextResponse.json(
-          { success: false, error: "Oda bulunamadı." },
-          { status: 404 }
-        );
-      }
-      roomId = room.id;
     }
 
     const existingProduct = await prisma.product.findUnique({
@@ -196,12 +181,15 @@ export async function PUT(
     const subImage3Path = subFile3
       ? await uploadFile(subFile3)
       : existingProduct.subImage3;
+    const subImage4Path = subFile4
+      ? await uploadFile(subFile4)
+      : existingProduct.subImage4;
 
     const updatedProduct = await prisma.product.update({
       where: { id: Number(id) },
       data: {
         title,
-        pricePerM2,
+        price,
         description,
         rating,
         reviewCount,
@@ -209,14 +197,13 @@ export async function PUT(
         subImage: subImagePath,
         subImage2: subImage2Path,
         subImage3: subImage3Path,
+        subImage4: subImage4Path,
         categoryId: mainCategory.id,
         subCategoryId,
-        roomId,
       },
       include: {
         category: true,
         subCategory: true,
-        room: true,
       },
     });
 
@@ -227,7 +214,6 @@ export async function PUT(
           ...updatedProduct,
           category: updatedProduct.category.name,
           subCategory: updatedProduct.subCategory?.name ?? null,
-          room: updatedProduct.room?.name ?? null,
         },
       },
       { status: 200 }

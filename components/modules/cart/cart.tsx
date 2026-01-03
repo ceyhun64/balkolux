@@ -6,7 +6,6 @@ import CartItem from "./cartItem";
 import CartSummary from "./cartSummary";
 import { Button } from "../../ui/button";
 import { ShoppingBag } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -20,7 +19,7 @@ import {
 interface Product {
   id: number;
   title: string;
-  pricePerM2: number;
+  price: number; // Prisma: Int
   mainImage: string;
   category: string;
 }
@@ -29,12 +28,6 @@ export interface CartItemType {
   id: number;
   product: Product;
   quantity: number;
-  note?: string | null;
-  profile?: string;
-  width?: number;
-  height?: number;
-  device?: string;
-  m2?: number;
 }
 
 export default function Cart() {
@@ -72,16 +65,10 @@ export default function Cart() {
         product: {
           id: item.productId,
           title: item.title,
-          pricePerM2: item.pricePerM2,
+          price: item.price,
           mainImage: item.image,
-          category: "Plicell",
+          category: item.category || "Genel",
         },
-        m2: item.m2,
-        width: item.width,
-        height: item.height,
-        profile: item.profile,
-        device: item.device,
-        note: item.note,
       }));
       setCartItems(guestCart);
     } catch (err) {
@@ -110,7 +97,7 @@ export default function Cart() {
   useEffect(() => {
     (async () => {
       const logged = await checkLogin();
-      if (logged) fetchCart();
+      if (logged) await fetchCart();
       else loadGuestCart();
     })();
   }, [checkLogin, fetchCart, loadGuestCart]);
@@ -118,13 +105,11 @@ export default function Cart() {
   // ---------- Quantity Update ----------
   const handleQuantityChange = async (id: number, delta: number) => {
     if (!isLoggedIn) {
-      // GUEST CART
       updateGuestCartQuantity(id, delta);
       loadGuestCart();
       return;
     }
 
-    // LOGGED-IN CART
     const item = cartItems.find((c) => c.id === id);
     if (!item) return;
 
@@ -138,16 +123,15 @@ export default function Cart() {
         credentials: "include",
       });
 
-      const updatedItem = await res.json();
-
       if (res.ok) {
+        const updatedItem = await res.json();
         setCartItems((prev) =>
           prev.map((c) =>
             c.id === id ? { ...c, quantity: updatedItem.quantity } : c
           )
         );
       } else {
-        toast.error(updatedItem.error || "Güncelleme başarısız");
+        toast.error("Güncelleme başarısız");
       }
     } catch {
       toast.error("Miktar güncellenemedi");
@@ -177,45 +161,34 @@ export default function Cart() {
     }
   };
 
+  // ✅ Yeni sadeleştirilmiş subtotal hesabı: price * quantity
   const subtotal = cartItems.reduce((acc, item) => {
-    const price = item.product.pricePerM2 || 0;
+    const price = item.product.price || 0;
     const quantity = item.quantity || 1;
-    const m2 = item.m2 || 1;
-    return acc + price * quantity * m2;
+    return acc + price * quantity;
   }, 0);
 
   if (isLoading) {
     return (
       <div className="container mx-auto px-3 md:px-40 py-8 md:py-16 mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-12 font-serif">
-          Sepetim
-        </h2>
-
+        <Skeleton className="h-10 w-48 mx-auto mb-12" />
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Sol taraf skeleton ürün listesi */}
           <div className="flex-1 space-y-6">
-            {[1, 2, 3].map((i) => (
+            {[1, 2].map((i) => (
               <div
                 key={i}
-                className="flex items-center gap-4 p-4 border rounded-lg shadow-sm"
+                className="flex items-center gap-4 p-4 border rounded-lg"
               >
                 <Skeleton className="w-24 h-24 rounded-md" />
-                <div className="flex-1 space-y-3">
-                  <Skeleton className="h-4 w-3/4" />
+                <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-4 w-1/4" />
                 </div>
-                <Skeleton className="w-10 h-10 rounded-md" />
               </div>
             ))}
           </div>
-
-          {/* Sağ taraf summary skeleton */}
-          <div className="w-full md:w-80 p-6 border rounded-lg shadow-md space-y-4">
-            <Skeleton className="h-6 w-1/2" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="h-10 w-full rounded-md" />
+          <div className="w-full md:w-80 p-6 border rounded-lg space-y-4">
+            <Skeleton className="h-32 w-full" />
           </div>
         </div>
       </div>
@@ -223,15 +196,17 @@ export default function Cart() {
   }
 
   const EmptyCart = () => (
-    <div className="flex flex-col items-center justify-center mt-16 space-y-4 text-gray-500">
-      <ShoppingBag className="h-12 w-12 text-gray-400 animate-bounce" />
-      <p className="text-lg font-semibold">Sepetiniz boş</p>
-      <p className="text-sm text-gray-400 text-center px-4">
-        Sepetinize ürün eklemek için ürünleri keşfedin ve alışverişe başlayın.
+    <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 text-gray-500">
+      <div className="p-6 bg-gray-50 rounded-full">
+        <ShoppingBag className="h-16 w-16 text-gray-300" />
+      </div>
+      <p className="text-xl font-semibold text-gray-900">Sepetiniz şu an boş</p>
+      <p className="text-sm text-gray-400 text-center max-w-xs">
+        Görünüşe göre henüz sepetinize bir ürün eklemediniz.
       </p>
       <Link href="/products">
-        <Button variant="outline" className="mt-2 rounded-full">
-          Ürünleri Keşfet
+        <Button className="mt-4 bg-[#7B0323] hover:bg-[#5E021A] text-white rounded-full px-8 py-6">
+          Alışverişe Başla
         </Button>
       </Link>
     </div>
@@ -240,17 +215,16 @@ export default function Cart() {
   return (
     <div className="container mx-auto px-3 md:px-40 py-8 md:py-16 mb-12">
       {cartItems.length > 0 && (
-        <h2 className="relative text-3xl md:text-4xl font-bold text-gray-800 text-center mb-12 font-serif">
-          <span className="absolute inset-0 -z-10 bg-pink-200 rounded-lg opacity-20 blur-xl"></span>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-12">
           Sepetim
-        </h2>
+        </h1>
       )}
 
       {cartItems.length === 0 ? (
         <EmptyCart />
       ) : (
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="flex-1 space-y-6">
+        <div className="flex flex-col lg:flex-row gap-10">
+          <div className="flex-1 space-y-4">
             {cartItems.map((item) => (
               <CartItem
                 key={item.id}
@@ -262,7 +236,9 @@ export default function Cart() {
             ))}
           </div>
 
-          <CartSummary subtotal={subtotal} />
+          <div className="w-full lg:w-[380px]">
+            <CartSummary subtotal={subtotal} />
+          </div>
         </div>
       )}
     </div>

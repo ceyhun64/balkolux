@@ -16,7 +16,6 @@ interface ProductData {
   reviewCount?: number;
   category: string;
   subCategory?: string;
-  room?: string;
 }
 
 // ======================================================
@@ -28,7 +27,6 @@ export async function GET() {
       include: {
         category: true,
         subCategory: true,
-        room: true, // 🆕 room ilişkisi
       },
       orderBy: { createdAt: "desc" },
     });
@@ -47,7 +45,6 @@ export async function GET() {
       subImage4: p.subImage4 ?? undefined,
       category: p.category.name,
       subCategory: p.subCategory?.name ?? undefined,
-      room: p.room?.name ?? undefined, // 🆕 room ilişkisi
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     }));
@@ -155,24 +152,6 @@ export async function POST(request: Request) {
       subCategoryId = subCategory.id;
     }
 
-    // Find room
-    let roomId: number | undefined = undefined;
-
-    if (roomName) {
-      const room = await prisma.room.findFirst({
-        where: { name: roomName },
-      });
-
-      if (!room) {
-        return NextResponse.json(
-          { success: false, error: "Oda kategorisi bulunamadı." },
-          { status: 404 }
-        );
-      }
-
-      roomId = room.id;
-    }
-
     // Create product
     const newProduct = await prisma.product.create({
       data: {
@@ -188,12 +167,10 @@ export async function POST(request: Request) {
         subImage4: subImage4Path,
         categoryId: category.id,
         subCategoryId,
-        roomId, // 🆕 room ilişkisi
       },
       include: {
         category: true,
         subCategory: true,
-        room: true,
       },
     });
 
@@ -210,7 +187,6 @@ export async function POST(request: Request) {
       subImage3: newProduct.subImage3 ?? undefined,
       category: newProduct.category.name,
       subCategory: newProduct.subCategory?.name,
-      room: newProduct.room?.name ?? undefined,
     };
 
     return NextResponse.json(
