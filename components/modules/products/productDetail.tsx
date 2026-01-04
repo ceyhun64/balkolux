@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import {
@@ -33,6 +33,10 @@ export default function ProductDetailPage() {
 
   const { isFavorited, addFavorite, removeFavorite } = useFavorite();
 
+  const cartDropdownRef = useRef<{ open: () => void; refreshCart: () => void }>(
+    null
+  );
+
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
@@ -48,6 +52,72 @@ export default function ProductDetailPage() {
     };
     if (productId) fetchProduct();
   }, [productId]);
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      try {
+        const res = await fetch("/api/account/check", {
+          credentials: "include",
+        });
+        if (!res.ok) return setIsLoggedIn(false);
+        const data = await res.json();
+        setIsLoggedIn(!!data.user?.id);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+    checkLogin();
+  }, []);
+
+  const handleAddToCart = async () => {
+    if (!product) {
+      toast.error("Ürün bilgisi bulunamadı.");
+      return;
+    }
+
+    const item = {
+      productId: product.id,
+      quantity,
+      title: product.title,
+      price: product.price,
+      image: product.mainImage,
+    };
+
+    // Misafir kullanıcı için sepete ekle
+    if (!isLoggedIn) {
+      addToGuestCart(item);
+      toast.success("Ürün sepete eklendi.");
+      window.dispatchEvent(new CustomEvent("cartUpdated"));
+      return;
+    }
+
+    // Giriş yapmış kullanıcı için API'ye gönder
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(item),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(
+          `Ürün sepete eklendi! Toplam: ₺${(
+            product.price * quantity
+          ).toLocaleString("tr-TR")}`
+        );
+        window.dispatchEvent(new CustomEvent("cartUpdated"));
+        cartDropdownRef.current?.open?.();
+        cartDropdownRef.current?.refreshCart?.();
+      } else {
+        toast.error(data.error || "Sepete eklenemedi");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Sepete ekleme sırasında bir hata oluştu.");
+    }
+  };
 
   if (loading) return <ProductDetailSkeleton />;
   if (!product)
@@ -66,7 +136,7 @@ export default function ProductDetailPage() {
   ].filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-stone-800 selection:bg-stone-100">
+    <div className="min-h-screen bg-zinc-50 text-stone-800">
       {/* Üst Navigasyon */}
       <div className="max-w-[1600px] mx-auto px-6 py-8">
         <Link
@@ -163,7 +233,7 @@ export default function ProductDetailPage() {
 
                   {/* Sepete Ekle */}
                   <button
-                    onClick={() => toast.success("Sepete eklendi")}
+                    onClick={handleAddToCart}
                     className="flex-1 h-14 bg-stone-900 text-white text-[11px] uppercase tracking-[0.3em] font-bold hover:bg-stone-800 transition-all duration-500"
                   >
                     Sepete Ekle

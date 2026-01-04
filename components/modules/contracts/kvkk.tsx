@@ -1,216 +1,150 @@
 "use client";
 
 import React from "react";
-import { MapPin, Phone, Globe, Mail, ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+import { Shield, ArrowRight, MapPin, Phone, Mail } from "lucide-react";
 
 export default function KvkkPage() {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-16 space-y-12 font-sans">
-      {/* Başlık */}
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">
-          KVKK Aydınlatma Metni
-        </h1>
-        <p className="text-gray-500">yazan Moda Perde - 22 Nisan 2025</p>
-      </div>
+    <div className="bg-white min-h-screen selection:bg-stone-100 selection:text-stone-900">
+      <div className="max-w-5xl mx-auto px-6 py-24 md:py-32">
+        {/* Üst Başlık - Minimalist */}
+        <header className="mb-24 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 text-stone-400"
+          >
+            <Shield size={14} strokeWidth={1.5} />
+            <span className="text-[10px] tracking-[0.5em] uppercase font-medium">
+              Güvenlik & Gizlilik
+            </span>
+          </motion.div>
 
-      {/* İçerik */}
-      <div className="space-y-6 text-gray-700 leading-relaxed">
-        <p>
-          NowArt olarak,{" "}
-          <strong>6698 sayılı Kişisel Verilerin Korunması Kanunu</strong>{" "}
-          ("KVKK") kapsamında kişisel verilerinizin korunmasına büyük önem
-          veriyoruz. Bu Aydınlatma Metni ile kişisel verilerinizin hangi
-          amaçlarla işlendiği, nasıl toplandığı, hangi süreyle saklandığı ve
-          haklarınız hakkında bilgi verilmektedir.
-        </p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-6xl font-serif text-stone-900 leading-tight"
+          >
+            KVKK <br />
+            <span className="italic font-light text-stone-400">
+              Aydınlatma Metni
+            </span>
+          </motion.h1>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            1. Veri Sorumlusunun Kimliği
-          </h2>
-          <div className="mt-3 bg-rose-50 p-6 rounded-xs shadow-sm border border-rose-100">
-            <p className="font-medium">
-              Şirket Adı: <span className="font-normal">Moda Perde</span>
+          <p className="text-[11px] text-stone-400 font-medium tracking-widest uppercase border-t border-stone-100 pt-6">
+            Yürürlük: 22 Nisan 2025 — Veri Sorumlusu: Moda Perde
+          </p>
+        </header>
+
+        {/* Ana İçerik - İnce Tipografi */}
+        <div className="space-y-20">
+          {/* Giriş Paradrafı */}
+          <section className="max-w-3xl">
+            <p className="text-stone-500 text-lg font-light leading-relaxed italic">
+              "Verilerinizin gizliliği, tasarımlarımızdaki hassasiyet kadar
+              değerlidir."
             </p>
-            <p className="font-medium">
-              Adres:{" "}
-              <span className="font-normal">
-                Mustafa Kökmen Blv. 91, 27700 Gaziantep, Nizip Türkiye
-              </span>
-            </p>
-            <p className="font-medium">
-              Telefon: <span className="font-normal">+90 533 387 40 74</span>
-            </p>
-            <p className="font-medium">
-              E-posta:{" "}
-              <span className="font-normal">info@modaperde.com</span>
-            </p>
-            <p className="font-medium">
-              Web Site: <span className="font-normal">modaperde.com</span>
-            </p>
-          </div>
-        </section>
+          </section>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            2. Kişisel Verilerin İşlenme Amaçları
-          </h2>
-          <p className="mt-3">
-            Kişisel verileriniz aşağıdaki amaçlarla işlenmektedir:
-          </p>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>Sipariş işlemlerinin gerçekleştirilmesi ve takibi.</li>
-            <li>Müşteri desteği sağlanması.</li>
-          </ul>
-        </section>
+          {/* Grid Yapılı Maddeler */}
+          <div className="space-y-16 border-t border-stone-100 pt-16">
+            {/* 01. Veri Sorumlusu */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <h2 className="text-[11px] font-bold text-stone-900 tracking-[0.3em] uppercase">
+                01. Veri Sorumlusu
+              </h2>
+              <div className="md:col-span-2">
+                <p className="text-sm text-stone-500 font-light leading-relaxed mb-6">
+                  6698 sayılı Kişisel Verilerin Korunması Kanunu uyarınca,
+                  kişisel verileriniz veri sorumlusu olarak Moda Perde
+                  tarafından aşağıda açıklanan kapsamda işlenebilecektir.
+                </p>
+                <address className="not-italic bg-stone-50 p-8 text-[13px] text-stone-600 space-y-2 font-light border-l-2 border-stone-200">
+                  <span className="text-stone-900 font-medium block">
+                    Moda Perde
+                  </span>
+                  Mustafa Kökmen Blv. 91, Nizip / Gaziantep <br />
+                  info@modaperde.com — +90 533 387 40 74
+                </address>
+              </div>
+            </div>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            3. İşlenen Kişisel Veri Türleri
-          </h2>
-          <p className="mt-3">
-            Aşağıdaki kişisel veri türleri; amaçlar doğrultusunda
-            işlenebilmektedir:
-          </p>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>Ad, soyad</li>
-            <li>Telefon numarası</li>
-            <li>E-posta adresi</li>
-            <li>IP adresi</li>
-            <li>Adres bilgisi</li>
-          </ul>
-        </section>
+            {/* 02. İşlenme Amaçları */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-stone-50 pt-16">
+              <h2 className="text-[11px] font-bold text-stone-900 tracking-[0.3em] uppercase">
+                02. İşleme Amaçları
+              </h2>
+              <div className="md:col-span-2 space-y-6">
+                <p className="text-sm text-stone-500 font-light leading-relaxed">
+                  Toplanan kişisel verileriniz, operasyonel süreçlerin yönetimi
+                  ve sizlere daha rafine bir hizmet sunulabilmesi adına şu
+                  amaçlarla işlenmektedir:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    "Sipariş Yönetimi",
+                    "Lojistik & Teslimat",
+                    "Satış Sonrası Destek",
+                    "Yasal Yükümlülükler",
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 text-xs text-stone-600 font-light border-b border-stone-50 pb-3"
+                    >
+                      <ArrowRight size={10} className="text-stone-300" /> {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            4. Veri Toplama Yöntemleri
-          </h2>
-          <p className="mt-3">
-            Kişisel verileriniz aşağıdaki yöntemlerle toplanabilir:
-          </p>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>Web sitesinde bulunan formlar aracılığıyla.</li>
-            <li>Çerezler (cookies) yoluyla.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            5. Verilerin Paylaşımı ve Aktarımı
-          </h2>
-          <p className="mt-3">
-            Kişisel verileriniz, aşağıdaki kişi ve kuruluşlarla paylaşılabilir:
-          </p>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>Kargo şirketleri (sipariş teslimatı için gerektiğinde).</li>
-            <li>
-              Ödeme hizmet sağlayıcıları (ödeme işlemleri için gerekli
-              bilgiler).
-            </li>
-            <li>Resmi merciler (yasal yükümlülükler gerektirdiğinde).</li>
-          </ul>
-          <p className="mt-2">
-            <strong>Yurt dışına veri aktarımı:</strong> Yapılmamaktadır.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            6. Verilerin Saklanma Süresi
-          </h2>
-          <p className="mt-3">
-            Kişisel verileriniz, ilgili mevzuatta öngörülen saklama süreleri ve
-            yasal yükümlülükler çerçevesinde tutulacaktır. Ayrıca müşteri
-            iletişim bilgileri hizmetin gerektirdiği süre boyunca saklanacaktır.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            7. Kullanıcı Hakları
-          </h2>
-          <p className="mt-3">
-            KVKK’nın 11. maddesi uyarınca sahip olduğunuz haklar şunlardır:
-          </p>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme.</li>
-            <li>İşlenmişse buna ilişkin bilgi talep etme.</li>
-            <li>
-              İşleme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme.
-            </li>
-            <li>Verilerin aktarıldığı üçüncü kişileri bilme.</li>
-            <li>Eksik veya yanlış işlenmişse düzeltilmesini isteme.</li>
-            <li>
-              KVKK’da öngörülen şartlar çerçevesinde silinmesini veya yok
-              edilmesini isteme.
-            </li>
-            <li>
-              Bu işlemlerin, verilerin aktarıldığı üçüncü kişilere
-              bildirilmesini talep etme.
-            </li>
-            <li>
-              Otomatik sistemler aracılığıyla analiz edilmesi nedeniyle
-              aleyhinize bir sonuç oluşmasına itiraz etme.
-            </li>
-            <li>
-              Kanuna aykırı işlenmesi nedeniyle zarara uğramanız hâlinde
-              tazminat talep etme.
-            </li>
-          </ul>
-          <p className="mt-3">
-            Bu hakları kullanmak için bizimle iletişime geçebilirsiniz; iletişim
-            bilgileri aşağıda yer almaktadır.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            8. Veri Güvenliği Tedbirleri
-          </h2>
-          <p className="mt-3">
-            NowArt olarak kişisel verilerinizin gizliliğini ve güvenliğini
-            sağlamak için hem teknolojik hem de idari tedbirler almaktayız.
-            Verilere yetkisiz erişimleri engellemek ve kötüye kullanımı önlemek
-            için güvenlik uygulamalarımız sürekli güncellenmektedir.
-          </p>
-        </section>
-      </div>
-
-      {/* İletişim Kartı */}
-      <div className="bg-rose-50 p-8 rounded-xs shadow-lg space-y-4 border border-rose-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">İletişim</h2>
-        <div className="space-y-3 text-gray-700">
-          <div className="flex items-start gap-3">
-            <MapPin className="w-5 h-5 text-rose-500" />
-            <div>
-              <p>Mustafa Kökmen Blv. 91, 27700 Gaziantep, Nizip Türkiye</p>
+            {/* 07. Kullanıcı Hakları */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-stone-50 pt-16">
+              <h2 className="text-[11px] font-bold text-stone-900 tracking-[0.3em] uppercase">
+                07. Haklarınız
+              </h2>
+              <div className="md:col-span-2">
+                <p className="text-sm text-stone-500 font-light leading-relaxed mb-8">
+                  Kanun’un 11. maddesi uyarınca verilerinizin silinmesini,
+                  düzeltilmesini veya işlenme durumunun sorgulanmasını her zaman
+                  talep edebilirsiniz.
+                </p>
+                <button className="text-[10px] tracking-[0.3em] uppercase font-bold text-stone-900 border-b border-stone-900 pb-2 hover:text-stone-400 hover:border-stone-400 transition-all duration-500">
+                  Başvuru Formunu İndir
+                </button>
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <Phone className="w-5 h-5 text-rose-500" />
-            <span>+90 533 387 40 74</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Globe className="w-5 h-5 text-rose-500" />
-            <span>modaperde.com</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Mail className="w-5 h-5 text-rose-500" />
-            <span>info@modaperde.com</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-rose-500" />
-            <span>
-              Kişisel verilerinizin korunması için alınan güvenlik tedbirleri
-              uygulanmaktadır.
-            </span>
-          </div>
         </div>
+
+        {/* Minimal Footer İletişim */}
+        <footer className="mt-32 pt-16 border-t border-stone-900/10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="flex gap-12">
+              <div className="space-y-2">
+                <p className="text-[9px] tracking-widest text-stone-400 uppercase">
+                  E-Posta
+                </p>
+                <p className="text-xs font-light text-stone-600">
+                  privacy@modaperde.com
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[9px] tracking-widest text-stone-400 uppercase">
+                  Telefon
+                </p>
+                <p className="text-xs font-light text-stone-600">
+                  +90 533 387 40 74
+                </p>
+              </div>
+            </div>
+            <p className="text-[9px] text-stone-300 tracking-[0.2em] uppercase">
+              © 2026 Moda Perde Tüm Hakları Saklıdır.
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   );

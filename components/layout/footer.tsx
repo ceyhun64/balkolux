@@ -33,9 +33,16 @@ export default function Footer() {
     sozlesmeler: {
       title: "SÖZLEŞMELER",
       links: [
-        { label: "Üyelik Sözleşmesi", href: "/contracts/membership" },
-        { label: "KVKK Politikası", href: "/contracts/kvkk" },
-        { label: "Gizlilik ve Güvenlik", href: "/contracts/privacy" },
+        { href: "/contracts/kvkk", label: "KVKK Aydınlatma Metni" },
+        {
+          href: "/contracts/distance_sale",
+          label: "Mesafeli Satış Sözleşmesi",
+        },
+        {
+          href: "/contracts/personal_data",
+          label: "Kişisel Veriler Onay Metni",
+        },
+        { href: "/contracts/payment_options", label: "Ödeme Seçenekleri" },
       ],
     },
   };

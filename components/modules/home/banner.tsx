@@ -1,55 +1,99 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react"; // Simge eklemek zenginlik katar
+import { ArrowRight } from "lucide-react";
 
 export default function Banner() {
-  const [banner, setBanner] = useState<{
-    title?: string;
-    subtitle?: string;
-  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
-    // API simülasyonu veya fetch
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
-    return <Skeleton className="w-full h-[500px] mb-12 rounded-none" />;
+    return (
+      <Skeleton className="w-full h-[600px] rounded-none bg-stone-900/10" />
+    );
   }
 
   return (
-    <section className="bg-zinc-700 py-32 overflow-hidden relative">
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-neutral-800/30 skew-x-12 translate-x-20" />
-
-      <div className="container mx-auto px-6 md:px-12 relative z-10 flex flex-col items-center text-center">
-        <h2 className="luxury-serif text-4xl md:text-6xl text-white mb-8">
-          Hayalinizdeki Salonu <br />{" "}
-          <span className="italic">Beraber Tasarlayalım.</span>
-        </h2>
-        <p className="modern-sans text-neutral-400 font-light max-w-lg mb-12">
-          Kişiye özel kumaş seçimleri ve ölçülendirme hizmetimizle, mekanınıza
-          tam uyum sağlayan çözümler sunuyoruz.
-        </p>
-        <button className="group flex items-center gap-4 bg-white text-neutral-900 px-10 py-5 rounded-full hover:bg-neutral-200 transition-all duration-500">
-          <span className="modern-sans text-xs font-bold tracking-[0.2em] uppercase">
-            Danışmanlık Al
-          </span>
-          <ArrowRight
-            size={18}
-            className="group-hover:translate-x-2 transition-transform"
-          />
-        </button>
+    <section className="relative w-full min-h-[70vh] flex items-center justify-center overflow-hidden bg-[#0f0f0f] py-24">
+      {/* Arka Plan Dokusu ve Işık Oyunu */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')] opacity-20" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 0.15, scale: 1 }}
+          transition={{ duration: 3, ease: "easeOut" }}
+          className="absolute -top-[20%] -right-[10%] w-[60%] h-[100%] bg-stone-400 rounded-full blur-[150px]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0f0f0f]/80" />
       </div>
+
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Üst Küçük Başlık */}
+          <motion.span
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="text-[10px] md:text-[11px] tracking-[0.6em] text-stone-500 uppercase mb-8 block font-medium"
+          >
+            Atölye & Tasarım Hizmetleri
+          </motion.span>
+
+          {/* Ana Başlık */}
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 0.2 }}
+            className="text-5xl md:text-8xl text-white font-serif leading-[1.1] tracking-tight mb-10"
+          >
+            Hayalinizdeki Salonu <br />
+            <span className="italic font-light text-stone-300">
+              Beraber Tasarlayalım.
+            </span>
+          </motion.h2>
+
+          {/* Açıklama Metni */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.5, delay: 0.5 }}
+            className="text-stone-400 text-sm md:text-base font-light max-w-xl mx-auto leading-relaxed mb-14"
+          >
+            Kişiye özel kumaş seçkisi ve hassas ölçülendirme disipliniyle,
+            mekanınızın ruhuna eşlik eden rafine çözümler sunuyoruz.
+          </motion.p>
+
+          {/* Buton - Minimal ama Güçlü */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.8 }}
+          >
+            <button className="group relative inline-flex items-center gap-6 px-12 py-6 bg-transparent overflow-hidden border border-stone-800 hover:border-stone-400 transition-all duration-700">
+              {/* Hover Arka Planı */}
+              <div className="absolute inset-0 w-0 bg-white group-hover:w-full transition-all duration-700 ease-[0.19,1,0.22,1]" />
+
+              <span className="relative z-10 text-[11px] tracking-[0.4em] uppercase text-stone-200 group-hover:text-stone-950 font-bold transition-colors duration-500">
+                Danışmanlık Al
+              </span>
+              <ArrowRight
+                size={16}
+                className="relative z-10 text-stone-500 group-hover:text-stone-950 group-hover:translate-x-2 transition-all duration-500"
+              />
+            </button>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Estetik Kenar Çizgileri */}
+      <div className="absolute left-12 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-stone-800 to-transparent opacity-30 hidden lg:block" />
+      <div className="absolute right-12 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-stone-800 to-transparent opacity-30 hidden lg:block" />
     </section>
   );
 }

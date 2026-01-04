@@ -1,190 +1,147 @@
 "use client";
 
 import React from "react";
-import { MapPin, Phone, Globe, Mail, Package } from "lucide-react";
+import { MapPin, Phone, Mail, ArrowUpRight } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function DistanceSalesContract() {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-16 space-y-12 font-sans">
-      {/* Başlık */}
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Mesafeli Satış Sözleşmesi
-        </h1>
-        <p className="text-gray-500">yazan Moda Perde - 05 Haziran 2025</p>
-      </div>
-
-      {/* İçerik */}
-      <div className="space-y-6 text-gray-700 leading-relaxed">
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">1. Taraflar</h2>
-          <p className="mt-2">
-            Bu sözleşme, Satıcı ile Alıcı arasında elektronik ortamda
-            kurulmuştur.
-          </p>
-          <div className="mt-3 bg-rose-50 p-6 rounded-xs shadow-sm border border-rose-100">
-            <p className="font-medium">Satıcı Bilgileri:</p>
-            <ul className="list-disc list-inside mt-1 ml-4 space-y-1">
-              <li>Unvan: Moda Perde</li>
-              <li>
-                Adres: Mustafa Kökmen Blv. 91, 27700 Gaziantep, Nizip Türkiye
-              </li>
-              <li>Telefon: +90 533 387 40 74</li>
-              <li>E-posta: info@modaperde.com</li>
-              <li>Web Sitesi: modaperde.com</li>
-            </ul>
-            <p className="mt-2 font-medium">Alıcı Bilgileri:</p>
-            <p>
-              Alıcı, sipariş sırasında paylaştığı ad, soyad, adres, telefon ve
-              e-posta bilgileri ile tanımlanır.
-            </p>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            2. Sözleşmenin Konusu ve Kapsamı
-          </h2>
-          <p className="mt-2">
-            Bu sözleşme, Alıcı'nın sipariş verdiği ürünlerin/hizmetlerin satışı
-            ve teslimine ilişkin hak ve yükümlülükleri kapsar.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            3. Ürün/Hizmet Bilgileri
-          </h2>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>Ürün Adı: [Sipariş edilen ürünlerin isimleri]</li>
-            <li>Adet: [Ürün adedi]</li>
-            <li>Fiyat: [Ürün birim fiyatı ve toplam fiyat (KDV dahil)]</li>
-            <li>Kargo Ücreti: [Kargo ücreti (varsa)]</li>
-            <li>Teslimat Adresi: [Alıcı tarafından belirtilen adres]</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            4. Ödeme ve Teslimat Şartları
-          </h2>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>
-              Ödeme, krosei kartı, havale/EFT veya Satıcı tarafından belirlenen
-              diğer yöntemlerle yapılır.
-            </li>
-            <li>
-              Sipariş onaylandıktan sonra ürünler en geç 7 iş günü içinde
-              kargoya verilecektir.
-            </li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            5. Cayma Hakkı
-          </h2>
-          <p className="mt-2">
-            Alıcı, ürün teslim tarihinden itibaren 14 gün içinde gerekçe
-            göstermeksizin cayma hakkını kullanabilir. Cayma hakkının kullanımı
-            için Satıcı'ya yazılı bildirim yapılmalıdır.
-          </p>
-          <p className="mt-2 font-medium">
-            Cayma hakkının kullanılamadığı durumlar:
-          </p>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>
-              Kişiye özel üretilen ürünler, hasarlı çıkmadıkça iade edilemez.
-            </li>
-            <li>
-              Kargo ücretleri karşılanmadığında geri gönderimde iade yapılmaz.
-            </li>
-            <li>Teslim sonrası açılan veya deforme ürünler.</li>
-            <li>
-              Kişiye özel ölçülerde üretilen ürünler, yeniden satışa sunulamaz.
-            </li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            6. İade ve Değişim Koşulları
-          </h2>
-          <p className="mt-2">
-            Kişiye özel ebatlarda üretilen ürünlerde iade hakkı yoktur. Sipariş
-            ile bu koşullar kabul edilmiş sayılır.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            7. Sorumluluklar ve Garantiler
-          </h2>
-          <ul className="list-disc list-inside mt-2 ml-4 space-y-1">
-            <li>
-              Ürün teslim sırasında hasarlı veya eksikse, kargo görevlisine
-              tutanakla bildirilmelidir.
-            </li>
-            <li>Ayıplı mal durumunda, Alıcı kanuni haklarını kullanabilir.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            8. Hukuki Uyuşmazlıklar
-          </h2>
-          <p className="mt-2">
-            İşbu sözleşmeden doğabilecek ihtilaflarda, Tüketici Hakem Heyetleri
-            ve Tüketici Mahkemeleri yetkilidir.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-900">
-            9. Elektronik Onay ve Yürürlük
-          </h2>
-          <p className="mt-2">
-            Alıcı, sözleşmenin tüm koşullarını elektronik ortamda kabul etmiş
-            olup, sipariş onayı ile yürürlüğe girer.
-          </p>
-        </section>
-      </div>
-
-      {/* İletişim Kartı */}
-      <div className="bg-rose-50 p-8 rounded-xs shadow-lg space-y-4 border border-rose-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Satıcı İletişim
-        </h2>
-        <div className="space-y-3 text-gray-700">
-          <div className="flex items-start gap-3">
-            <MapPin className="w-5 h-5 text-rose-500" />
-            <div>
-              <p>Mustafa Kökmen Blv. 91, 27700 Gaziantep, Nizip Türkiye</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Phone className="w-5 h-5 text-rose-500" />
-            <span>+90 533 387 40 74</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Globe className="w-5 h-5 text-rose-500" />
-            <span>modaperde.com</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Mail className="w-5 h-5 text-rose-500" />
-            <span>info@modaperde.com</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Package className="w-5 h-5 text-rose-500" />
-            <span>
-              Ürünler, sözleşme ve teslim şartlarına uygun olarak
-              gönderilecektir.
+    <div className="bg-white min-h-screen">
+      <div className="max-w-4xl mx-auto px-6 py-24 space-y-20">
+        {/* Üst Başlık ve Tarih */}
+        <header className="border-b border-stone-100 pb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4"
+          >
+            <span className="text-[10px] tracking-[0.5em] text-stone-400 uppercase block">
+              Yasal Bilgilendirme
             </span>
-          </div>
+            <h1 className="text-4xl md:text-5xl font-serif text-stone-900 leading-tight">
+              Mesafeli Satış <br />{" "}
+              <span className="italic font-light text-stone-500 text-3xl md:text-4xl">
+                Sözleşmesi
+              </span>
+            </h1>
+            <p className="text-[11px] text-stone-400 font-medium tracking-widest uppercase pt-4">
+              Son Güncelleme: 05 Haziran 2025 — Referans: MP-2025/01
+            </p>
+          </motion.div>
+        </header>
+
+        {/* Sözleşme İçeriği */}
+        <div className="space-y-16">
+          {/* Madde 1: Taraflar */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <h2 className="text-[11px] font-bold text-stone-900 tracking-[0.3em] uppercase">
+              01. Taraflar
+            </h2>
+            <div className="md:col-span-2 space-y-6">
+              <p className="text-sm text-stone-500 leading-relaxed font-light italic">
+                Bu sözleşme, aşağıda bilgileri yer alan Satıcı ile Alıcı
+                arasında mesafeli iletişim araçları kullanılarak akdedilmiştir.
+              </p>
+              <div className="grid grid-cols-1 gap-8 pt-4 border-t border-stone-50">
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+                    Satıcı Kimliği
+                  </p>
+                  <address className="not-italic text-[13px] text-stone-600 space-y-1 font-light leading-relaxed">
+                    <span className="text-stone-900 font-medium block mb-2">
+                      Moda Perde & Dış Mekan Sistemleri
+                    </span>
+                    Mustafa Kökmen Blv. 91, 27700 <br />
+                    Gaziantep, Nizip — Türkiye
+                  </address>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Madde 2 & 3: Konu */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-stone-100 pt-16">
+            <h2 className="text-[11px] font-bold text-stone-900 tracking-[0.3em] uppercase">
+              02. Konu & Kapsam
+            </h2>
+            <div className="md:col-span-2 text-sm text-stone-500 leading-[1.8] font-light">
+              <p>
+                İşbu sözleşmenin konusu, Alıcı'nın Satıcı'ya ait elektronik
+                ticaret platformu üzerinden siparişini verdiği, nitelikleri ve
+                satış fiyatı belirtilen ürünlerin satışı ve teslimi ile ilgili
+                6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli
+                Sözleşmeler Yönetmeliği hükümleri uyarınca tarafların hak ve
+                yükümlülüklerinin belirlenmesidir.
+              </p>
+            </div>
+          </section>
+
+          {/* Madde 5: Cayma Hakkı (Kritik Bölüm) */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-stone-100 pt-16">
+            <h2 className="text-[11px] font-bold text-stone-900 tracking-[0.3em] uppercase">
+              05. Cayma Hakkı
+            </h2>
+            <div className="md:col-span-2 space-y-6">
+              <p className="text-sm text-stone-500 leading-[1.8] font-light">
+                Alıcı, standart ürünlerde teslim tarihinden itibaren 14 gün
+                içinde cayma hakkına sahiptir.
+              </p>
+              <div className="bg-stone-50 p-8 space-y-4">
+                <p className="text-[11px] font-bold text-stone-900 uppercase tracking-tighter italic">
+                  İstisnai Durumlar:
+                </p>
+                <ul className="space-y-3">
+                  {[
+                    "Kişiye özel ölçü ile üretilen perde ve döşemelik ürünler.",
+                    "Alıcı'nın isteği doğrultusunda modifiye edilen dış mekan mobilyaları.",
+                    "Ambalajı açılmış ve yeniden satılabilirliği yitirilmiş ürünler.",
+                  ].map((item, i) => (
+                    <li
+                      key={i}
+                      className="text-[12px] text-stone-500 font-light flex gap-3"
+                    >
+                      <span className="text-stone-300">—</span> {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* İletişim & Onay */}
+          <footer className="pt-24 border-t border-stone-100">
+            <div className="bg-[#0a0a0a] p-12 md:p-16 text-white flex flex-col md:flex-row justify-between items-start gap-12 relative overflow-hidden">
+              <div className="relative z-10 space-y-6">
+                <h3 className="text-2xl font-serif italic font-light tracking-tight">
+                  Hukuki Destek & İletişim
+                </h3>
+                <div className="space-y-4 text-stone-400 text-xs font-light tracking-wide">
+                  <div className="flex items-center gap-4">
+                    <Mail size={14} strokeWidth={1} />{" "}
+                    <span>legal@modaperde.com</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Phone size={14} strokeWidth={1} />{" "}
+                    <span>+90 533 387 40 74</span>
+                  </div>
+                </div>
+              </div>
+              <button className="relative z-10 group flex items-center gap-4 border border-stone-700 px-8 py-4 hover:border-white transition-all duration-500">
+                <span className="text-[10px] tracking-[0.3em] uppercase font-bold">
+                  Yardım Merkezi
+                </span>
+                <ArrowUpRight
+                  size={14}
+                  className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                />
+              </button>
+
+              {/* Dekoratif Arka Plan Logosu */}
+              <div className="absolute -bottom-10 -right-10 text-[120px] font-serif italic text-white/[0.03] pointer-events-none select-none">
+                MP
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
     </div>

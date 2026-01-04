@@ -23,7 +23,7 @@ export default function Favorites() {
   );
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <div className="max-w-[1600px] mx-auto px-6 md:px-12 lg:px-20 py-24 md:py-32">
         {/* Header Section - Minimalist & Editorial */}
         {!loading && favorites.length > 0 && (

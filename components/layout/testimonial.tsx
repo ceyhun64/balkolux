@@ -11,19 +11,61 @@ interface Testimonial {
 }
 
 const outdoorTestimonials: Testimonial[] = [
-  { name: "Selin Y.", role: "Lüks Oturma Grubu", message: "Teak ağacı oturma grubunuz verandamıza bambaşka bir hava kattı. Kumaşların su iticiliği ve kalitesi beklediğimizin çok üzerinde.", avatarLetter: "S", rating: 5 },
-  { name: "Ahmet K.", role: "Premium Barbekü Serisi", message: "Barbekü performansı inanılmaz. Isı dengesi ve döküm kalitesi profesyonel düzeyde. Bahçe partilerimizin vazgeçilmezi oldu.", avatarLetter: "A", rating: 5 },
-  { name: "Caner M.", role: "Alüminyum Şezlong Seti", message: "Havuz başı için aldığımız şezlonglar hem çok hafif hem de inanılmaz estetik. Güneş altındaki dayanıklılığı gerçekten başarılı.", avatarLetter: "C", rating: 5 },
-  { name: "Melis E.", role: "Rattan Salıncak", message: "Bahçemdeki en sevdiğim köşe oldu. Örgü kalitesi ve minderlerin konforu o kadar iyi ki, üzerinden kalkmak istemiyoruz.", avatarLetter: "M", rating: 5 },
-  { name: "Bülent T.", role: "Dev Bahçe Şemsiyesi", message: "360 derece dönebilen mekanizması çok pratik. En rüzgarlı günlerde bile sağlamlığından ödün vermedi, çok güven verici.", avatarLetter: "B", rating: 5 },
-  { name: "Deniz A.", role: "Modern Masa Takımı", message: "Mermer tablalı masa takımı tam bir tasarım harikası. 10 kişilik akşam yemeklerimizde tüm misafirlerimiz hayran kaldı.", avatarLetter: "D", rating: 5 },
+  {
+    name: "Selin Y.",
+    role: "Lüks Oturma Grubu",
+    message:
+      "Teak ağacı oturma grubunuz verandamıza bambaşka bir hava kattı. Kumaşların su iticiliği ve kalitesi beklediğimizin çok üzerinde.",
+    avatarLetter: "S",
+    rating: 5,
+  },
+  {
+    name: "Ahmet K.",
+    role: "Premium Barbekü Serisi",
+    message:
+      "Barbekü performansı inanılmaz. Isı dengesi ve döküm kalitesi profesyonel düzeyde. Bahçe partilerimizin vazgeçilmezi oldu.",
+    avatarLetter: "A",
+    rating: 5,
+  },
+  {
+    name: "Caner M.",
+    role: "Alüminyum Şezlong Seti",
+    message:
+      "Havuz başı için aldığımız şezlonglar hem çok hafif hem de inanılmaz estetik. Güneş altındaki dayanıklılığı gerçekten başarılı.",
+    avatarLetter: "C",
+    rating: 5,
+  },
+  {
+    name: "Melis E.",
+    role: "Rattan Salıncak",
+    message:
+      "Bahçemdeki en sevdiğim köşe oldu. Örgü kalitesi ve minderlerin konforu o kadar iyi ki, üzerinden kalkmak istemiyoruz.",
+    avatarLetter: "M",
+    rating: 5,
+  },
+  {
+    name: "Bülent T.",
+    role: "Dev Bahçe Şemsiyesi",
+    message:
+      "360 derece dönebilen mekanizması çok pratik. En rüzgarlı günlerde bile sağlamlığından ödün vermedi, çok güven verici.",
+    avatarLetter: "B",
+    rating: 5,
+  },
+  {
+    name: "Deniz A.",
+    role: "Modern Masa Takımı",
+    message:
+      "Mermer tablalı masa takımı tam bir tasarım harikası. 10 kişilik akşam yemeklerimizde tüm misafirlerimiz hayran kaldı.",
+    avatarLetter: "D",
+    rating: 5,
+  },
 ];
 
 const Testimonials: React.FC = () => {
   return (
-    <div className="py-32 bg-[#F9F9F8] relative overflow-hidden">
+    <div className="py-32 bg-zinc-50 relative overflow-hidden">
       {/* Decorative Background Element */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-[#F3F3F1] -skew-x-12 translate-x-1/2 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-zinc-200 -skew-x-12 translate-x-1/2 pointer-events-none" />
 
       {/* Header */}
       <div className="max-w-4xl mx-auto text-center px-6 mb-24 relative z-10">
@@ -49,14 +91,18 @@ const Testimonials: React.FC = () => {
                 >
                   <div className="relative">
                     <Quote className="absolute -top-6 -left-6 w-12 h-12 text-stone-50 opacity-20" />
-                    
+
                     {/* Rating */}
                     <div className="flex gap-1 mb-8">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           size={11}
-                          className={i < t.rating ? "fill-stone-800 text-stone-800" : "text-stone-200"}
+                          className={
+                            i < t.rating
+                              ? "fill-stone-800 text-stone-800"
+                              : "text-stone-200"
+                          }
                         />
                       ))}
                     </div>
@@ -87,16 +133,26 @@ const Testimonials: React.FC = () => {
       </div>
 
       {/* Trust Badges / Stats */}
-      <div className="mt-20 flex justify-center items-center gap-12 opacity-30 grayscale pointer-events-none">
-          <span className="text-[10px] font-bold tracking-[0.3em] text-stone-900 uppercase">UV Resistance Cert.</span>
-          <span className="text-[10px] font-bold tracking-[0.3em] text-stone-900 uppercase">Weatherproof Fabric</span>
-          <span className="text-[10px] font-bold tracking-[0.3em] text-stone-900 uppercase">Premium Teak Wood</span>
+      <div className="mt-20 flex justify-center items-center gap-12 px-2 opacity-30 grayscale pointer-events-none">
+        <span className=" text-[8px] md:text-[10px] font-bold tracking-[0.3em] text-stone-900 uppercase">
+          UV Dayanım Sertifikası
+        </span>
+        <span className="text-[8px] md:text-[10px]  font-bold tracking-[0.3em] text-stone-900 uppercase">
+          Hava Koşullarına Dayanıklı Kumaş
+        </span>
+        <span className="text-[8px] md:text-[10px]  font-bold tracking-[0.3em] text-stone-900 uppercase">
+          Premium Tik Ağacı
+        </span>
       </div>
 
       <style jsx>{`
         @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
         .animate-marquee {
           animation: marquee 60s linear infinite;
