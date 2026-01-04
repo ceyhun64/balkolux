@@ -13,7 +13,6 @@ import {
   X,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import MobileFilter from "./mobileFilter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Select,
@@ -200,10 +199,7 @@ const ProductTopBar: React.FC<ProductTopBarProps> = ({
                   <span className="text-[10px] text-stone-400 uppercase tracking-widest">
                     Kategoriler
                   </span>
-                  <MobileFilter
-                    selectedCategory={selectedCategory}
-                    onSelectCategory={setSelectedCategory}
-                  />
+                  
                 </div>
 
                 {/* Grid Seçimi */}

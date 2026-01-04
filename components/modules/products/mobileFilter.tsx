@@ -1,5 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectTrigger,
@@ -7,99 +11,180 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { useRouter, usePathname } from "next/navigation";
 
-interface FilterProps {
+interface MobileFilterProps {
+  onClose?: () => void;
   selectedCategory: string;
   onSelectCategory: (cat: string) => void;
+  minPrice: number;
+  maxPrice: number;
+  setMinPrice: (val: number) => void;
+  setMaxPrice: (val: number) => void;
+  gridCols: number;
+  setGridCols: (cols: any) => void;
+  sort: string;
+  setSort: (sort: any) => void;
 }
 
 const productCategories = [
-  { label: "Tüm Perdeler", href: "/products" },
-  { label: "Dikey Perde", href: "/products/vertical" },
-  { label: "Ahşap Jaluzi", href: "/products/wooden" },
-  { label: "Metal Jaluzi", href: "/products/metal" },
-  { label: "Perde Aksesuarları", href: "/products/accessories" },
-  {
-    label: "Stor Perde",
-    href: "/products/roller",
-    subItems: [
-      { label: "Lazer Kesim Stor", href: "/products/roller/laser-cut" },
-    ],
-  },
-  { label: "Zebra Perde", href: "/products/zebra" },
-  { label: "Rüstik", href: "/products/rustic" },
-  { label: "Tüller", href: "/products/sheer" },
-  { label: "Fon", href: "/products/drapes" },
-  { label: "Plise", href: "/products/picell" },
+  { label: "Tüm Koleksiyon", value: "all" },
+  { label: "Oturma Takımları", value: "seating_sets" },
+  { label: "Masa Takımları", value: "table_sets" },
+  { label: "Salıncaklar", value: "swing" },
+  { label: "Şezlonglar", value: "sunbed" },
+  { label: "Barbekü Serisi", value: "barbecue" },
 ];
 
-const MobileFilter: React.FC<FilterProps> = ({
+const sortOptions = [
+  { id: "az", label: "A'dan Z'ye" },
+  { id: "za", label: "Z'den A'ya" },
+  { id: "priceLow", label: "Düşük Fiyat" },
+  { id: "priceHigh", label: "Yüksek Fiyat" },
+];
+
+const MobileFilter: React.FC<MobileFilterProps> = ({
+  onClose,
   selectedCategory,
   onSelectCategory,
+  minPrice,
+  maxPrice,
+  setMinPrice,
+  setMaxPrice,
+  gridCols,
+  setGridCols,
+  sort,
+  setSort,
 }) => {
   const router = useRouter();
-  const pathname = usePathname();
-  const [currentSelection, setCurrentSelection] =
-    useState<string>(selectedCategory);
-
-  // Sayfa değiştiğinde otomatik olarak seçili kategori ayarlansın
-  useEffect(() => {
-    const matchedCategory = productCategories.find((cat) => {
-      if (cat.href === pathname) return true;
-      if (cat.subItems?.some((sub) => sub.href === pathname)) return true;
-      return false;
-    });
-
-    if (matchedCategory) {
-      // Eğer alt kategori eşleşiyorsa alt kategoriyi seç
-      const matchedSub = matchedCategory.subItems?.find(
-        (sub) => sub.href === pathname
-      );
-      const slug = matchedSub
-        ? matchedSub.href.split("/products/")[1]
-        : matchedCategory.href.split("/products/")[1] || "all";
-
-      setCurrentSelection(slug);
-      onSelectCategory(slug);
-    } else {
-      setCurrentSelection("all");
-      onSelectCategory("all");
-    }
-  }, [pathname, onSelectCategory]);
 
   const handleCategoryChange = (value: string) => {
-    setCurrentSelection(value);
     onSelectCategory(value);
     router.push(`/products/${value === "all" ? "" : value}`);
   };
 
-  return (
-    <div className="md:hidden flex-1">
-      <Select value={currentSelection} onValueChange={handleCategoryChange}>
-        <SelectTrigger className="w-full bg-white border border-gray-200 rounded-lg h-12 shadow-sm hover:shadow-md transition-all">
-          <SelectValue placeholder="Kategori Seç" />
-        </SelectTrigger>
-        <SelectContent>
-          {productCategories.map((cat) => {
-            const slug = cat.href.split("/products/")[1] || "all";
+  const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+    <h3 className="text-[10px] uppercase tracking-[0.2em] text-stone-400 font-light mb-6">
+      {children}
+    </h3>
+  );
 
-            return (
-              <React.Fragment key={slug}>
-                <SelectItem value={slug}>{cat.label}</SelectItem>
-                {cat.subItems?.map((sub) => {
-                  const subSlug = sub.href.split("/products/")[1];
-                  return (
-                    <SelectItem key={subSlug} value={subSlug}>
-                      └ {sub.label}
-                    </SelectItem>
-                  );
-                })}
-              </React.Fragment>
-            );
-          })}
-        </SelectContent>
-      </Select>
+  return (
+    <div className="flex flex-col gap-y-12 pb-10">
+      {/* BAŞLIK VE KAPATMA */}
+      <div className="flex items-center justify-between border-b border-stone-100 pb-4">
+        <span className="text-[11px] uppercase tracking-[0.3em] font-medium text-stone-900">
+          Filtreleme
+        </span>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="text-stone-400 hover:text-stone-900 transition-colors"
+          >
+            <X strokeWidth={1.2} size={20} />
+          </button>
+        )}
+      </div>
+
+      {/* 1. KATEGORİ */}
+      <section>
+        <SectionTitle>Koleksiyon</SectionTitle>
+        <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+          <SelectTrigger className="w-full border-none bg-stone-50/50 h-12 rounded-none px-4 focus:ring-0 border-b border-stone-200">
+            <div className="text-[14px] text-stone-800 font-light italic">
+              <SelectValue placeholder="Seçiniz" />
+            </div>
+          </SelectTrigger>
+          <SelectContent className="border-stone-100 rounded-none shadow-xl">
+            {productCategories.map((cat) => (
+              <SelectItem
+                key={cat.value}
+                value={cat.value}
+                className="py-3 text-[13px]"
+              >
+                {cat.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </section>
+
+      {/* 2. FİYAT */}
+      <section>
+        <SectionTitle>Fiyat Aralığı</SectionTitle>
+        <div className="px-1">
+          <Slider
+            value={[minPrice, maxPrice]}
+            onValueChange={([min, max]) => {
+              setMinPrice(min);
+              setMaxPrice(max);
+            }}
+            max={300000}
+            step={5000}
+            className="mb-6"
+          />
+          <div className="flex justify-between text-[11px] tracking-widest text-stone-500 font-light">
+            <span>{minPrice.toLocaleString()} ₺</span>
+            <span>{maxPrice.toLocaleString()} ₺</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. GÖRÜNÜM (Tekli/İkili Seçimi) */}
+      <section>
+        <SectionTitle>Görünüm Düzeni</SectionTitle>
+        <div className="flex gap-4">
+          {[1, 2].map((num) => (
+            <button
+              key={num}
+              onClick={() => setGridCols(num)}
+              className={cn(
+                "flex-1 py-4 text-[10px] tracking-[0.15em] uppercase transition-all duration-500 border-b",
+                gridCols === num
+                  ? "border-stone-900 text-stone-900 font-medium"
+                  : "border-stone-100 text-stone-300 font-light"
+              )}
+            >
+              {num === 1 ? "Geniş Liste" : "İkili Kılavuz"}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. SIRALAMA */}
+      <section>
+        <SectionTitle>Sıralama</SectionTitle>
+        <div className="space-y-1">
+          {sortOptions.map((option) => (
+            <button
+              key={option.id}
+              onClick={() => setSort(option.id)}
+              className={cn(
+                "w-full flex justify-between items-center py-3 text-[13px] transition-colors",
+                sort === option.id
+                  ? "text-stone-900"
+                  : "text-stone-400 font-light"
+              )}
+            >
+              <span>{option.label}</span>
+              {sort === option.id && (
+                <div className="w-1 h-1 bg-stone-900 rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 5. SIFIRLA */}
+      <button
+        onClick={() => {
+          setMinPrice(0);
+          setMaxPrice(300000);
+          setSort("az");
+        }}
+        className="text-[10px] tracking-[0.2em] uppercase text-stone-300 hover:text-stone-800 transition-colors underline underline-offset-8 text-left"
+      >
+        Ayarları Temizle
+      </button>
     </div>
   );
 };

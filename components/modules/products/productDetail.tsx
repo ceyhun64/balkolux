@@ -140,7 +140,7 @@ export default function ProductDetailPage() {
       {/* Üst Navigasyon */}
       <div className="max-w-[1600px] mx-auto px-6 py-8">
         <Link
-          href="/shop"
+          href="/products"
           className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-stone-400 hover:text-stone-800 transition-colors"
         >
           <ArrowLeft size={14} /> Koleksiyona Dön

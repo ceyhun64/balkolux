@@ -111,7 +111,7 @@ export default function Navbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out text-white ${getNavbarBg()}`}
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-in-out text-white ${getNavbarBg()}`}
       >
         <div className="max-w-[1600px] mx-auto px-4 md:px-12">
           {/* ÜST SATIR: Hamburger - Logo - İkonlar */}

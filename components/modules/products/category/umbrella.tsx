@@ -24,7 +24,7 @@ export default function SeatingSets() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch("/api/products/category/1");
+        const res = await fetch("/api/products/category/5");
         const data = await res.json();
         if (data.products) setProducts(data.products);
       } catch (error) {
@@ -84,7 +84,7 @@ export default function SeatingSets() {
             </span>
           </div>
           <h2 className="text-4xl md:text-6xl luxury-serif italic tracking-tight">
-            Oturma Grupları
+            Şemsiye
           </h2>
           <p className="modern-sans text-stone-500 text-sm md:text-base font-light max-w-lg leading-relaxed">
             {filteredProducts.length} seçkin model, dış mekan yaşam alanınızı
