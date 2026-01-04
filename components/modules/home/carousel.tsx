@@ -9,24 +9,32 @@ import { ArrowRight } from "lucide-react";
 const heroes = [
   {
     id: 1,
-    title: "Işık Süzgeci Tül Perdeler",
-    subtitle: "Zarafetin Yeni Tanımı",
-    image: "/heroes/1001.jpg",
-    href: "/products/sheer",
+    title: "Dış Mekanda Konfor Sanatı",
+    subtitle: "Premium Rattan & İroko Koleksiyonu",
+    image: "/heroes/1001.webp",
+    href: "/products/oturma-gruplari",
   },
   {
     id: 2,
-    title: "Plise Perde Sistemleri",
-    subtitle: "Minimalist Çözümler",
-    image: "/heroes/1003.jpg",
-    href: "/products/plise",
+    title: "Yıldızların Altında Akşam Yemeği",
+    subtitle: "Modern Sandalye ve Mobilya Takımları",
+    image: "/heroes/1002.webp",
+    href: "/products/sezlonglar",
   },
   {
     id: 3,
-    title: "Sezonun En İyileri",
-    subtitle: "Özel Koleksiyon",
-    image: "/heroes/tum.webp",
-    href: "/products",
+    title: "Doğayla Bütünleşen Tasarımlar",
+    subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
+    image: "/heroes/1003.webp",
+    href: "/products/yeni-sezon",
+  },
+  {
+    id: 4,
+    title: "Güneşin Keyfini Sürün",
+
+    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
+    image: "/heroes/1004.webp",
+    href: "/products/yemek-masalari",
   },
 ];
 

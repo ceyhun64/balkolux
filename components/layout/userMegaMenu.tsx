@@ -2,205 +2,204 @@
 
 import Link from "next/link";
 import {
-  LogIn,
-  UserPlus,
   User,
   MapPin,
   Package,
   X,
   ChevronRight,
   LogOut,
+  CreditCard,
+  Settings,
+  ArrowRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 interface UserMegaMenuProps {
-  user: { name?: string; email?: string } | null;
-  setUser: (user: { name?: string; email?: string } | null) => void;
   userMenuOpen: boolean;
   setUserMenuOpen: (open: boolean) => void;
-  pathname: string;
 }
 
 export default function UserMegaMenu({
-  user,
-  setUser,
   userMenuOpen,
   setUserMenuOpen,
 }: UserMegaMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [user, setUser] = useState<{
+    name?: string;
+    surname?: string;
+    email?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // ESC ve dışarı tıklama kapatma
+  const checkUserStatus = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/account/check", { cache: "no-store" });
+      const data = await res.json();
+      setUser(data.user || null);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userMenuOpen) checkUserStatus();
+  }, [userMenuOpen, checkUserStatus]);
+
   useEffect(() => {
     if (!userMenuOpen) return;
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setUserMenuOpen(false);
-    };
+    const handleEsc = (e: KeyboardEvent) =>
+      e.key === "Escape" && setUserMenuOpen(false);
     document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, [userMenuOpen, setUserMenuOpen]);
 
   const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      setUser(null);
-      toast.error("Çıkış yaptınız."); // 🔹 Toast ekledik
-      router.push("/");
-    } catch (err) {
-      console.error("Çıkış yapılamadı", err);
-      toast.error("Çıkış sırasında bir hata oluştu."); // 🔹 Hata toast
-    }
+    await signOut({ redirect: false });
+    setUser(null);
+    setUserMenuOpen(false);
+    toast.success("Oturum kapatıldı.");
+    router.refresh();
   };
 
-  const mainItems = user
-    ? [
-        { label: "Profil Bilgilerim", href: "/profile", icon: User },
-        { label: "Sipariş Geçmişi", href: "/profile/orders", icon: Package },
-        { label: "Adres Defteri", href: "/profile/addresses", icon: MapPin },
-      ]
-    : [];
+  const menuItems = [
+    { label: "Profilim", href: "/profile", icon: User },
+    { label: "Siparişlerim", href: "/profile/orders", icon: Package },
+    { label: "Adreslerim", href: "/profile/addresses", icon: MapPin },
+    { label: "Ödemeler", href: "/profile/payments", icon: CreditCard },
+  ];
 
   return (
     <AnimatePresence>
       {userMenuOpen && (
         <>
-          {/* Backdrop: Hafif ve Modern */}
+          {/* Sofistike Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setUserMenuOpen(false)}
-            className="fixed inset-0 bg-black/10 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-stone-900/10 backdrop-blur-[2px] z-[100]"
           />
 
-          {/* Sheet (Sağ Panel) */}
           <motion.div
             ref={menuRef}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed top-0 right-0 h-full w-full max-w-[400px] bg-white z-[101] shadow-2xl flex flex-col"
+            transition={{ duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
+            className="fixed top-0 right-0 h-full w-full max-w-[380px] bg-zinc-100 z-[101] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.05)]"
           >
-            {/* Header */}
-            <div className="flex justify-between items-center px-8 py-10">
-              <span className="text-[10px] tracking-[0.4em] text-zinc-400 uppercase font-bold">
-                {user ? "Hesabınız" : "Giriş Paneli"}
+            {/* Header: Minimalist & Clean */}
+            <div className="px-10 pt-12 pb-6 flex justify-between items-baseline">
+              <span className="text-[9px] tracking-[0.5em] text-stone-400 uppercase font-medium">
+                {user ? "Hesap" : "BalkoLüx"}
               </span>
               <button
                 onClick={() => setUserMenuOpen(false)}
-                className="group p-2 -mr-2 outline-none"
+                className="text-stone-500 hover:text-stone-900 transition-colors"
               >
-                <X className="w-5 h-5 text-zinc-400 group-hover:text-black transition-colors duration-300 stroke-[1.5px]" />
+                <X size={18} strokeWidth={1} />
               </button>
             </div>
 
-            <div className="flex-1 px-8 overflow-y-auto">
-              {user ? (
-                /* --- Authenticated User --- */
-                <div className="space-y-12">
-                  {/* User Info */}
-                  <motion.div
+            <div className="flex-1 px-10 overflow-y-auto">
+              {loading ? (
+                <div className="h-full flex items-center justify-center">
+                  <span className="text-[10px] tracking-widest text-stone-300 animate-pulse uppercase">
+                    Yükleniyor
+                  </span>
+                </div>
+              ) : user ? (
+                /* --- AUTH STATE --- */
+                <div className="py-12 flex flex-col h-full">
+                  <motion.header
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="flex flex-col gap-1"
+                    className="mb-16"
                   >
-                    <h2 className="text-3xl font-light text-zinc-900 italic font-serif leading-tight">
-                      {user.name || "Kullanıcı"}
+                    <h2 className="text-3xl font-serif italic text-stone-900">
+                      {user.name} {user.surname}
                     </h2>
-                    <p className="text-xs text-zinc-400 tracking-wider font-light">
+                    <p className="text-[11px] text-stone-400 mt-2 tracking-wide font-light">
                       {user.email}
                     </p>
-                  </motion.div>
+                  </motion.header>
 
-                  {/* Menu Links */}
                   <nav className="space-y-1">
-                    {mainItems.map((item, i) => (
-                      <motion.div
+                    {menuItems.map((item, i) => (
+                      <Link
                         key={i}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + i * 0.1 }}
+                        href={item.href}
+                        onClick={() => setUserMenuOpen(false)}
+                        className="group flex items-center justify-between py-5 border-b border-stone-50"
                       >
-                        <Link
-                          href={item.href}
-                          onClick={() => setUserMenuOpen(false)}
-                          className="group flex items-center justify-between py-5 border-b border-zinc-50"
-                        >
-                          <div className="flex items-center gap-4">
-                            <item.icon className="w-4 h-4 text-zinc-400 group-hover:text-black transition-colors" />
-                            <span className="text-sm text-zinc-600 group-hover:text-black transition-colors tracking-tight">
-                              {item.label}
-                            </span>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-zinc-300 group-hover:translate-x-1 transition-all" />
-                        </Link>
-                      </motion.div>
+                        <span className="text-sm font-light text-stone-600 group-hover:text-stone-900 transition-colors tracking-tight">
+                          {item.label}
+                        </span>
+                        <ArrowRight
+                          size={14}
+                          className="text-stone-200 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                        />
+                      </Link>
                     ))}
                   </nav>
 
                   <button
-                    className="flex items-center gap-3 text-xs text-zinc-400 hover:text-red-800 transition-colors pt-4 group"
                     onClick={handleLogout}
+                    className="mt-auto mb-10 text-[10px] tracking-[0.2em] text-stone-400 hover:text-stone-900 transition-colors uppercase py-4"
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span className="group-hover:tracking-widest transition-all">
-                      Güvenli Çıkış Yap
-                    </span>
+                    Oturumu Kapat
                   </button>
                 </div>
               ) : (
-                /* --- Guest --- */
-                <div className="space-y-10">
+                /* --- GUEST STATE --- */
+                <div className="py-12 h-full flex flex-col">
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex-1 flex flex-col justify-center"
                   >
-                    <p className="text-xl font-light text-zinc-800 leading-relaxed font-serif italic">
-                      Kişiselleştirilmiş bir deneyim için oturum açın veya
-                      aramıza katılın.
-                    </p>
+                    <h3 className="text-4xl font-serif italic text-stone-900 leading-[1.1] mb-8">
+                      Zarafet, <br /> detaylarda gizlidir.
+                    </h3>
+
+                    <div className="space-y-6">
+                      <Link
+                        href="/login"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block text-sm font-light text-stone-900 border-b border-stone-900 w-fit pb-1 hover:text-stone-500 hover:border-stone-500 transition-all"
+                      >
+                        Giriş Yapın
+                      </Link>
+                      <Link
+                        href="/register"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block text-sm font-light text-stone-900 border-b border-stone-900 w-fit pb-1 hover:text-stone-500 hover:border-stone-500 transition-all"
+                      >
+                        Hesap Oluşturun
+                      </Link>
+                    </div>
                   </motion.div>
-
-                  <div className="flex flex-col gap-4 pt-6">
-                    <Link
-                      href="/login"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="w-full flex items-center justify-center py-4 bg-black text-white text-xs tracking-[0.2em] uppercase hover:bg-zinc-800 transition-all duration-500"
-                    >
-                      <LogIn className="w-4 h-4 mr-2" />
-                      Giriş Yap
-                    </Link>
-
-                    <Link
-                      href="/register"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="w-full flex items-center justify-center py-4 border border-zinc-200 text-black text-xs tracking-[0.2em] uppercase hover:border-black transition-all duration-500"
-                    >
-                      <UserPlus className="w-4 h-4 mr-2" />
-                      Hesap Oluştur
-                    </Link>
-                  </div>
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="p-8 bg-zinc-50">
-              <p className="text-[9px] text-zinc-400 tracking-[0.2em] leading-relaxed uppercase">
-                Yardıma mı ihtiyacınız var? <br />
-                <Link
-                  href="/contact"
-                  className="text-black border-b border-zinc-300"
-                >
-                  Müşteri Hizmetleri
-                </Link>
-              </p>
+            <div className="px-10 py-10">
+              <Link
+                href="/contact"
+                className="text-[10px] text-stone-400 hover:text-stone-900 transition-colors uppercase tracking-[0.2em]"
+              >
+                Müşteri Deneyimi
+              </Link>
             </div>
           </motion.div>
         </>

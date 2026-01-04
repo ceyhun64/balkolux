@@ -1,24 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Info,
-  MessageCircle,
-  Star,
-  CreditCard,
-  Lightbulb,
-  Check,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Star, Lightbulb, Check, ArrowRight } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface Comment {
   id: number;
@@ -26,11 +12,7 @@ interface Comment {
   title?: string;
   comment?: string;
   createdAt: string;
-  user?: {
-    id: number;
-    name: string;
-    surname: string;
-  };
+  user?: { id: number; name: string; surname: string; };
 }
 
 interface ProductTabsProps {
@@ -42,433 +24,216 @@ interface ProductTabsProps {
 
 export default function ProductTabs({
   productId,
-  productTitle,
   productPrice,
   productDescription,
 }: ProductTabsProps) {
-  const [activeTab, setActiveTab] = useState<
-    "info" | "comments" | "installments" | "suggestions"
-  >("info");
+  const [activeTab, setActiveTab] = useState<"info" | "comments" | "installments" | "suggestions">("info");
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [commentText, setCommentText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [suggestionText, setSuggestionText] = useState("");
-  const [suggestionEmail, setSuggestionEmail] = useState("");
-  const [isSuggestionSubmitting, setIsSuggestionSubmitting] = useState(false);
-
-  const [currentUser, setCurrentUser] = useState<{
-    id: number;
-    name: string;
-    surname: string;
-  } | null>(null);
-
-  const [hasUserCommented, setHasUserCommented] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("/api/account/check", {
-          credentials: "include",
-        });
+        const res = await fetch("/api/account/check");
         const data = await res.json();
-        if (data.user?.id) {
-          setCurrentUser({
-            id: data.user.id,
-            name: data.user.name,
-            surname: data.user.surname,
-          });
-        }
-      } catch (err) {
-        console.error(err);
-      }
+        if (data.user) setCurrentUser(data.user);
+      } catch (err) { console.error(err); }
     }
     fetchUser();
   }, []);
 
   useEffect(() => {
     if (productId) fetchComments();
-  }, [productId, currentUser]);
+  }, [productId]);
 
   const fetchComments = async () => {
-    if (!productId) return;
     setIsLoading(true);
     try {
       const res = await fetch(`/api/review/${productId}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Yorumlar alınamadı");
       setComments(data);
-
-      if (currentUser) {
-        const userAlreadyCommented = data.some(
-          (comment: Comment) => comment.user?.id === currentUser.id
-        );
-        setHasUserCommented(userAlreadyCommented);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCommentSubmit = async () => {
-    if (!productId || !currentUser) {
-      toast.error("Giriş yapmalısınız.");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId,
-          rating,
-          title,
-          comment: commentText,
-        }),
-      });
-      if (!res.ok) throw new Error("Gönderilemedi");
-
-      setComments([
-        {
-          id: Date.now(),
-          rating,
-          title,
-          comment: commentText,
-          createdAt: new Date().toISOString(),
-          user: currentUser,
-        },
-        ...comments,
-      ]);
-
-      setHasUserCommented(true);
-      setIsReviewModalOpen(false);
-      toast.success("Yorumunuz yayınlandı.");
-      setRating(0);
-      setTitle("");
-      setCommentText("");
-    } catch (error) {
-      toast.error("Hata oluştu.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch (error) { console.error(error); }
+    finally { setIsLoading(false); }
   };
 
   const tabs = [
-    { id: "info", label: "Ürün Bilgisi" },
-    { id: "comments", label: "Yorumlar", badge: comments.length },
-    { id: "installments", label: "Taksitler" },
-    { id: "suggestions", label: "Öneriniz" },
-  ];
-
-  const installmentBanks = [
-    "Akbank",
-    "Garanti BBVA",
-    "İş Bankası",
-    "Yapı Kredi",
+    { id: "info", label: "Detaylar" },
+    { id: "comments", label: "Yorumlar", count: comments.length },
+    { id: "installments", label: "Taksit" },
+    { id: "suggestions", label: "Öneri" },
   ];
 
   return (
-    <section className="mt-24 max-w-6xl mx-auto px-4 sm:px-6">
-      {/* Modern Segmented Control Navigation */}
-      <div className="flex justify-center mb-12">
-        <div className="inline-flex items-center bg-gray-100/80 p-1  border border-gray-200/50 backdrop-blur-sm">
+    <section className="mt-32 max-w-5xl mx-auto px-6 font-light">
+      
+      {/* Minimal Tab Navigasyonu */}
+      <nav className="flex items-center justify-center border-b border-stone-100 mb-20 overflow-x-auto no-scrollbar">
+        <div className="flex gap-12">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`relative px-6 py-2.5 text-sm font-medium transition-all duration-300 ease-out ${
-                activeTab === tab.id
-                  ? "bg-white text-black shadow-sm ring-1 ring-black/5"
-                  : "text-gray-500 hover:text-gray-800"
-              }`}
+              className={cn(
+                "pb-6 text-[11px] uppercase tracking-[0.3em] transition-all relative",
+                activeTab === tab.id ? "text-stone-900 opacity-100 font-bold" : "text-stone-600 opacity-60 hover:opacity-100"
+              )}
             >
-              <span className="flex items-center gap-2">
-                {tab.label}
-                {tab.badge !== undefined && tab.badge > 0 && (
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 price ${
-                      activeTab === tab.id
-                        ? "bg-black text-white"
-                        : "bg-gray-200 text-gray-600"
-                    }`}
-                  >
-                    {tab.badge}
-                  </span>
-                )}
-              </span>
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="ml-2 opacity-50 font-light">({tab.count})</span>
+              )}
+              {activeTab === tab.id && (
+                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-stone-900 animate-in fade-in duration-500" />
+              )}
             </button>
           ))}
         </div>
-      </div>
+      </nav>
 
-      <div >
-        {/* Info Tab */}
+      <div className="min-h-[300px]">
+        {/* 1. Detaylar */}
         {activeTab === "info" && (
-          <div className="animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <div className="max-w-4xl mx-auto">
-              {productDescription ? (
-                <div
-                  className="prose prose-neutral max-w-none text-gray-600 leading-relaxed lg:columns-1 gap-12"
-                  dangerouslySetInnerHTML={{ __html: productDescription }}
-                />
-              ) : (
-                <div className="text-center py-20 text-gray-400 font-light">
-                  Açıklama henüz eklenmedi.
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Comments Tab */}
-        {activeTab === "comments" && (
-          <div className="animate-in fade-in duration-500 space-y-12">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pb-8 border-b border-gray-100">
-              <div>
-                <h3 className="text-2xl font-semibold tracking-tight text-gray-900">
-                  Müşteri Değerlendirmeleri
-                </h3>
-                <p className="text-gray-500 text-sm mt-1">
-                  Bu ürün için toplam {comments.length} yorum yapıldı.
-                </p>
-              </div>
-              {!hasUserCommented && currentUser && (
-                <Button
-                  onClick={() => setIsReviewModalOpen(true)}
-                  className=" bg-black hover:bg-zinc-800 text-white px-8 py-5 h-auto transition-transform active:scale-95"
-                >
-                  Yorum Yaz
-                </Button>
-              )}
-            </div>
-
-            {isLoading ? (
-              <div className="flex justify-center py-20">
-                <div className="w-6 h-6 border-2 border-black border-t-transparent price animate-spin"></div>
-              </div>
-            ) : comments.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {comments.map((comment) => (
-                  <div
-                    key={comment.id}
-                    className="group p-6 price bg-gray-50/50 hover:bg-white border border-transparent hover:border-gray-100 transition-all duration-300"
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 price bg-zinc-200 flex items-center justify-center text-xs font-bold text-zinc-600">
-                          {comment.user?.name[0]}
-                          {comment.user?.surname?.[0]}
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">
-                            {comment.user?.name} {comment.user?.surname}
-                          </p>
-                          <div className="flex gap-0.5 mt-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={12}
-                                className={
-                                  i < comment.rating
-                                    ? "fill-black text-black"
-                                    : "text-gray-300"
-                                }
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-[11px] text-gray-400 tabular-nums">
-                        {new Date(comment.createdAt).toLocaleDateString(
-                          "tr-TR"
-                        )}
-                      </span>
-                    </div>
-                    {comment.title && (
-                      <h4 className="font-medium text-gray-900 mb-2">
-                        {comment.title}
-                      </h4>
-                    )}
-                    <p className="text-gray-600 text-sm leading-relaxed">
-                      {comment.comment}
-                    </p>
-                  </div>
-                ))}
-              </div>
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-700">
+            {productDescription ? (
+              <div 
+                className="prose prose-stone max-w-none text-stone-600 font-light leading-relaxed text-sm md:text-base columns-1 md:columns-2 gap-16"
+                dangerouslySetInnerHTML={{ __html: productDescription }}
+              />
             ) : (
-              <div className="text-center py-24 bg-gray-50 price border border-dashed border-gray-200">
-                <p className="text-gray-400 font-medium">
-                  Henüz bir değerlendirme yok.
-                </p>
-              </div>
+              <p className="text-center italic text-stone-300 py-12">Detaylı bilgi yakında eklenecek.</p>
             )}
           </div>
         )}
 
-        {/* Installments Tab */}
-        {activeTab === "installments" && (
-          <div className="animate-in fade-in duration-500 max-w-3xl mx-auto">
-            <div className=" overflow-hidden border border-gray-100 shadow-sm bg-white">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-500 uppercase text-[10px] tracking-widest">
-                    <th className="px-8 py-5 text-left font-semibold">Banka</th>
-                    <th className="px-8 py-5 text-center font-semibold">
-                      3 Taksit
-                    </th>
-                    <th className="px-8 py-5 text-center font-semibold">
-                      6 Taksit
-                    </th>
-                    <th className="px-8 py-5 text-right font-semibold">
-                      9 Taksit
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {installmentBanks.map((bank) => (
-                    <tr
-                      key={bank}
-                      className="hover:bg-gray-50/30 transition-colors"
-                    >
-                      <td className="px-8 py-5 font-medium text-gray-900">
-                        {bank}
-                      </td>
-                      <td className="px-8 py-5 text-center text-gray-600">
-                        {(productPrice / 3).toFixed(2)} TL
-                      </td>
-                      <td className="px-8 py-5 text-center text-gray-600">
-                        {(productPrice / 6).toFixed(2)} TL
-                      </td>
-                      <td className="px-8 py-5 text-right font-semibold text-black">
-                        {(productPrice / 9).toFixed(2)} TL
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {["Vade Farksız", "Güvenli Ödeme", "Hızlı İşlem"].map((item) => (
-                <div
-                  key={item}
-                  className="flex items-center gap-2 text-[11px] text-gray-500 justify-center"
+        {/* 2. Yorumlar */}
+        {activeTab === "comments" && (
+          <div className="animate-in fade-in duration-700 space-y-16">
+            <div className="flex justify-between items-end border-b border-stone-100 pb-8">
+              <h3 className="text-2xl italic font-extralight text-stone-900 leading-none">Deneyimler</h3>
+              {currentUser && (
+                <button 
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="text-[10px] uppercase tracking-widest font-bold border-b border-stone-900 pb-1 hover:opacity-60 transition-opacity"
                 >
-                  <Check size={14} className="text-green-500" /> {item}
+                  Yorumunu Paylaş
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+              {comments.map((comment) => (
+                <div key={comment.id} className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={10} className={cn(i < comment.rating ? "fill-stone-900" : "text-stone-200")} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] text-stone-300 font-mono italic">
+                      {new Date(comment.createdAt).toLocaleDateString("tr-TR")}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-stone-800 uppercase tracking-tighter">{comment.user?.name} {comment.user?.surname}</p>
+                    <p className="text-sm text-stone-500 leading-relaxed font-light">{comment.comment}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Suggestions Tab */}
+        {/* 3. Taksitler */}
+        {activeTab === "installments" && (
+          <div className="animate-in fade-in duration-700 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 gap-4 divide-y divide-stone-50">
+              {["Akbank", "Garanti", "İş Bankası", "Yapı Kredi"].map((bank) => (
+                <div key={bank} className="flex justify-between items-center py-6 group hover:px-2 transition-all">
+                  <span className="text-sm tracking-widest uppercase text-stone-400 group-hover:text-stone-900 transition-colors">{bank}</span>
+                  <div className="flex gap-8 text-sm">
+                    <div className="text-center">
+                      <p className="text-[9px] uppercase text-stone-300 mb-1">3 Taksit</p>
+                      <p>{(productPrice / 3).toFixed(2)} TL</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[9px] uppercase text-stone-300 mb-1">9 Taksit</p>
+                      <p className="font-medium">{(productPrice / 9).toFixed(2)} TL</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 4. Öneriler */}
         {activeTab === "suggestions" && (
-          <div className="animate-in fade-in duration-500 max-w-xl mx-auto text-center">
-            <div className="mb-10">
-              <div className="w-16 h-16 bg-yellow-50 price flex items-center justify-center mx-auto mb-4">
-                <Lightbulb size={32} className="text-yellow-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900">
-                Fikirleriniz Önemli
-              </h3>
-              <p className="text-gray-500 mt-2">
-                Deneyiminizi iyileştirmemize yardımcı olun.
-              </p>
-            </div>
+          <div className="animate-in fade-in duration-700 max-w-lg mx-auto text-center space-y-10 py-10">
             <div className="space-y-4">
-              <input
-                value={suggestionEmail}
-                onChange={(e) => setSuggestionEmail(e.target.value)}
-                placeholder="E-posta adresiniz (opsiyonel)"
-                className="w-full px-6 py-4 price bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-black/5 focus:border-black/10 transition-all outline-none text-sm"
-              />
-              <textarea
-                value={suggestionText}
-                onChange={(e) => setSuggestionText(e.target.value)}
-                placeholder="Önerinizi buraya yazın..."
-                className="w-full px-6 py-4 price bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-black/5 focus:border-black/10 transition-all outline-none text-sm min-h-[160px] resize-none"
-              />
-              <Button
-                onClick={() => {
-                  toast.success("Öneriniz alındı.");
-                  setSuggestionText("");
-                }}
-                className="w-full py-7 price bg-black hover:bg-zinc-800 text-white font-medium"
-              >
-                Gönder
-              </Button>
+              <h3 className="text-3xl font-extralight italic text-stone-900">Bir fikrin mi var?</h3>
+              <p className="text-stone-400 text-sm font-light">Tasarım sürecimizi senin önerilerinle geliştirmek isteriz.</p>
             </div>
+            <div className="relative border-b border-stone-200 focus-within:border-stone-800 transition-all duration-500 text-left">
+              <textarea 
+                className="w-full bg-transparent outline-none py-4 text-sm font-light resize-none min-h-[100px]"
+                placeholder="Önerini buraya bırakabilirsin..."
+              />
+            </div>
+            <button className="flex items-center gap-4 mx-auto text-[10px] uppercase tracking-[0.4em] font-bold group">
+              İlet <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+            </button>
           </div>
         )}
       </div>
 
       {/* Modern Yorum Modalı */}
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
-        <DialogContent className="sm:max-w-[480px]  p-8 border-none shadow-2xl overflow-hidden">
-          <DialogHeader className="mb-6">
-            <DialogTitle className="text-2xl font-bold">
-              Deneyiminizi Paylaşın
-            </DialogTitle>
-            <DialogDescription>
-              Ürün hakkındaki görüşleriniz diğer müşterilere ışık tutacaktır.
-            </DialogDescription>
+        <DialogContent className="max-w-md bg-[#FCFBFA] border-none shadow-2xl rounded-none font-light">
+          <DialogHeader className="text-left space-y-4">
+            <DialogTitle className="text-2xl italic font-extralight tracking-tight">Ürünü Değerlendir</DialogTitle>
+            <DialogDescription className="text-xs uppercase tracking-widest text-stone-400">Puanın ve görüşlerin bizim için kıymetli.</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
-            <div className="flex justify-center gap-2 mb-2">
+          <div className="space-y-12 mt-8">
+            <div className="flex justify-center gap-4">
               {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setRating(n)}
-                  className="transition-transform active:scale-90"
-                >
-                  <Star
-                    size={32}
-                    className={`${
-                      n <= rating ? "fill-black text-black" : "text-gray-200"
-                    } transition-colors`}
-                  />
+                <button key={n} onClick={() => setRating(n)} className="transition-all hover:scale-110">
+                  <Star size={24} className={cn(n <= rating ? "fill-stone-900" : "text-stone-200")} />
                 </button>
               ))}
             </div>
 
-            <input
-              placeholder="Başlık (Opsiyonel)"
-              className="w-full px-4 py-3 price bg-gray-50 border-none outline-none focus:ring-1 focus:ring-black/10 text-sm"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-
-            <textarea
-              placeholder="Yorumunuzu buraya yazın..."
-              className="w-full px-4 py-3 price bg-gray-50 border-none outline-none focus:ring-1 focus:ring-black/10 text-sm min-h-[120px] resize-none"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-            />
-
-            <div className="flex gap-3 pt-2">
-              <Button
-                variant="ghost"
-                onClick={() => setIsReviewModalOpen(false)}
-                className="flex-1 price h-12"
-              >
-                İptal
-              </Button>
-              <Button
-                onClick={handleCommentSubmit}
-                disabled={rating === 0 || !commentText || isSubmitting}
-                className="flex-[2] price bg-black h-12 text-white"
-              >
-                {isSubmitting ? "Gönderiliyor..." : "Yorumu Yayınla"}
-              </Button>
+            <div className="space-y-10">
+              <div className="border-b border-stone-200 focus-within:border-stone-800 transition-all duration-500">
+                <input 
+                  placeholder="Başlık (Opsiyonel)" 
+                  className="w-full bg-transparent py-3 outline-none text-sm font-light"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </div>
+              <div className="border-b border-stone-200 focus-within:border-stone-800 transition-all duration-500">
+                <textarea 
+                  placeholder="Yorumunuz..." 
+                  className="w-full bg-transparent py-3 outline-none text-sm font-light min-h-[80px] resize-none"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                />
+              </div>
             </div>
+
+            <button 
+              onClick={() => { toast.success("Alındı."); setIsReviewModalOpen(false); }}
+              className="w-full bg-stone-900 text-white py-4 text-[10px] uppercase tracking-widest font-bold hover:bg-stone-800 transition-colors"
+            >
+              Yorumu Yayınla
+            </button>
           </div>
         </DialogContent>
       </Dialog>

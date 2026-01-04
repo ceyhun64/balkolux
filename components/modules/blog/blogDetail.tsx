@@ -4,17 +4,14 @@ import React from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, ArrowLeft } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface Blog {
   id: number;
   title: string;
-  date: string;
   content: string;
   image: string;
-  // createdAt alanını BlogPage'deki gibi kullanalım
   createdAt: string;
 }
 
@@ -25,42 +22,27 @@ export default function BlogDetailPage() {
   let blog: Blog | null = null;
   if (blogParam) {
     try {
-      // blog verisini güvenli bir şekilde ayrıştır
       blog = JSON.parse(blogParam);
     } catch (err) {
-      console.error("Blog parametresi ayrıştırılamadı:", err);
+      console.error("Parse hatası:", err);
     }
   }
 
-  // Blog içeriği bulunamazsa veya parse edilemezse (Empty/Error State)
   if (!blog)
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white via-amber-950/5 to-white font-sans">
-        <Card className="relative p-10 rounded-xl shadow-2xl shadow-rose-200/50 border border-gray-100 max-w-xl mx-auto text-center bg-white">
-          <div className="mb-6">
-            <ArrowLeft className="w-16 h-16 mx-auto text-rose-500" />
-          </div>
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
-            Geri Dönüş Gerekiyor
-          </h2>
-          <p className="text-gray-600 mb-8 text-lg">
-            Blog içeriği yüklenemedi veya bulunamadı. Lütfen ana blog sayfasına
-            geri dönün.
-          </p>
-          <Link
-            href="/blog"
-            className="inline-flex items-center justify-center px-8 py-3 bg-rose-600 text-white font-semibold hover:bg-rose-700 transition-all rounded-full shadow-lg shadow-rose-600/30 text-base"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Tüm Blogları Gör
-          </Link>
-        </Card>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FCFBFA] px-6 text-center">
+        <h2 className="text-2xl font-light text-stone-800 mb-6 italic">
+          İçerik bulunamadı.
+        </h2>
+        <Link
+          href="/blog"
+          className="text-xs tracking-widest uppercase border-b border-stone-300 pb-1 hover:border-stone-800 transition-colors"
+        >
+          Listeye Geri Dön
+        </Link>
       </div>
     );
 
-  // Normal İçerik Durumu
-
-  // Tarihi formatlama (BlogPage'deki ile tutarlı)
   const formattedDate = new Date(blog.createdAt).toLocaleDateString("tr-TR", {
     day: "numeric",
     month: "long",
@@ -68,86 +50,99 @@ export default function BlogDetailPage() {
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="min-h-screen bg-white "
-    >
-      {/* ---------------- HERO (Görsel ve Başlık) ---------------- */}
-      <div className="relative w-full h-[400px] md:h-[550px] lg:h-[700px] overflow-hidden">
-        {/* Resim */}
-        <Image
-          src={blog.image}
-          alt={blog.title}
-          fill
-          sizes="100vw"
-          priority
-          className="object-cover w-full h-full brightness-[0.70]"
-        />
-
-        {/* Gradient Overlay (Rose Temalı Alt Gölge) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-rose-950/80 via-black/20 to-transparent" />
-
-        {/* İçerik */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 pb-12 md:pb-20 max-w-4xl mx-auto text-center">
-          {/* Tarih ve Kategori Vurgusu */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex items-center justify-center text-sm font-semibold uppercase tracking-widest text-rose-300 mb-4 font-sans"
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            {formattedDate}
-          </motion.div>
-
-          {/* Başlık */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="text-white font-extrabold text-4xl md:text-6xl tracking-tight leading-snug drop-shadow-lg"
-          >
-            {blog.title}
-          </motion.h1>
-        </div>
-
-        {/* Geri Dön Butonu (Modern Konumlandırma) */}
+    <div className="min-h-screen bg-[#FCFBFA] text-stone-800 selection:bg-stone-100">
+      {/* --- TOP NAVIGATION --- */}
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-8 flex justify-between items-center mix-blend-difference text-white">
         <Link
           href="/blog"
-          className="absolute top-8 left-8 p-3 rounded-full bg-white/30 text-white backdrop-blur-sm 
-                       hover:bg-rose-600 hover:text-white transition-all duration-300 shadow-lg z-10"
+          className="group flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Geri Dön
         </Link>
-      </div>
+      </nav>
 
-      {/* ---------------- CONTENT (İçerik) ---------------- */}
-      <div className="max-w-4xl mx-auto px-6 py-16 md:py-24">
+      {/* --- HERO SECTION --- */}
+      <header className="relative h-[80dvh] w-full flex flex-col items-center justify-center text-center px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="text-gray-800 text-lg md:text-xl leading-loose tracking-normal font-light"
+          transition={{ duration: 1 }}
+          className="max-w-4xl z-10 space-y-8"
         >
-          {/* İçeriği paragraf ve boşluklara ayırma */}
+          <div className="space-y-4">
+            <span className="text-[10px] tracking-[0.5em] uppercase text-stone-400 font-medium italic">
+              {formattedDate} — Tasarım Notları
+            </span>
+            <h1 className="text-4xl md:text-7xl font-extralight tracking-tighter leading-[1.1] text-stone-900 italic">
+              {blog.title}
+            </h1>
+          </div>
+        </motion.div>
+
+        {/* Zarif Bir Scroll Göstergesi */}
+        <div className="absolute bottom-12 w-[1px] h-16 bg-stone-200" />
+      </header>
+
+      {/* --- FEATURE IMAGE --- */}
+      <section className="max-w-6xl mx-auto px-6 mb-24">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2 }}
+          className="relative aspect-[21/9] overflow-hidden bg-stone-100"
+        >
+          <Image
+            src={blog.image}
+            alt={blog.title}
+            fill
+            priority
+            className="object-cover grayscale hover:grayscale-0 transition-all duration-1000"
+          />
+        </motion.div>
+      </section>
+
+      {/* --- ARTICLE CONTENT --- */}
+      <article className="max-w-2xl mx-auto px-6 pb-32">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="prose prose-stone prose-lg"
+        >
           {blog.content.split("\n").map((line, i) =>
             line.trim() === "" ? (
-              // Boş satırları daha kontrollü bir boşlukla değiştir
-              <div key={i} className="h-6 md:h-8" />
+              <div key={i} className="h-8" />
             ) : (
-              // Paragraflara stil uygulama
               <p
                 key={i}
-                className="mb-6 md:mb-8 text-gray-700 first-letter:text-4xl first-letter:font-bold first-letter:text-rose-600 first-letter:mr-1 first-letter:float-left"
+                className="text-stone-600 font-light leading-relaxed mb-8 first-letter:text-5xl first-letter:font-extralight first-letter:mr-3 first-letter:float-left first-letter:text-stone-900 first-letter:italic"
               >
                 {line}
               </p>
             )
           )}
         </motion.div>
-      </div>
-    </motion.div>
+
+        {/* FOOTER: Paylaş veya Sıradaki */}
+        <div className="mt-24 pt-12 border-t border-stone-100 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] uppercase tracking-widest text-stone-400">
+              Yazar
+            </span>
+            <span className="text-sm font-medium tracking-tight">
+              Moda Perde Tasarım Ekibi
+            </span>
+          </div>
+          <Link
+            href="/blog"
+            className="group flex items-center gap-2 text-xs tracking-widest uppercase font-semibold text-stone-900"
+          >
+            Sıradaki Yazı{" "}
+            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </Link>
+        </div>
+      </article>
+    </div>
   );
 }

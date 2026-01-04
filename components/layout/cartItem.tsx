@@ -22,7 +22,7 @@ const CartItem: React.FC<CartItemDropdownProps> = ({
   return (
     <div className="group flex items-center gap-4 py-3 transition-all duration-200">
       {/* Ürün Görseli - Daha yumuşak köşeler ve temiz arka plan */}
-      <div className="relative w-16 h-16 flex-shrink-0 bg-secondary/30 rounded-xl overflow-hidden">
+      <div className="relative w-24 h-16 flex-shrink-0 bg-secondary/30 overflow-hidden">
         <img
           src={item.product.mainImage}
           alt={item.product.title}

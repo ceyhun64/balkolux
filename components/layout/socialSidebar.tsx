@@ -2,88 +2,67 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Instagram, Facebook, Phone } from "lucide-react";
-import Image from "next/image";
+import { Plus, Instagram, Facebook, MessageCircle, Phone } from "lucide-react";
 
 export default function SocialSidebar() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // LocalStorage’dan ilk durumu oku
   useEffect(() => {
     const stored = localStorage.getItem("socialSidebarOpen");
-    if (stored !== null) {
-      setIsOpen(stored === "true");
-    }
+    if (stored !== null) setIsOpen(stored === "true");
   }, []);
 
-  // Durum değişirse localStorage’a kaydet
   useEffect(() => {
     localStorage.setItem("socialSidebarOpen", String(isOpen));
   }, [isOpen]);
 
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
-  const whatsappNumber = "+90 533 387 40 74";
+  const whatsappNumber = "+90 546 225 56 59";
   const whatsappLink = `https://wa.me/${whatsappNumber.replace(/[^\d]/g, "")}`;
 
-  const socialIcons = [
+  const socialLinks = [
     {
       name: "Instagram",
-      link: "https://www.instagram.com/nataliaperde",
-      src: "/socialMedia/instagram.webp",
-      bg: "bg-gradient-to-tr from-[#feda75] via-[#fa7e1e] to-[#d62976]",
+      link: "https://www.instagram.com/balkolux",
+      icon: Instagram,
     },
     {
       name: "Facebook",
-      link: "https://www.facebook.com/p/Ferudun-POLAT-100054520957916/",
-      src: "/socialMedia/facebook.webp",
-      bg: "bg-[#1877f2]",
+      link: "https://www.facebook.com/p/Balkol%C3%BCx-Balkon-Bah%C3%A7e-Mobilyalar%C4%B1-61561591640222/",
+      icon: Facebook,
     },
-    {
-      name: "WhatsApp",
-      link: whatsappLink,
-      src: "/socialMedia/whatsapp.webp",
-      bg: "bg-[#25D366]",
-    },
-    {
-      name: "Telefon",
-      link: `tel:${whatsappNumber}`,
-      src: "/socialMedia/phone.webp",
-      bg: "bg-[#075E54]",
-    },
+    { name: "WhatsApp", link: whatsappLink, icon: MessageCircle },
+    { name: "Telefon", link: `tel:${whatsappNumber}`, icon: Phone },
   ];
 
   return (
-    <div className="fixed left-2 bottom-6 z-50 flex flex-col items-center">
+    <div className="fixed left-6 bottom-8 z-50 flex flex-col items-center">
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="flex flex-col items-center gap-3 mb-2"
-            initial={{ opacity: 0, y: 20}}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{
-              duration: 0.35,
-              ease: "easeOut",
-              staggerChildren: 0.08,
-            }}
+            className="flex flex-col items-center gap-5 mb-6"
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 10 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
-            {socialIcons.map((icon) => (
+            {socialLinks.map((item, idx) => (
               <motion.a
-                key={icon.name}
-                href={icon.link}
+                key={item.name}
+                href={item.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{
-                  scale: 1.15,
-                  rotate: [0, -8, 8, 0],
-                  boxShadow: `0 0 18px ${icon.bg}90`,
-                }}
-                transition={{ duration: 0.4 }}
-                className={` rounded-full text-white flex items-center justify-center ${icon.bg} shadow-lg backdrop-blur-md`}
-                aria-label={icon.name}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: idx * 0.05 }}
+                className="group relative flex items-center justify-center"
               >
-                <Image className="rounded-full" src={icon.src} alt={icon.name} width={42} height={42} />
+             
+                {/* Icon Container */}
+                <div className="w-10 h-10 rounded-full border border-zinc-300 bg-white/80 flex items-center justify-center text-zinc-900 group-hover:text-stone-900 group-hover:border-stone-900 group-hover:shadow-sm transition-all duration-500">
+                  <item.icon size={18} strokeWidth={1.2} />
+                </div>
               </motion.a>
             ))}
           </motion.div>
@@ -92,17 +71,16 @@ export default function SocialSidebar() {
 
       <motion.button
         onClick={toggleSidebar}
-        whileTap={{ scale: 0.92 }}
-        className="p-3 rounded-full bg-zinc-800 border-2 border-white hover:bg-zinc-800/50 transition-colors text-white"
-        style={{ marginTop: isOpen ? 12 : 0 }}
-        aria-label={isOpen ? "Kapat" : "Aç"}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="w-12 h-12 rounded-full bg-zinc-800 text-white shadow-2xl flex items-center justify-center transition-colors hover:bg-stone-800"
+        aria-label="İletişim Kanalları"
       >
         <motion.div
-          animate={{ rotate: isOpen ? 45 : 0 }}
-          transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          style={{ originX: 0.5, originY: 0.5 }}
+          animate={{ rotate: isOpen ? 135 : 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-          <Plus size={24} />
+          <Plus size={24} strokeWidth={1.5} />
         </motion.div>
       </motion.button>
     </div>

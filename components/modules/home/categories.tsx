@@ -14,10 +14,30 @@ interface CategoryData {
 }
 
 const initialCategories: CategoryData[] = [
-  { id: 1, name: "OTURMA TAKIMLARI", image: "/categories/livingroom.webp", href: "/products/seating_sets" },
-  { id: 2, name: "MASA TAKIMLARI", image: "/categories/table.webp", href: "/products/table_sets" },
-  { id: 3, name: "ŞEZLONG ÇEŞİTLERİ", image: "/categories/sunlounger.webp", href: "/products/loungers" },
-  { id: 4, name: "SALINCAK ÇEŞİTLERİ", image: "/categories/swing.jpg", href: "/products/swings" },
+  {
+    id: 1,
+    name: "OTURMA TAKIMLARI",
+    image: "/categories/livingroom.webp",
+    href: "/products/seating_sets",
+  },
+  {
+    id: 2,
+    name: "MASA TAKIMLARI",
+    image: "/categories/table.webp",
+    href: "/products/table_sets",
+  },
+  {
+    id: 3,
+    name: "ŞEZLONG ÇEŞİTLERİ",
+    image: "/categories/sunlounger.webp",
+    href: "/products/loungers",
+  },
+  {
+    id: 4,
+    name: "SALINCAK ÇEŞİTLERİ",
+    image: "/categories/swing.jpg",
+    href: "/products/swings",
+  },
 ];
 
 export default function CategoriesSection() {
@@ -31,22 +51,26 @@ export default function CategoriesSection() {
   return (
     <section className=" bg-background py-20 md:py-32">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
-        
         {/* Minimal Başlık Alanı */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-          <div className="max-w-xl">
-            <span className="text-[10px] tracking-[0.5em] text-black/40 font-medium uppercase mb-4 block">
-              Küratörlüğünü Yaptığımız Koleksiyon
+        {/* Başlık Alanı */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
+          <div className="max-w-2xl">
+            <span className="text-[10px] tracking-[0.6em] text-neutral-400 font-semibold uppercase mb-4 block">
+              Dış Mekan Koleksiyonu 2024
             </span>
-            <h2 className="text-4xl md:text-5xl font-extralight tracking-tight text-black leading-tight">
-              Dış Mekan Yaşamı <br /> <span className="font-normal italic">Yeniden Tanımlandı</span>
+            <h2 className="text-4xl md:text-6xl font-light tracking-tight text-neutral-900 leading-[1.1]">
+              Bahçe ve Balkon Yaşamını <br />
+              <span className="font-serif italic text-neutral-500">
+                Yeniden Kurgulayın
+              </span>
             </h2>
           </div>
-          <Link 
-            href="/products" 
-            className="text-[11px] tracking-[0.3em] font-medium border-b border-black pb-2 hover:opacity-50 transition-all uppercase"
+          <Link
+            href="/products"
+            className="group flex items-center gap-2 text-[11px] tracking-[0.3em] font-bold border-b border-black pb-2 hover:text-neutral-500 hover:border-neutral-300 transition-all uppercase"
           >
-            Tüm Kategorileri Gör
+            Tüm Ürünleri Keşfet
+            <ArrowUpRight className="w-3 h-3 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
           </Link>
         </div>
 
@@ -54,7 +78,10 @@ export default function CategoriesSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-[4/5] w-full rounded-none" />
+                <Skeleton
+                  key={i}
+                  className="aspect-[4/5] w-full rounded-none"
+                />
               ))
             : initialCategories.map((category) => (
                 <PremiumCategoryCard key={category.id} category={category} />
@@ -67,7 +94,10 @@ export default function CategoriesSection() {
 
 function PremiumCategoryCard({ category }: { category: CategoryData }) {
   return (
-    <Link href={category.href} className="group relative block overflow-hidden bg-gray-50 aspect-[4/5]">
+    <Link
+      href={category.href}
+      className="group relative block overflow-hidden bg-gray-50 aspect-[4/5]"
+    >
       {/* Görsel Katmanı */}
       <div className="relative w-full h-full">
         <Image
@@ -91,7 +121,7 @@ function PremiumCategoryCard({ category }: { category: CategoryData }) {
               Koleksiyonu Keşfet
             </p>
           </div>
-          
+
           <div className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
             <ArrowUpRight className="w-4 h-4" />
           </div>

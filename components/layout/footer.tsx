@@ -161,7 +161,7 @@ export default function Footer() {
               <span className="text-stone-400 text-[9px] uppercase tracking-[0.3em]">
                 Design by
               </span>
-              <a href="https://wa.me/905541496377" target="_blank">
+              <a href="https://jhun.com.tr" target="_blank">
                 <GradientText
                   className="text-xl font-bold font-mono tracking-tighter"
                   text=".jhun{ }"

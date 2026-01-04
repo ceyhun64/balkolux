@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
-import { Heart, User, X, Search } from "lucide-react";
+import { Heart, User, X, Search, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -174,6 +174,7 @@ export default function Navbar() {
             {/* SAĞ: Arama (Desktop) & İkonlar */}
             <div className="flex items-center justify-end gap-1 md:gap-5 flex-1 md:flex-1">
               {/* DESKTOP ARAMA (Sadece MD ve üzeri) */}
+              {/* DESKTOP ARAMA (Sadece MD ve üzeri) */}
               <div
                 ref={searchRef}
                 className="relative hidden md:flex items-center"
@@ -182,65 +183,117 @@ export default function Navbar() {
                   <motion.div
                     initial={false}
                     animate={{
-                      width: searchOpen ? 260 : 0,
+                      width: searchOpen ? 300 : 0, // Genişliği biraz artırdık
                       opacity: searchOpen ? 1 : 0,
                     }}
-                    transition={{ type: "spring", stiffness: 220, damping: 26 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 28 }}
                     className="overflow-hidden"
                   >
-                    <div className="flex items-center h-9 bg-white/5 backdrop-blur-md px-4">
+                    <div className="flex items-center h-10 bg-white/10 backdrop-blur-md px-4 rounded-sm border border-white/5">
                       <input
                         autoFocus={searchOpen}
                         type="text"
-                        placeholder="Ara…"
+                        placeholder="Koleksiyonlarda ara…"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full bg-transparent text-[12px] text-white placeholder:text-white/30 focus:outline-none"
+                        className="w-full bg-transparent text-[12px] text-white placeholder:text-white/30 focus:outline-none tracking-wide"
                       />
+                      {searchQuery && (
+                        <X
+                          size={14}
+                          className="text-white/40 cursor-pointer hover:text-white transition-colors"
+                          onClick={() => setSearchQuery("")}
+                        />
+                      )}
                     </div>
                   </motion.div>
                   <button
                     onClick={() => setSearchOpen(!searchOpen)}
-                    className="p-2 rounded-full hover:bg-white/10 transition"
+                    className="p-2.5 rounded-full hover:bg-white/10 transition-all active:scale-95"
                   >
-                    <Search size={18} className="text-white/70" />
+                    <Search
+                      size={18}
+                      className={searchOpen ? "text-white" : "text-white/70"}
+                    />
                   </button>
                 </div>
 
-                {/* Desktop Sonuçlar Popover */}
+                {/* Desktop Sonuçlar Popover - MOBİL STİLİNE UYARLANDI */}
                 <AnimatePresence>
                   {searchOpen && searchQuery && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8 }}
+                      initial={{ opacity: 0, y: 15 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 6 }}
-                      className="absolute right-0 top-full mt-3 w-80 bg-zinc-900/95 backdrop-blur-xl border border-white/5 shadow-xl overflow-hidden z-50"
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 top-full mt-4 w-[400px] bg-zinc-700/90 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden z-[60]"
                     >
-                      {filteredProducts.map((product) => (
-                        <Link
-                          key={product.id}
-                          href={`/products/${product.id}`}
-                          className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition"
-                          onClick={() => {
-                            setSearchOpen(false);
-                            setSearchQuery("");
-                          }}
-                        >
-                          <div className="relative w-12 h-8 overflow-hidden bg-white/5">
-                            <Image
-                              src={product.mainImage}
-                              alt={product.title}
-                              fill
-                              className="object-cover"
-                            />
+                      {isLoadingProducts ? (
+                        <div className="p-8 text-center text-[10px] tracking-[0.2em] text-white/30 uppercase animate-pulse">
+                          Aranıyor...
+                        </div>
+                      ) : filteredProducts.length > 0 ? (
+                        <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
+                          {filteredProducts.map((product) => (
+                            <Link
+                              key={product.id}
+                              href={`/products/${product.id}`}
+                              className="flex items-center gap-4 px-5 py-4 hover:bg-white/5 transition-all border-b border-white/5 group"
+                              onClick={() => {
+                                setSearchOpen(false);
+                                setSearchQuery("");
+                              }}
+                            >
+                              {/* Ürün Görseli - Mobil Stili gibi kare/dikdörtgen temiz yapı */}
+                              <div className="relative aspect-square w-23 h-16 bg-white overflow-hidden shrink-0">
+                                <Image
+                                  src={product.mainImage}
+                                  alt={product.title}
+                                  fill
+                                  className="object-contain group-hover:scale-110 transition-transform duration-500"
+                                />
+                              </div>
+
+                              {/* Ürün Detayları */}
+                              <div className="flex flex-col min-w-0 gap-0.5">
+                                <p className="text-[11px] text-white/40 uppercase tracking-[0.1em] font-medium">
+                                  {product.category}
+                                </p>
+                                <p className="text-[13px] text-white font-light group-hover:text-stone-300 transition-colors truncate">
+                                  {product.title}
+                                </p>
+                                <p className="text-[12px] text-white/60 mt-1">
+                                  {product.price.toLocaleString("tr-TR", {
+                                    style: "currency",
+                                    currency: "TRY",
+                                  })}
+                                </p>
+                              </div>
+
+                              <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ChevronRight
+                                  size={14}
+                                  className="text-white/30"
+                                />
+                              </div>
+                            </Link>
+                          ))}
+
+                          {/* Alt Bilgi */}
+                          <div className="p-4 bg-white/5 text-center">
+                            <Link href={`/products`}>
+                              <button className="text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-colors">
+                                Tüm Sonuçları Gör
+                              </button>
+                            </Link>
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-[11px] text-white truncate">
-                              {product.title}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
+                        </div>
+                      ) : (
+                        <div className="p-10 text-center flex flex-col items-center gap-2">
+                          <span className="text-[11px] text-white/20 uppercase tracking-widest">
+                            Sonuç Bulunamadı
+                          </span>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -306,7 +359,7 @@ export default function Navbar() {
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="absolute left-4 right-4 top-full mt-2 bg-zinc-900 border border-white/10 shadow-2xl overflow-hidden z-[60]"
+                  className="absolute left-4 right-4 top-full mt-2 bg-zinc-500/90 backdrop-blur-2xl border border-white/10 shadow-2xl overflow-hidden z-[60]"
                 >
                   {isLoadingProducts ? (
                     <div className="p-4 text-center text-xs text-white/40">
@@ -324,13 +377,14 @@ export default function Navbar() {
                           }}
                           className="flex items-center gap-3 p-3 border-b border-white/5 active:bg-white/10"
                         >
-                          <Image
-                            src={product.mainImage}
-                            alt={product.title}
-                            width={40}
-                            height={40}
-                            className="object-cover rounded bg-white/5"
-                          />
+                          <div className="relative h-full w-1/5 p-4">
+                            <Image
+                              src={product.mainImage}
+                              alt={product.title}
+                              fill
+                              className="object-contain bg-white"
+                            />
+                          </div>
                           <div className="min-w-0">
                             <p className="text-[12px] text-white truncate">
                               {product.title}
@@ -361,11 +415,8 @@ export default function Navbar() {
         collectionLink={collectionLink}
       />
       <UserMegaMenu
-        user={user}
-        setUser={setUser}
         userMenuOpen={userMenuOpen}
         setUserMenuOpen={setUserMenuOpen}
-        pathname={pathname}
       />
       <MobileNavSheet
         isOpen={mobileOpen}

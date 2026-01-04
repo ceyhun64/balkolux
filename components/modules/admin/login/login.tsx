@@ -1,17 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { signIn } from "next-auth/react";
-import { GradientText } from "@/components/ui/shadcn-io/gradient-text/index";
-import { signOut } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -21,12 +18,14 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
   useEffect(() => {
     const logoutExistingSession = async () => {
-      await signOut({ redirect: false }); // Mevcut session'ı kapat
+      await signOut({ redirect: false });
     };
     logoutExistingSession();
   }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -39,7 +38,7 @@ export default function AdminLogin() {
       });
 
       if (res?.error) {
-        toast.error(" Hatalı email veya şifre!");
+        toast.error("Kimlik bilgileri doğrulanamadı.");
         return;
       }
 
@@ -48,109 +47,124 @@ export default function AdminLogin() {
         const sessionData = await sessionRes.json();
 
         if (sessionData?.user?.role !== "ADMIN") {
-          toast.error(" Bu alan sadece adminler içindir!");
+          toast.error("Yetkisiz erişim denemesi.");
           return;
         }
 
-        toast.success(" Giriş başarılı! Yönlendiriliyorsunuz...");
-        setTimeout(() => router.push("/admin/dashboard"), 1000);
+        toast.success("Yönetim paneline yönlendiriliyorsunuz.");
+        setTimeout(() => router.push("/admin/dashboard"), 800);
       }
     } catch (err) {
-      toast.error(" Giriş sırasında bir hata oluştu.");
+      toast.error("Sistem hatası oluştu.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100px-4 font-sans">
+    <div className="flex min-h-screen items-center justify-center bg-[#FDFDFD] text-stone-800 font-sans selection:bg-stone-100">
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative w-full max-w-md bg-white/80 backdrop-blur-md rounded-xs shadow-2xl p-10 flex flex-col gap-6"
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[400px] px-8 py-12"
       >
-        {/* Logo / Başlık */}
-        <div className="flex flex-col items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-18 h-12 md:w-22 md:h-14 lg:w-26 lg:h-16">
+        {/* Logo Bölümü */}
+        <div className="flex flex-col items-center mb-12">
+          <Link
+            href="/"
+            className="mb-8 opacity-90 hover:opacity-100 transition-opacity"
+          >
+            <div className="relative w-24 h-12">
               <Image
-                src="/logo/logo.webp"
-                alt="Moda Perde 6"
+                src="/logo/logoblack.png"
+                alt="BalkoLüx Logo"
                 fill
-                quality={100}
+                priority
                 className="object-contain"
-                sizes="(max-width: 768px) 144px, (max-width: 1024px) 176px, 208px"
               />
             </div>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 ">
-            Admin Panel
+          <h1 className="text-xl font-light tracking-[0.2em]  text-stone-900">
+            Admin{" "}
+            <span className="font-serif italic text-stone-400 capitalize tracking-normal">
+              Girişi
+            </span>
           </h1>
-          <p className="text-sm text-gray-500 text-center">
-            Yönetici girişi için kimlik doğrulaması yapın
-          </p>
         </div>
 
-        <Separator className="my-4" />
-
         {/* Form */}
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-2 text-left">
             <Label
               htmlFor="email"
-              className="flex items-center gap-2 text-gray-700  font-medium"
+              className="text-[10px] uppercase tracking-widest text-stone-400 ml-1"
             >
-              <Mail size={16} /> E-posta
+              E-posta Adresi
             </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@Moda Perde.com"
-              required
-              className="rounded-lg "
-            />
+            <div className="relative group">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300 group-focus-within:text-stone-800 transition-colors" />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@balkolux.com"
+                required
+                className="bg-transparent border-stone-200 border-x-0 border-t-0 border-b rounded-none px-10 h-12 focus-visible:ring-0 focus-visible:border-stone-800 transition-all placeholder:text-stone-200"
+              />
+            </div>
           </div>
 
-          <div className="flex flex-col gap-1 relative">
+          <div className="space-y-2 text-left relative">
             <Label
               htmlFor="password"
-              className="flex items-center gap-2 text-gray-700 font-medium"
+              className="text-[10px] uppercase tracking-widest text-stone-400 ml-1"
             >
-              <Lock size={16} /> Şifre
+              Şifre
             </Label>
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="rounded-lg pr-10"
-            />
-            <button
-              type="button"
-              className="absolute right-3 mt-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
+            <div className="relative group">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300 group-focus-within:text-stone-800 transition-colors" />
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                className="bg-transparent border-stone-200 border-x-0 border-t-0 border-b rounded-none px-10 h-12 focus-visible:ring-0 focus-visible:border-stone-800 transition-all placeholder:text-stone-200"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-800 transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-[#7B0323] to-[#5E021A] hover:from-[##7B0323]/90 hover:to-[#5E021A]/90 text-white font-semibold py-3 rounded-full shadow-lg transition-transform transform hover:scale-105"
             disabled={isLoading}
+            className="w-full mt-8 bg-stone-900 hover:bg-stone-800 text-white font-light tracking-widest h-12 rounded-none transition-all group"
           >
-            {isLoading ? "Yükleniyor..." : "Giriş Yap"}
+            {isLoading ? (
+              <span className="animate-pulse">Doğrulanıyor...</span>
+            ) : (
+              <div className="flex items-center gap-2">
+                Giriş Yap{" "}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            )}
           </Button>
         </form>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
-          © {new Date().getFullYear()} Moda Perde Admin System
-        </p>
+        <div className="mt-16 text-center">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-stone-300">
+            © {new Date().getFullYear()} BalkoLüx Management System
+          </p>
+        </div>
       </motion.div>
     </div>
   );
