@@ -11,14 +11,14 @@ const heroes = [
     id: 1,
     title: "Işık Süzgeci Tül Perdeler",
     subtitle: "Zarafetin Yeni Tanımı",
-    image: "/heroes/oturma.webp",
+    image: "/heroes/1001.jpg",
     href: "/products/sheer",
   },
   {
     id: 2,
     title: "Plise Perde Sistemleri",
     subtitle: "Minimalist Çözümler",
-    image: "/heroes/masa.webp",
+    image: "/heroes/1003.jpg",
     href: "/products/plise",
   },
   {
