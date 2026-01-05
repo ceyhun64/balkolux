@@ -2,7 +2,13 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Instagram, Facebook, Phone, ArrowRight } from "lucide-react";
+import {
+  Instagram,
+  Facebook,
+  Phone,
+  ArrowRight,
+  MessageCircle,
+} from "lucide-react";
 import Image from "next/image";
 import { GradientText } from "../ui/shadcn-io/gradient-text/index";
 import { toast } from "sonner";
@@ -16,9 +22,9 @@ export default function Footer() {
     kurumsal: {
       title: "KURUMSAL",
       links: [
-        { label: "Hakkımızda", href: "/about" },
-        { label: "Mağazalarımız", href: "/stores" },
+        { label: "Hakkımızda", href: "/institutional/about" },
         { label: "İletişim", href: "/contact" },
+        { label: "Neden Biz", href: "/institutional/why_us" },
         { label: "Kargo Takip", href: "/track-order" },
       ],
     },
@@ -26,8 +32,10 @@ export default function Footer() {
       title: "ALIŞVERİŞ",
       links: [
         { label: "Sepetim", href: "/cart" },
-        { label: "Beğendiklerim", href: "/wishlist" },
-        { label: "Siparişlerim", href: "/orders" },
+        { label: "Beğendiklerim", href: "/favorites" },
+        { label: "Siparişlerim", href: "/profile/orders" },
+        { label: "Üye Ol", href: "/register" },
+        { label: "Giriş Yap", href: "/login" },
       ],
     },
     sozlesmeler: {
@@ -83,7 +91,7 @@ export default function Footer() {
               Yaşam alanlarınıza lüks ve zarafet katan modern tasarımlar.
             </p>
             <div className="flex items-center gap-5">
-              {[Instagram, Facebook, Phone].map((Icon, i) => (
+              {[Instagram, Facebook, MessageCircle, Phone].map((Icon, i) => (
                 <a
                   key={i}
                   href="#"
