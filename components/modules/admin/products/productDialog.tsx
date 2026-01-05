@@ -24,28 +24,27 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export interface ProductFormData {
   title: string;
   description: string;
-  pricePerM2: number;
+  price: number;
   rating: number;
   reviewCount: number;
   category: string;
   subCategory?: string;
-  room?: string;
 }
 
 interface Product {
   id: number;
   title: string;
   description: string;
-  pricePerM2: number;
+  price: number;
   rating: number;
   reviewCount?: number;
   category: string;
   subCategory?: string;
-  room?: string;
   mainImage: string;
   subImage?: string;
   subImage2?: string;
   subImage3?: string;
+  subImage4?: string;
 }
 
 interface ProductDialogProps {
@@ -55,6 +54,7 @@ interface ProductDialogProps {
     subFile?: File | null,
     subFile2?: File | null,
     subFile3?: File | null,
+    subFile4?: File | null,
     productId?: number
   ) => void;
   product?: Product; // Eğer varsa formu doldur (güncelleme)
@@ -69,12 +69,11 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
     const [productData, setProductData] = useState<ProductFormData>({
       title: "",
       description: "",
-      pricePerM2: 0,
+      price: 0,
       rating: 0,
       reviewCount: 0,
       category: "",
       subCategory: "",
-      room: "",
     });
 
     // 🔹 Sadece File | null kullan
@@ -82,36 +81,24 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
     const [sub1, setSub1] = useState<File | null>(null);
     const [sub2, setSub2] = useState<File | null>(null);
     const [sub3, setSub3] = useState<File | null>(null);
+    const [sub4, setSub4] = useState<File | null>(null);
 
     // Mevcut URL'ler preview için
     const [mainUrl, setMainUrl] = useState<string | null>(null);
     const [subUrl1, setSubUrl1] = useState<string | null>(null);
     const [subUrl2, setSubUrl2] = useState<string | null>(null);
     const [subUrl3, setSubUrl3] = useState<string | null>(null);
+    const [subUrl4, setSubUrl4] = useState<string | null>(null);
 
     const [loading, setLoading] = useState(false);
 
     const categories = [
-      "Dikey Perde",
-      "Ahşap Jaluzi",
-      "Metal Jaluzi",
-      "Perde Aksesuarları",
-      "Stor Perde",
-      "Zebra Perde",
-      "Rüstik",
-      "Tüller",
-      "Fon",
-      "Plise",
-    ];
-
-    const roomOptions = [
-      "Salon",
-      "Mutfak",
-      "Yatak Odası",
-      "Banyo",
-      "Çocuk Odası",
-      "Oturma Odası",
-      "Ofis",
+      "Oturma Takımları",
+      "Masa Takımları",
+      "Salıncak",
+      "Şezlong",
+      "Şemsiye",
+      "Barbekü",
     ];
 
     useEffect(() => {
@@ -119,24 +106,25 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
         setProductData({
           title: product.title,
           description: product.description,
-          pricePerM2: product.pricePerM2,
+          price: product.price,
           rating: product.rating,
           reviewCount: product.reviewCount || 0,
           category: product.category,
           subCategory: product.subCategory || "",
-          room: product.room || "",
         });
 
         setMainFile(null);
         setSub1(null);
         setSub2(null);
         setSub3(null);
+        setSub4(null);
 
         // Preview için mevcut URL'leri ata
         setMainUrl(product.mainImage || null);
         setSubUrl1(product.subImage || null);
         setSubUrl2(product.subImage2 || null);
         setSubUrl3(product.subImage3 || null);
+        setSubUrl4(product.subImage4 || null);
 
         setOpen(true);
       } else {
@@ -149,7 +137,7 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
       setProductData((prev) => ({
         ...prev,
         [name]:
-          name === "pricePerM2" || name === "rating" || name === "reviewCount"
+          name === "price" || name === "rating" || name === "reviewCount"
             ? Number(value)
             : value,
       }));
@@ -164,17 +152,17 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
       setProductData({
         title: "",
         description: "",
-        pricePerM2: 0,
+        price: 0,
         rating: 0,
         reviewCount: 0,
         category: "",
         subCategory: "",
-        room: "",
       });
       setMainFile(null);
       setSub1(null);
       setSub2(null);
       setSub3(null);
+      setSub4(null);
       setMainUrl(null);
       setSubUrl1(null);
       setSubUrl2(null);
@@ -186,7 +174,7 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
       if (!productData.title || !productData.category) return;
 
       setLoading(true);
-      onSubmit(productData, mainFile, sub1, sub2, sub3, product?.id);
+      onSubmit(productData, mainFile, sub1, sub2, sub3, sub4, product?.id);
       setLoading(false);
       resetForm();
       setOpen(false);
@@ -236,9 +224,9 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                     placeholder="Ürün açıklaması"
                   />
                   <InputGroup
-                    label="Fiyat (m²)"
-                    value={productData.pricePerM2}
-                    name="pricePerM2"
+                    label="Fiyat "
+                    value={productData.price}
+                    name="price"
                     onChange={handleChange}
                     type="number"
                     min={0}
@@ -260,27 +248,6 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                         {categories.map((cat) => (
                           <SelectItem key={cat} value={cat}>
                             {cat}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>Oda</Label>
-                    <Select
-                      value={productData.room || ""}
-                      onValueChange={(val) =>
-                        setProductData((prev) => ({ ...prev, room: val }))
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Oda seç" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roomOptions.map((room) => (
-                          <SelectItem key={room} value={room}>
-                            {room}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -312,6 +279,12 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                         handleFile(e, setSub3)
                       }
                     />
+                    <FileInput
+                      label="Alt Görsel 4"
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        handleFile(e, setSub4)
+                      }
+                    />
                   </div>
                 </div>
 
@@ -324,6 +297,7 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                       { file: sub1, url: subUrl1 },
                       { file: sub2, url: subUrl2 },
                       { file: sub3, url: subUrl3 },
+                      { file: sub4, url: subUrl4 },
                     ].map((img, i) => (
                       <div
                         key={i}
@@ -357,13 +331,10 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                       <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
                         {productData.category || "Kategori Yok"}
                       </span>
-                      <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                        {productData.room || "Oda Yok"}
-                      </span>
                     </div>
                     <p className="text-[#001e59] font-semibold text-xl mt-2">
-                      {productData.pricePerM2 > 0
-                        ? `${productData.pricePerM2} TL / m²`
+                      {productData.price > 0
+                        ? `${productData.price} TL `
                         : "Fiyat Yok"}
                     </p>
                   </div>

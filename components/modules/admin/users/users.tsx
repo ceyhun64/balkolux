@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Sidebar from "@/components/modules/admin/sideBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,32 +17,28 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import {
+  Search,
+  Trash2,
+  Mail,
+  Phone,
+  MapPin,
+  Users as UsersIcon,
+  CheckCircle2,
+  MoreVertical,
+} from "lucide-react";
 
-const getUserPhone = (user: User) => {
-  if (user.phone && user.phone.trim() !== "") return user.phone;
-  if (user.addresses && user.addresses.length > 0) {
-    const addrPhone = user.addresses[0].phone;
-    return addrPhone && addrPhone.trim() !== "" ? addrPhone : "-";
-  }
-  return "-";
-};
-
+// --- Interfaces ---
 interface Address {
   id: number;
-  userId: number;
   title: string;
+  address: string;
+  city: string;
+  district: string;
+  zip: string;
   firstName: string;
   lastName: string;
-  address: string;
-  neighborhood?: string | null;
-  district: string;
-  city: string;
-  tcno?: string | null;
-  zip: string;
-  phone: string;
-  country: string;
-  createdAt: string;
-  updatedAt: string;
+  phone?: string;
 }
 
 interface User {
@@ -54,468 +50,372 @@ interface User {
   addresses?: Address[];
 }
 
-// 🔹 Silme dialogu reusable
-interface DeleteDialogProps {
-  onConfirm: () => void;
-  trigger: React.ReactNode;
-  title?: string;
-  description?: string;
-}
+const ITEMS_PER_PAGE = 12;
 
-const DeleteDialog: React.FC<DeleteDialogProps> = ({
-  onConfirm,
-  trigger,
-  title = "Silme İşlemi",
-  description = "Bu işlemi yapmak istediğine emin misin?",
-}) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[400px] bg-white text-gray-800 rounded-xs border border-gray-200 shadow-lg">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-bold text-[#001e59]">
-            {title}
-          </DialogTitle>
-          <DialogDescription className="mt-2 text-sm text-gray-600">
-            {description}
-          </DialogDescription>
-        </DialogHeader>
-
-        <DialogFooter className="mt-4 flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            İptal
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              onConfirm();
-              setOpen(false);
-            }}
-          >
-            Sil
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-export default function Users(): React.JSX.Element {
+export default function UsersManagement() {
   const isMobile = useIsMobile();
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [search, setSearch] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isBatchDeleting, setIsBatchDeleting] = useState(false);
 
-  // 🔹 API’den kullanıcıları çek
-  const fetchUsers = async () => {
-    setLoading(true);
+  const fetchUsers = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await fetch("/api/user/all");
-      if (!res.ok) throw new Error("Kullanıcılar alınamadı");
+      if (!res.ok) throw new Error("Veriler alınamadı");
       const data = await res.json();
-      setUsers(data.users);
+      setUsers(data.users || []);
     } catch (err) {
-      console.error(err);
-      alert("Kullanıcılar alınırken bir hata oluştu");
+      toast.error("Kullanıcı listesi yüklenirken bir hata oluştu.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
-  const deleteUser = async (id: number) => {
+  // Yardımcı: Telefon getirme
+  const displayPhone = (user: User) => {
+    return user.phone || user.addresses?.[0]?.phone || "Tanımlanmadı";
+  };
+
+  // Filtreleme (Memoized)
+  const filteredUsers = useMemo(() => {
+    return users.filter((u) =>
+      `${u.name} ${u.surname} ${u.email}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+  }, [users, search]);
+
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  // Silme İşlemleri
+  const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(`/api/user/all/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) throw new Error("Silme işlemi başarısız");
-
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-      toast.success("Kullanıcı başarıyla silindi.");
-    } catch (err) {
-      console.error(err);
-      toast.error("Kullanıcı silinemedi.");
+      const res = await fetch(`/api/user/all/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setUsers((prev) => prev.filter((u) => u.id !== id));
+        toast.success("Kullanıcı başarıyla silindi.");
+      }
+    } catch (error) {
+      toast.error("Silme işlemi başarısız.");
     }
   };
-  const deleteSelectedUsers = async () => {
+
+  const handleBatchDelete = async () => {
+    setIsBatchDeleting(true);
     try {
+      // Örnek toplu silme API çağrısı simülasyonu
       await Promise.all(
         selectedIds.map((id) =>
           fetch(`/api/user/all/${id}`, { method: "DELETE" })
         )
       );
-
       setUsers((prev) => prev.filter((u) => !selectedIds.includes(u.id)));
       setSelectedIds([]);
-      toast.success("Kullanıcılar başarıyla silindi.");
-    } catch (err) {
-      console.error(err);
-      toast.error("Seçilen kullanıcılar silinirken hata oluştu.");
+      toast.success(`${selectedIds.length} kullanıcı silindi.`);
+    } catch (error) {
+      toast.error("Bazı kullanıcılar silinemedi.");
+    } finally {
+      setIsBatchDeleting(false);
     }
   };
 
-  // ✅ Checkbox işlemleri
-  const handleSelectAll = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedIds(paginatedUsers.map((u) => u.id));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSelectOne = (id: number) => {
-    if (selectedIds.includes(id)) {
-      setSelectedIds(selectedIds.filter((sid) => sid !== id));
-    } else {
-      setSelectedIds([...selectedIds, id]);
-    }
-  };
-
-  // 🔍 Filtreleme
-  const filteredUsers = users.filter(
-    (u) =>
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.surname.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase())
-  );
-  console.log("users", users);
-
-  // 📄 Sayfalama
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * 15,
-    currentPage * 15
-  );
-
-  if (loading) return <Spinner />;
+  if (loading)
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-white">
+        <Spinner className="w-8 h-8 text-indigo-600" />
+      </div>
+    );
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="flex min-h-screen bg-[#F8F9FB] font-sans selection:bg-indigo-100">
       <Sidebar />
-
       <main
-        className={`flex-1 p-4 md:p-8 transition-all ${
-          isMobile ? "" : "md:ml-64"
+        className={`flex-1 p-6 lg:p-12 transition-all duration-300 ${
+          isMobile ? "mt-14" : "md:ml-72"
         }`}
       >
-        {/* Başlık ve Araç Çubuğu */}
-        <div className="flex flex-col sm:flex-row mb-6 gap-4">
-          <div className="flex flex-col sm:flex-row justify-center md:justify-between md:items-start items-center mb-6 mt-3 gap-4">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#001e59]">
-              Kullanıcılar
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="h-1 w-8 bg-indigo-600 rounded-full" />
+              <span className="text-xs font-bold uppercase tracking-widest text-indigo-600">
+                Yönetim Paneli
+              </span>
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+              Müşteri Yönetimi
             </h1>
+            <p className="text-slate-500 text-sm mt-1 font-medium">
+              İşletmenizin performansını gerçek zamanlı izleyin.
+            </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto justify-between items-start sm:items-center ">
-            {/* Seçilenleri silme dialog */}
-            <DeleteDialog
-              onConfirm={deleteSelectedUsers}
-              trigger={
-                <Button
-                  variant="default"
-                  className={`w-full sm:w-auto rounded-xs shadow-sm transition-all ${
-                    selectedIds.length > 0
-                      ? "bg-red-500 hover:bg-red-600 text-white cursor-pointer"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                  disabled={selectedIds.length === 0}
-                >
-                  Seçilenleri Sil ({selectedIds.length})
-                </Button>
-              }
-              title={`Seçilen ${selectedIds.length} kullanıcı silinecek!`}
-              description="Bu kullanıcıları silmek istediğine emin misin?"
-            />
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+              <Input
+                placeholder="İsim veya e-posta ile ara..."
+                className="pl-11 h-12 w-full md:w-80 bg-white border-slate-200 rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-50 transition-all border-none"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
 
-            <Input
-              type="text"
-              placeholder="Ad, soyad veya email ara..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-64 rounded-xs bg-white border border-gray-300 text-gray-900 placeholder-gray-500 shadow-sm focus:ring-2 focus:ring-[#001e59]/30"
-            />
+            {selectedIds.length > 0 && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="h-12 px-6 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-none shadow-none font-bold animate-in fade-in zoom-in duration-200">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Sil ({selectedIds.length})
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="rounded-[2rem] border-none">
+                  <DialogHeader>
+                    <DialogTitle>Seçilenleri Sil</DialogTitle>
+                    <DialogDescription>
+                      {selectedIds.length} kullanıcıyı sistemden kalıcı olarak
+                      silmek istediğinize emin misiniz?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter className="mt-4">
+                    <Button variant="ghost" className="rounded-xl">
+                      Vazgeç
+                    </Button>
+                    <Button
+                      onClick={handleBatchDelete}
+                      disabled={isBatchDeleting}
+                      className="bg-red-600 hover:bg-red-700 rounded-xl px-8"
+                    >
+                      {isBatchDeleting ? (
+                        <Spinner className="w-4 h-4" />
+                      ) : (
+                        "Evet, Hepsini Sil"
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
-        </div>
+        </header>
 
-        {/* Masaüstü tablo */}
-        <div className="hidden lg:block overflow-x-auto bg-white border border-gray-200 rounded-xs shadow-md">
-          <table className="min-w-full text-left text-gray-800">
+        {/* Veri Tablosu */}
+        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+          <table className="w-full text-left">
             <thead>
-              <tr className="bg-gray-100 text-gray-700">
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
+              <tr className="border-b border-slate-50 bg-slate-50/30">
+                <th className="px-8 py-5 w-12">
                   <input
                     type="checkbox"
-                    checked={
-                      selectedIds.length > 0 &&
-                      selectedIds.length === paginatedUsers.length
+                    className="w-5 h-5 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    onChange={(e) =>
+                      setSelectedIds(
+                        e.target.checked ? paginatedUsers.map((u) => u.id) : []
+                      )
                     }
-                    onChange={handleSelectAll}
                   />
                 </th>
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
-                  ID
+                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400">
+                  Profil
                 </th>
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
-                  Ad
+                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400">
+                  İletişim
                 </th>
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
-                  Soyad
+                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-slate-400">
+                  Adres Bilgisi
                 </th>
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 hidden sm:table-cell">
-                  Telefon
-                </th>
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 hidden md:table-cell">
-                  Email
-                </th>
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 hidden lg:table-cell">
-                  Adresler
-                </th>
-                <th className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 text-center">
-                  İşlemler
+                <th className="px-6 py-5 text-right text-xs font-bold uppercase tracking-widest text-slate-400">
+                  Yönet
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {paginatedUsers.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="text-center py-6 text-gray-500 italic"
-                  >
-                    Kullanıcı bulunamadı.
-                  </td>
-                </tr>
-              ) : (
-                paginatedUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="hover:bg-gray-50 transition-all duration-150"
-                  >
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(user.id)}
-                        onChange={() => handleSelectOne(user.id)}
-                        className="w-4 h-4 accent-[#001e59]"
-                      />
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
-                      {user.id}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
-                      {user.name}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200">
-                      {user.surname}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 hidden sm:table-cell">
-                      {getUserPhone(user)}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 hidden md:table-cell">
-                      {user.email}
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 hidden lg:table-cell">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="default"
-                            className="bg-[#001e59] hover:bg-[#003080] text-white rounded-xs shadow-sm transition-transform hover:scale-105"
-                            onClick={() => setSelectedUser(user)}
-                          >
-                            Adresleri Gör
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="bg-white text-gray-800 border border-gray-200 rounded-xs shadow-lg max-w-lg">
-                          <DialogHeader>
-                            <DialogTitle className="text-lg font-bold text-[#001e59]">
-                              {user.name} {user.surname} - Adresleri
-                            </DialogTitle>
-                            <DialogDescription className="text-gray-500">
-                              Kullanıcıya kayıtlı tüm adresler
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="mt-4 space-y-4">
-                            {user.addresses && user.addresses.length > 0 ? (
-                              user.addresses.map((addr) => {
-                                const addressParts = [
-                                  addr.title || addr.firstName || "Adres",
-                                  addr.address,
-                                  addr.city,
-                                  addr.district,
-                                  addr.zip,
-                                  addr.country,
-                                ].filter(Boolean);
-                                return (
-                                  <div
-                                    key={addr.id}
-                                    className="p-4 bg-gray-50 border border-gray-200 rounded-xs shadow-sm hover:shadow-md transition-shadow"
-                                  >
-                                    <h4 className="font-semibold text-gray-800 mb-1">
-                                      {addr.title || addr.firstName || "Adres"}
-                                    </h4>
-                                    <p className="text-gray-600 text-sm">
-                                      {addressParts.slice(1).join(", ")}
-                                    </p>
-                                  </div>
-                                );
-                              })
-                            ) : (
-                              <div className="text-center text-gray-400 italic py-6">
-                                Bu kullanıcıya kayıtlı adres bulunamadı.
-                              </div>
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </td>
-                    <td className="px-2 sm:px-3 py-2 sm:py-3 border-b border-gray-200 text-center">
-                      <DeleteDialog
-                        onConfirm={() => deleteUser(user.id)}
-                        trigger={
-                          <Button
-                            variant="default"
-                            size="sm"
-                            className="bg-red-500 hover:bg-red-600 text-white rounded-xs shadow-sm"
-                          >
-                            Sil
-                          </Button>
-                        }
-                        title={`${user.name} ${user.surname} silinecek!`}
-                        description="Bu kullanıcıyı silmek istediğine emin misin?"
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobil card görünümü */}
-        <div className="lg:hidden flex flex-col gap-4 mt-4">
-          {paginatedUsers.length === 0 ? (
-            <div className="text-center py-6 text-gray-500 italic">
-              Kullanıcı bulunamadı.
-            </div>
-          ) : (
-            paginatedUsers.map((user) => (
-              <div
-                key={user.id}
-                className="bg-white border border-gray-200 rounded-xs shadow-md p-4 flex flex-col gap-2"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
+            <tbody className="divide-y divide-slate-50">
+              {paginatedUsers.map((user) => (
+                <tr
+                  key={user.id}
+                  className="hover:bg-indigo-50/20 transition-all group"
+                >
+                  <td className="px-8 py-5">
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(user.id)}
-                      onChange={() => handleSelectOne(user.id)}
-                      className="w-4 h-4 accent-[#001e59]"
+                      onChange={() =>
+                        setSelectedIds((prev) =>
+                          prev.includes(user.id)
+                            ? prev.filter((i) => i !== user.id)
+                            : [...prev, user.id]
+                        )
+                      }
+                      className="w-5 h-5 rounded-md border-slate-300 text-indigo-600"
                     />
-                    <h3 className="font-bold text-gray-800">
-                      {user.name} {user.surname}
-                    </h3>
-                  </div>
-
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="bg-[#001e59] hover:bg-[#003080] text-white rounded-xs shadow-sm transition-transform hover:scale-105"
-                        onClick={() => setSelectedUser(user)}
-                      >
-                        Adresleri Gör
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="bg-white text-gray-800 border border-gray-200 rounded-xs shadow-lg max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="text-lg font-bold text-[#001e59]">
-                          {user.name} {user.surname} - Adresleri
-                        </DialogTitle>
-                        <DialogDescription className="text-gray-500">
-                          Kullanıcıya kayıtlı tüm adresler
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="mt-4 space-y-4">
-                        {user.addresses && user.addresses.length > 0 ? (
-                          user.addresses.map((addr) => {
-                            const addressParts = [
-                              addr.title || addr.firstName || "Adres",
-                              addr.address,
-                              addr.city,
-                              addr.district,
-                              addr.zip,
-                              addr.country,
-                            ].filter(Boolean);
-
-                            return (
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-600 font-black text-sm shadow-inner group-hover:from-indigo-100 group-hover:to-indigo-200 group-hover:text-indigo-600 transition-all">
+                        {user.name[0]}
+                        {user.surname[0]}
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                          {user.name} {user.surname}
+                        </p>
+                        <p className="text-[10px] font-bold text-slate-400 tracking-tighter uppercase">
+                          ID: #{user.id}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="space-y-1">
+                      <div className="flex items-center text-sm font-medium text-slate-600">
+                        <Mail className="w-3.5 h-3.5 mr-2 text-slate-300" />{" "}
+                        {user.email}
+                      </div>
+                      <div className="flex items-center text-xs text-slate-400">
+                        <Phone className="w-3.5 h-3.5 mr-2 text-slate-300" />{" "}
+                        {displayPhone(user)}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="h-9 rounded-xl text-xs font-bold border-slate-200 hover:bg-slate-50 hover:text-indigo-600 transition-all"
+                        >
+                          <MapPin className="w-3.5 h-3.5 mr-1.5" />
+                          {user.addresses?.length || 0} Adres Kaydı
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="rounded-[2rem] border-none max-w-lg">
+                        <DialogHeader>
+                          <DialogTitle className="text-xl font-black">
+                            Adres Detayları
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 my-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                          {user.addresses?.length ? (
+                            user.addresses.map((addr) => (
                               <div
                                 key={addr.id}
-                                className="p-4 bg-gray-50 border border-gray-200 rounded-xs shadow-sm hover:shadow-md transition-shadow"
+                                className="p-5 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-colors"
                               >
-                                <h4 className="font-semibold text-gray-800 mb-1">
-                                  {addr.title || addr.firstName || "Adres"}
-                                </h4>
-                                <p className="text-gray-600 text-sm">
-                                  {addressParts.slice(1).join(", ")}
+                                <div className="flex justify-between mb-2">
+                                  <span className="text-xs font-black uppercase tracking-widest text-indigo-600">
+                                    {addr.title}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-bold">
+                                    #{addr.id}
+                                  </span>
+                                </div>
+                                <p className="text-sm font-semibold text-slate-700">
+                                  {addr.address}
+                                </p>
+                                <p className="text-xs text-slate-500 mt-1 font-medium">
+                                  {addr.district} / {addr.city}
                                 </p>
                               </div>
-                            );
-                          })
-                        ) : (
-                          <div className="text-center text-gray-400 italic py-6">
-                            Bu kullanıcıya kayıtlı adres bulunamadı.
-                          </div>
-                        )}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-10 text-slate-400 font-medium">
+                              Kayıtlı adres bulunamadı.
+                            </div>
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </td>
+                  <td className="px-6 py-5 text-right">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="rounded-3xl">
+                        <DialogHeader>
+                          <DialogTitle>Kullanıcıyı Sil</DialogTitle>
+                          <DialogDescription>
+                            <b>
+                              {user.name} {user.surname}
+                            </b>{" "}
+                            isimli kullanıcıyı silmek üzeresiniz. Bu işlem geri
+                            alınamaz.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="mt-6">
+                          <Button variant="ghost" className="rounded-xl">
+                            Vazgeç
+                          </Button>
+                          <Button
+                            onClick={() => handleDelete(user.id)}
+                            className="bg-red-600 hover:bg-red-700 rounded-xl px-8"
+                          >
+                            Kullanıcıyı Sil
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-                <div className="text-gray-600 text-sm">
-                  <p>Email: {user.email}</p>
-                  <p>Telefon: {getUserPhone(user)}</p>{" "}
-                </div>
-
-                <div className="flex justify-end mt-2">
-                  <DeleteDialog
-                    onConfirm={() =>
-                      setUsers(users.filter((u) => u.id !== user.id))
-                    }
-                    trigger={
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="bg-red-500 hover:bg-red-600 text-white rounded-xs shadow-sm"
-                      >
-                        Sil
-                      </Button>
-                    }
-                    title={`${user.name} ${user.surname} silinecek!`}
-                    description="Bu kullanıcıyı silmek istediğine emin misin?"
-                  />
-                </div>
+          {/* Empty State */}
+          {filteredUsers.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-32 space-y-4">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center">
+                <UsersIcon className="w-10 h-10 text-slate-200" />
               </div>
-            ))
+              <p className="text-slate-400 font-semibold text-lg">
+                Eşleşen kullanıcı bulunamadı.
+              </p>
+              <Button
+                variant="link"
+                onClick={() => setSearch("")}
+                className="text-indigo-600 font-bold"
+              >
+                Aramayı Temizle
+              </Button>
+            </div>
           )}
         </div>
 
-        {/* Sayfalama */}
-        <div className="mt-6 flex justify-center">
-          <DefaultPagination
-            totalItems={filteredUsers.length}
-            itemsPerPage={15}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-          />
+        {/* Pagination Alt Bar */}
+        <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-6 px-4">
+          <p className="text-sm font-bold text-slate-400">
+            {filteredUsers.length} sonuçtan{" "}
+            <span className="text-slate-900">
+              {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{" "}
+              {Math.min(currentPage * ITEMS_PER_PAGE, filteredUsers.length)}
+            </span>{" "}
+            arası gösteriliyor
+          </p>
+          <div className="bg-white p-1.5 rounded-2xl shadow-xl shadow-slate-200/50">
+            <DefaultPagination
+              totalItems={filteredUsers.length}
+              itemsPerPage={ITEMS_PER_PAGE}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </div>
       </main>
     </div>

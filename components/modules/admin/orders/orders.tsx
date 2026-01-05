@@ -179,15 +179,31 @@ export default function Orders() {
   if (loading) return <Spinner />;
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="flex min-h-screen bg-[#F8F9FB] font-sans selection:bg-indigo-100">
       <Sidebar />
-      <main className={`flex-1 p-4 md:p-8 ${isMobile ? "ml-0" : "md:ml-64"}`}>
-        <div className="flex flex-col sm:flex-row justify-center md:justify-between md:items-start items-center mb-6 mt-3 gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#001e59]">
-            
-            Sipariş Yönetimi
-          </h1>
-        </div>
+      <main
+        className={`flex-1 p-6 lg:p-12 transition-all duration-300 ${
+          isMobile ? "mt-14" : "md:ml-72"
+        }`}
+      >
+        {/* Header Section */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="h-1 w-8 bg-indigo-600 rounded-full" />
+              <span className="text-xs font-bold uppercase tracking-widest text-indigo-600">
+                Yönetim Paneli
+              </span>
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+              Sipariş Yönetimi
+            </h1>
+            <p className="text-slate-500 text-sm mt-1 font-medium">
+              İşletmenizin performansını gerçek zamanlı izleyin.
+            </p>
+          </div>
+         
+        </header>
         <Input
           placeholder="Müşteri adı, email veya ID ara..."
           value={search}

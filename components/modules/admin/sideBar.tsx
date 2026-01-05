@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import {
-  Box,
+  LayoutDashboard,
   Users,
   ShoppingCart,
   Package,
@@ -10,14 +10,17 @@ import {
   Menu,
   X,
   FileText,
-  Info,
   Settings,
+  Bell,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import Image from "next/image";
+
 interface MenuItem {
   id: string;
   label: string;
@@ -33,13 +36,13 @@ export default function AdminSidebar(): React.ReactElement {
   const menuItems: MenuItem[] = [
     {
       id: "dashboard",
-      label: "Yönetici Paneli",
-      icon: Box,
+      label: "Genel Bakış",
+      icon: LayoutDashboard,
       href: "/admin/dashboard",
     },
     {
       id: "products",
-      label: "Ürünler",
+      label: "Ürün Yönetimi",
       icon: Package,
       href: "/admin/products",
     },
@@ -49,196 +52,203 @@ export default function AdminSidebar(): React.ReactElement {
       icon: ShoppingCart,
       href: "/admin/orders",
     },
-    { id: "users", label: "Kullanıcılar", icon: Users, href: "/admin/users" },
-    { id: "blogs", label: "Bloglar", icon: FileText, href: "/admin/blogs" },
+    { id: "users", label: "Müşteriler", icon: Users, href: "/admin/users" },
+    {
+      id: "blogs",
+      label: "Blog Yazıları",
+      icon: FileText,
+      href: "/admin/blogs",
+    },
     {
       id: "subscribers",
       label: "Aboneler",
-      icon: Users,
+      icon: Bell,
       href: "/admin/subscribers",
     },
     {
       id: "settings",
-      label: "Ayarlar",
+      label: "Sistem Ayarları",
       icon: Settings,
       href: "/admin/banner",
     },
   ];
 
-  const active = menuItems.find(
+  const activeId = menuItems.find(
     (item) => pathname === item.href || pathname.startsWith(item.href + "/")
   )?.id;
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("/api/auth/logout", {
-        method: "POST",
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (!res.ok) throw new Error();
+      toast.success("Güvenli çıkış yapıldı", {
+        description: "Yönetici oturumunuz sonlandırıldı.",
       });
-
-      if (!res.ok) {
-        toast.error("Çıkış yapılırken bir hata oluştu");
-        return;
-      }
-
-      toast.success("Başarıyla çıkış yapıldı!");
-
-      setTimeout(() => {
-        router.push("/admin");
-      }, 1000); // Toast görünmesi için delay
+      router.push("/admin");
     } catch (error) {
-      toast.error("Sunucu hatası! Çıkış yapılamadı.");
+      toast.error("Çıkış yapılırken bir hata oluştu.");
     }
   };
 
-  const AdminInfo = (
-    <div className="flex flex-col gap-2 p-4 border-t border-gray-200  rounded-md shadow-sm font-sans">
-      {/* Kullanıcı Adı */}
-      <span className="font-semibold text-gray-900 ">
-        Feridun Polat
-      </span>
-
-      {/* Uyarı Mesajı */}
-      <div className="flex items-center gap-2 text-amber-700  bg-yellow-50  p-2 rounded-md">
-        <Info size={24} />
-        <p className="text-sm">
-          Lütfen admin sayfasından ayrılmadan önce çıkış yapınız.
-        </p>
+  const NavContent = (isMobile = false) => (
+    <div className="flex flex-col h-full bg-white px-5 py-8">
+      {/* Brand Logo */}
+      <div className="px-3 mb-12">
+        <Link
+          href="/admin/dashboard"
+          className="inline-block hover:opacity-80 transition-opacity"
+        >
+          <Image
+            src="/logo/logoblack.png"
+            alt="BalkoLüx Logo"
+            width={140}
+            height={36}
+            priority
+            className="h-auto w-auto"
+          />
+        </Link>
       </div>
 
-      {/* Çıkış Butonu */}
-      <button
-        onClick={handleLogout}
-        className="flex items-center justify-center gap-2 mt-2 w-full py-2 rounded-full bg-red-500 hover:bg-red-600 text-white font-medium transition-shadow shadow-md hover:shadow-lg"
-      >
-        <LogOut size={16} /> Çıkış Yap
-      </button>
-    </div>
-  );
+      {/* Navigation Menu */}
+      <nav className="flex-1 space-y-1 relative">
+        {menuItems.map(({ id, label, icon: Icon, href }) => {
+          const isActive = activeId === id;
+          return (
+            <Link
+              key={id}
+              href={href}
+              onClick={() => isMobile && setIsOpen(false)}
+              className={`relative flex items-center justify-between group px-4 py-3 rounded-2xl transition-all duration-300 ${
+                isActive
+                  ? "text-zinc-950"
+                  : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50"
+              }`}
+            >
+              {/* Active Background Animation */}
+              {isActive && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute inset-0 bg-zinc-100/80 rounded-2xl z-0"
+                  initial={false}
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
 
-  // Desktop Sidebar
-  const DesktopSidebar = (
-    <>
-      <AnimatePresence>
-        <motion.aside
-          initial={{ x: -300 }}
-          animate={{ x: 0 }}
-          exit={{ x: -300 }}
-          transition={{ duration: 0.25, ease: "easeInOut" }}
-          className="fixed left-0 top-0 w-64 h-screen bg-white shadow-lg flex flex-col justify-between border-r border-gray-200 hidden md:flex"
-        >
-          <div>
-            <div className="px-6 py-6 border-b border-gray-200 flex items-center gap-2">
-              <span className="text-xl font-bold text-gray-900 tracking-tight">
-                ModaPerde<span className="text-[#7B0323]"> Admin</span>
-              </span>
-            </div>
+              <div className="flex items-center gap-3.5 z-10">
+                <Icon
+                  size={20}
+                  strokeWidth={isActive ? 2.5 : 2}
+                  className={
+                    isActive
+                      ? "text-zinc-950"
+                      : "text-zinc-400 group-hover:text-zinc-600 transition-colors"
+                  }
+                />
+                <span
+                  className={`text-[13.5px] tracking-tight ${
+                    isActive ? "font-bold" : "font-medium"
+                  }`}
+                >
+                  {label}
+                </span>
+              </div>
 
-            <nav className="flex flex-col mt-4 px-3 space-y-1">
-              {menuItems.map(({ id, label, icon: Icon, href }) => {
-                const isActive = active === id;
-                return (
-                  <Link
-                    key={id}
-                    href={href}
-                    className={`group flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                      isActive
-                        ? "bg-[#7B0323]/20 text-[#001e59] shadow-inner font-semibold"
-                        : "text-gray-600 hover:text-[#001e59] hover:bg-gray-100"
-                    }`}
-                  >
-                    <Icon
-                      className={`w-5 h-5 ${
-                        isActive
-                          ? "text-[#7B0323]"
-                          : "text-gray-400 group-hover:text-[#7B0323]"
-                      }`}
-                    />
-                    <span className="text-sm">{label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+              {isActive && (
+                <motion.div
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="z-10"
+                >
+                  <ChevronRight size={14} className="text-zinc-400" />
+                </motion.div>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Profile & Logout Section */}
+      <div className="mt-auto pt-6 border-t border-zinc-100">
+        <div className="flex items-center gap-3 px-3 mb-6">
+          <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-xs">
+            AD
           </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-bold text-zinc-900 leading-none">
+              Yönetici
+            </span>
+            <span className="text-[11px] text-zinc-400 mt-1 font-medium">
+              BalkoLüx Admin Panel
+            </span>
+          </div>
+        </div>
 
-          {AdminInfo}
-        </motion.aside>
-      </AnimatePresence>
-    </>
-  );
-
-  // Mobile Sidebar
-  const MobileSidebar = (
-    <>
-      {!isOpen && (
-        <Button
-          size="icon"
-          onClick={() => setIsOpen(true)}
-          className="fixed top-4 left-4 z-50 w-12 h-12 p-3 bg-white rounded-full shadow-lg text-[#001e59] border border-gray-300 hover:bg-gray-100 md:hidden"
+        <button
+          onClick={handleLogout}
+          className="group flex items-center gap-3 w-full px-4 py-3.5 text-sm font-semibold text-zinc-500 hover:text-red-600 hover:bg-red-50/50 rounded-2xl transition-all duration-200"
         >
-          <Menu className="w-6 h-6" />
-        </Button>
-      )}
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="fixed inset-0 z-40 bg-white/95 backdrop-blur-md shadow-xl md:hidden flex flex-col justify-between"
-          >
-            <div className="flex justify-between items-center px-6 py-5 border-b border-gray-200">
-              <span className="text-xl font-bold text-gray-900">
-                ModaPerde<span className="text-[#7B0323]"> Admin</span>
-              </span>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setIsOpen(false)}
-              >
-                <X className="w-6 h-6" />
-              </Button>
-            </div>
-
-            <nav className="flex-1 overflow-y-auto mt-4 px-4 space-y-1">
-              {menuItems.map(({ id, label, icon: Icon, href }) => {
-                const isActive = active === id;
-                return (
-                  <Link
-                    key={id}
-                    href={href}
-                    onClick={() => setIsOpen(false)}
-                    className={`group flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                      isActive
-                        ? "bg-[#7B0323]/20 text-[#001e59] shadow-inner font-semibold"
-                        : "text-gray-600 hover:text-[#001e59] hover:bg-gray-100"
-                    }`}
-                  >
-                    <Icon
-                      className={`w-5 h-5 ${
-                        isActive
-                          ? "text-[#7B0323]"
-                          : "text-gray-400 group-hover:text-[#7B0323]"
-                      }`}
-                    />
-                    <span className="text-sm">{label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {AdminInfo}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+          <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center group-hover:bg-red-50 transition-colors">
+            <LogOut size={16} />
+          </div>
+          <span>Oturumu Kapat</span>
+        </button>
+      </div>
+    </div>
   );
 
   return (
     <>
-      <div className="hidden md:block">{DesktopSidebar}</div>
-      <div className="block md:hidden">{MobileSidebar}</div>
+      {/* Desktop Sidebar */}
+      <aside className="fixed left-0 top-0 w-[280px] h-screen bg-white border-r border-zinc-100 hidden md:block z-50">
+        {NavContent()}
+      </aside>
+
+      {/* Mobile Top Bar */}
+      <div className="md:hidden fixed top-0 left-0 w-full bg-white/70 backdrop-blur-xl border-b border-zinc-100 px-6 py-4 z-40 flex justify-between items-center">
+        <Image src="/logo/logoblack.png" alt="logo" width={100} height={26} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsOpen(true)}
+          className="rounded-xl bg-zinc-50 hover:bg-zinc-100"
+        >
+          <Menu size={20} className="text-zinc-900" />
+        </Button>
+      </div>
+
+      {/* Mobile Sidebar Overlay & Drawer */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 bg-zinc-950/30 backdrop-blur-sm z-[60] md:hidden"
+            />
+            <motion.aside
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 220 }}
+              className="fixed left-0 top-0 w-[300px] h-screen bg-white z-[70] md:hidden shadow-2xl border-r border-zinc-100"
+            >
+              <div className="absolute top-8 right-6">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full hover:bg-zinc-100"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <X size={20} className="text-zinc-500" />
+                </Button>
+              </div>
+              {NavContent(true)}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
