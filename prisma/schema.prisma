@@ -99,6 +99,8 @@ model Order {
   totalPrice    Int
   paidPrice     Int
   currency      String
+  installment   Int            @default(1) // Taksit sayısı (tek çekim ise 1)
+  iyziPaymentId String? // Iyzico'dan dönen paymentId (İptal/İade için şart)
   paymentMethod String
   transactionId String?
   createdAt     DateTime       @default(now())
@@ -118,6 +120,7 @@ model OrderItem {
   quantity   Int
   unitPrice  Float
   totalPrice Float
+  iyziTransactionId  String? // Kısmi iade işlemleri için hayat kurtarır
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product product @relation(fields: [productId], references: [id])

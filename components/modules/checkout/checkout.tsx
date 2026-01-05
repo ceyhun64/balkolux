@@ -1,4 +1,4 @@
-// PaymentPage.tsx
+// PaymentPage.tsx - Quantity Bug Fixed
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
@@ -421,19 +421,25 @@ export default function PaymentPage() {
 
       const billingAddress = { ...shippingAddress };
 
+      // 🔥 BUG FIX: Quantity değeri doğru şekilde gönderiliyor
       const basketItemsFormatted = cartItems.map((item) => {
         const unitPrice = item.product.price;
-        const totalPrice = unitPrice * item.quantity;
+        const quantity = item.quantity || 1; // quantity değerini al
+        const totalPrice = unitPrice * quantity; // toplam fiyat hesapla
+
+        console.log(
+          `Item: ${item.product.title}, Quantity: ${quantity}, Unit Price: ${unitPrice}, Total: ${totalPrice}`
+        );
 
         return {
           id: item.product.id.toString(),
           name: item.product.title,
           category1: item.product.category || "Genel",
           itemType: "PHYSICAL",
-          price: unitPrice.toFixed(2), // Birim fiyat (Iyzico "price" olarak bekler)
-          quantity: item.quantity,
-          unitPrice: unitPrice.toFixed(2),
-          totalPrice: totalPrice.toFixed(2),
+          price: totalPrice.toFixed(2), // Iyzico için toplam fiyat (price = unitPrice * quantity)
+          quantity: quantity, // Adet bilgisi
+          unitPrice: unitPrice.toFixed(2), // Birim fiyat
+          totalPrice: totalPrice.toFixed(2), // Toplam fiyat
         };
       });
 
@@ -458,6 +464,8 @@ export default function PaymentPage() {
         buyer,
       };
 
+      console.log("Order Payload:", JSON.stringify(orderPayload, null, 2));
+
       const res = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -465,7 +473,8 @@ export default function PaymentPage() {
       });
 
       if (!res.ok) {
-        throw new Error("Ödeme işlemi başarısız");
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Ödeme işlemi başarısız");
       }
 
       const data = await res.json();
@@ -524,7 +533,6 @@ export default function PaymentPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 font-sans">
       <div className="container mx-auto px-4 md:px-8 max-w-7xl">
-        {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             Güvenli Ödeme
@@ -534,9 +542,7 @@ export default function PaymentPage() {
           </p>
         </div>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {/* Left Column - Forms */}
           <div className="lg:col-span-2 space-y-6">
             <PaymentStepper currentStep={step} />
 
@@ -579,7 +585,6 @@ export default function PaymentPage() {
               </div>
             )}
 
-            {/* Security Badges */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex flex-wrap items-center justify-center gap-6">
                 <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -610,25 +615,12 @@ export default function PaymentPage() {
                   </svg>
                   <span className="font-medium">PCI DSS Uyumlu</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <svg
-                    className="w-5 h-5 text-purple-600"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
-                  </svg>
-                  <span className="font-medium">Hızlı Teslimat</span>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
-              {/* Payment Provider Logo */}
               <div className="bg-white rounded-lg shadow-md p-4 flex items-center justify-center">
                 <img
                   src="/iyzico/iyzico_ile_ode_colored_horizontal.webp"
@@ -638,12 +630,10 @@ export default function PaymentPage() {
                 />
               </div>
 
-              {/* Basket Summary */}
               <div className="bg-white rounded-lg shadow-md">
                 <BasketSummaryCard selectedCargoFee={selectedCargoFee} />
               </div>
 
-              {/* Help Section */}
               <div className="bg-blue-50 rounded-lg p-4 text-sm">
                 <Link href="/contact">
                   <h3 className="font-semibold text-gray-900 mb-2">
@@ -663,16 +653,11 @@ export default function PaymentPage() {
         </div>
       </div>
 
-      {/* Processing Overlay */}
       {processingPayment && (
-        <div className="fixed inset-0 bg-gradient-to-br from-blue-900/95 via-blue-800/95 to-indigo-900/95 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-300">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md mx-4 text-center transform animate-in zoom-in-95 duration-300">
-            {/* Animated Icon */}
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-900/95 via-blue-800/95 to-indigo-900/95 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md mx-4 text-center">
             <div className="relative mx-auto w-24 h-24 mb-6">
-              {/* Outer spinning ring */}
               <div className="absolute inset-0 rounded-full border-4 border-blue-200 animate-spin"></div>
-
-              {/* Inner pulsing circle */}
               <div className="absolute inset-2 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center animate-pulse">
                 <svg
                   className="w-10 h-10 text-white"
@@ -690,56 +675,13 @@ export default function PaymentPage() {
               </div>
             </div>
 
-            {/* Title */}
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
               Ödemeniz İşleniyor
             </h3>
-
-            {/* Description */}
             <p className="text-gray-600 mb-6 leading-relaxed">
-              Ödeme işleminiz güvenli bir şekilde gerçekleştiriliyor. Bu işlem
-              birkaç saniye sürebilir.
+              Ödeme işleminiz güvenli bir şekilde gerçekleştiriliyor.
             </p>
 
-            {/* Progress Steps */}
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-4 h-4 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <span className="text-gray-700 font-medium">
-                  Bilgiler doğrulanıyor
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 animate-pulse">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                </div>
-                <span className="text-gray-700 font-medium">
-                  Ödeme işleniyor
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3 text-sm">
-                <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
-                  <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-                </div>
-                <span className="text-gray-500">Sipariş oluşturuluyor</span>
-              </div>
-            </div>
-
-            {/* Warning Message */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
               <svg
                 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"
@@ -752,35 +694,9 @@ export default function PaymentPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-amber-900 mb-1">
-                  Önemli Uyarı
-                </p>
-                <p className="text-xs text-amber-800">
-                  Lütfen bu sayfayı kapatmayın veya tarayıcınızın geri tuşuna
-                  basmayın.
-                </p>
-              </div>
-            </div>
-
-            {/* Security Badge */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                <svg
-                  className="w-4 h-4 text-green-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="font-medium">
-                  256-bit SSL ile korunan güvenli ödeme
-                </span>
-              </div>
+              <p className="text-xs text-amber-800">
+                Lütfen bu sayfayı kapatmayın.
+              </p>
             </div>
           </div>
         </div>

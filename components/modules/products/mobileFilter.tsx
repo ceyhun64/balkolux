@@ -129,27 +129,6 @@ const MobileFilter: React.FC<MobileFilterProps> = ({
         </div>
       </section>
 
-      {/* 3. GÖRÜNÜM (Tekli/İkili Seçimi) */}
-      <section>
-        <SectionTitle>Görünüm Düzeni</SectionTitle>
-        <div className="flex gap-4">
-          {[1, 2].map((num) => (
-            <button
-              key={num}
-              onClick={() => setGridCols(num)}
-              className={cn(
-                "flex-1 py-4 text-[10px] tracking-[0.15em] uppercase transition-all duration-500 border-b",
-                gridCols === num
-                  ? "border-stone-900 text-stone-900 font-medium"
-                  : "border-stone-100 text-stone-300 font-light"
-              )}
-            >
-              {num === 1 ? "Geniş Liste" : "İkili Kılavuz"}
-            </button>
-          ))}
-        </div>
-      </section>
-
       {/* 4. SIRALAMA */}
       <section>
         <SectionTitle>Sıralama</SectionTitle>

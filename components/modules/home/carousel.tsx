@@ -12,29 +12,28 @@ const heroes = [
     title: "Dış Mekanda Konfor Sanatı",
     subtitle: "Premium Rattan & İroko Koleksiyonu",
     image: "/heroes/1001.webp",
-    href: "/products/oturma-gruplari",
+    href: "/products",
   },
   {
     id: 2,
     title: "Yıldızların Altında Akşam Yemeği",
     subtitle: "Modern Sandalye ve Mobilya Takımları",
     image: "/heroes/1002.webp",
-    href: "/products/sezlonglar",
+    href: "/products",
   },
   {
     id: 3,
     title: "Doğayla Bütünleşen Tasarımlar",
     subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
     image: "/heroes/1003.webp",
-    href: "/products/yeni-sezon",
+    href: "/products",
   },
   {
     id: 4,
     title: "Güneşin Keyfini Sürün",
-
     subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
     image: "/heroes/1004.webp",
-    href: "/products/yemek-masalari",
+    href: "/products",
   },
 ];
 

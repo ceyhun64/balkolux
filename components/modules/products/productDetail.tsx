@@ -151,18 +151,18 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 xl:gap-24">
           {/* SOL: GÖRSEL GALERİSİ */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="relative aspect-[4/5] md:aspect-[16/11] bg-white overflow-hidden border border-stone-100">
+            <div className="relative aspect-[16/11] bg-white overflow-hidden border border-stone-100">
               <CustomImageZoom src={images[activeIndex]} alt={product.title} />
             </div>
 
             {/* Thumbnail Navigation */}
-            <div className="flex gap-4 overflow-x-auto no-scrollbar justify-center">
+            <div className="flex gap-1 md:gap-4 overflow-x-auto no-scrollbar justify-center">
               {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveIndex(i)}
                   className={cn(
-                    "relative w-24 h-16 flex-shrink-0 transition-all duration-500 border-b-2 py-2",
+                    "relative w-18 h-12 md:w-24 md:h-16 flex-shrink-0 transition-all duration-500 border-b-2 py-2",
                     activeIndex === i
                       ? "border-stone-800 opacity-100"
                       : "border-transparent opacity-40 hover:opacity-70"
@@ -185,9 +185,8 @@ export default function ProductDetailPage() {
               {/* Başlık ve Kategori */}
               <header className="space-y-4">
                 <div className="flex items-center gap-3 text-[10px] tracking-[0.4em] uppercase text-stone-400 font-medium">
-                  <span>{product.category?.name}</span>
+                  <span>{product.category}</span>
                   <span className="w-1 h-1 rounded-full bg-stone-200" />
-                  <span>Premium Seri</span>
                 </div>
                 <h1 className="text-4xl xl:text-5xl font-extralight tracking-tighter text-stone-900 italic leading-[1.1]">
                   {product.title}
