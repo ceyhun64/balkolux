@@ -66,7 +66,7 @@ export default function KvkkPage() {
                     Moda Perde
                   </span>
                   Mustafa Kökmen Blv. 91, Nizip / Gaziantep <br />
-                  info@modaperde.com — +90 533 387 40 74
+                  info@modaperde.com — +90 546 225 56 59
                 </address>
               </div>
             </div>
@@ -136,7 +136,7 @@ export default function KvkkPage() {
                   Telefon
                 </p>
                 <p className="text-xs font-light text-stone-600">
-                  +90 533 387 40 74
+                  +90 546 225 56 59
                 </p>
               </div>
             </div>

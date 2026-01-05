@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Send, ArrowUpRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 // --- YARDIMCI BİLEŞENLER ---
@@ -31,12 +27,12 @@ const MinimalContactItem = ({
     {href ? (
       <a
         href={href}
-        className="text-sm md:text-base font-light text-stone-800 hover:text-stone-500 transition-colors inline-flex items-center gap-1"
+        className="text-sm md:text-base font-light text-stone-800 hover:text-stone-500 transition-colors inline-flex items-center gap-1 w-fit"
       >
-        {value}{" "}
+        {value}
         <ArrowUpRight
           size={14}
-          className="opacity-0 group-hover:opacity-100 transition-opacity"
+          className="opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
         />
       </a>
     ) : (
@@ -65,6 +61,7 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     // Simüle edilmiş gönderim süreci
     setTimeout(() => {
       toast.success("Mesajınız nezaketle alındı.");
@@ -96,19 +93,20 @@ export default function Contact() {
             <MinimalContactItem
               icon={MapPin}
               label="Atölye & Adres"
-              value="Mustafa Kökmen Blv. 91, Nizip, Gaziantep"
+              value="Esentepe bulvarı prof necmettin erbakan bulvarı no353, 01150 Çukurova/Adana"
             />
             <MinimalContactItem
               icon={Phone}
               label="Telefon"
-              value="+90 533 387 40 74"
-              href="tel:+905333874074"
+              value="+90 546 225 56 59"
+              href="tel:+905462255659"
             />
+            0546 225 56 59
             <MinimalContactItem
               icon={Mail}
               label="E-posta"
-              value="info@modaperde.com"
-              href="mailto:info@modaperde.com"
+              value="balkoluxofficial@gmail.com"
+              href="mailto:balkoluxofficial@gmail.com"
             />
           </section>
 
@@ -118,11 +116,16 @@ export default function Contact() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
                 {/* İsim */}
                 <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
-                  <label className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block">
+                  <label
+                    htmlFor="name"
+                    className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block"
+                  >
                     Adınız Soyadınız
                   </label>
                   <input
+                    id="name"
                     name="name"
+                    type="text"
                     value={formData.name}
                     onChange={handleChange}
                     className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-200 font-light text-sm"
@@ -132,10 +135,14 @@ export default function Contact() {
                 </div>
                 {/* E-posta */}
                 <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
-                  <label className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block">
+                  <label
+                    htmlFor="email"
+                    className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block"
+                  >
                     E-posta
                   </label>
                   <input
+                    id="email"
                     name="email"
                     type="email"
                     value={formData.email}
@@ -149,14 +156,18 @@ export default function Contact() {
 
               {/* Mesaj */}
               <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
-                <label className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block">
+                <label
+                  htmlFor="message"
+                  className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block"
+                >
                   Mesajınız
                 </label>
                 <textarea
+                  id="message"
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  rows={1}
+                  rows={4}
                   className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-200 font-light text-sm resize-none min-h-[100px]"
                   placeholder="Projenizden bahsedin..."
                   required
@@ -172,7 +183,11 @@ export default function Contact() {
                 <div className="w-10 h-10 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-900 group-hover:text-white transition-all duration-500">
                   <Send
                     size={14}
-                    className={isLoading ? "animate-pulse" : ""}
+                    className={
+                      isLoading
+                        ? "animate-pulse"
+                        : "group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
+                    }
                   />
                 </div>
               </button>
@@ -180,16 +195,18 @@ export default function Contact() {
           </section>
         </div>
 
-        {/* HARİTA: SOFİSTİKE BİR SUNUM */}
-        <section className="mt-32 grayscale hover:grayscale-0 transition-all duration-1000">
-          <div className="aspect-[21/9] w-full bg-stone-100 relative overflow-hidden">
-            {/* Yer tutucu yerine gerçek iframe */}
+        {/* HARİTA SECTION */}
+        <section className="mt-32 transition-all duration-1000 overflow-hidden border border-stone-100">
+          <div className="aspect-video md:aspect-[21/9] w-full bg-stone-100 relative">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3184.456789!2d37.6625!3d37.0123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDAwJzQ0LjMiTiAzN8KwMzknNDUuMCJF!5e0!3m2!1str!2str!4v1620000000000"
-              className="absolute inset-0 w-full h-full opacity-70"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3183.9616024599623!2d35.23440603988665!3d37.058398191523295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15288937bb30296f%3A0xba1e46a2a25b37f5!2sBalkoL%C3%BCX%20Balkon%20ve%20Bah%C3%A7e%20Mobilyalar%C4%B1!5e0!3m2!1str!2str!4v1767622279882!5m2!1str!2str"
+              width="100%"
+              height="100%"
               style={{ border: 0 }}
-              allowFullScreen
+              allowFullScreen={true}
               loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="BalkoLüx Adres"
             />
           </div>
         </section>

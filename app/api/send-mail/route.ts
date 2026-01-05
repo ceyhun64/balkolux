@@ -35,7 +35,7 @@ export async function POST(req: Request): Promise<Response> {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moda Perde - Yeni Mesaj</title>
+  <title>BalkoLüx - Yeni Mesaj</title>
 </head>
 <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   
@@ -51,13 +51,13 @@ export async function POST(req: Request): Promise<Response> {
   <div style="background: #ffffff; border-radius: 16px; padding: 16px; display: inline-block; margin-bottom: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.10); position: relative; z-index: 1;">
     <img 
       src="cid:modaperde-logo" 
-      alt="Moda Perde Logo" 
+      alt="BalkoLüx Logo" 
       style="width: 110px; height: auto; display: block;"
     />
   </div>
 
   <h1 style="margin: 0; font-size: 26px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px; position: relative; z-index: 1;">
-    MODA PERDE
+    BalkoLüx
   </h1>
 
   <p style="margin: 8px 0 0 0; font-size: 14px; color: #ffffff; font-weight: 500; position: relative; z-index: 1;">
@@ -103,7 +103,7 @@ export async function POST(req: Request): Promise<Response> {
         </div>
 
         <div style="text-align: center; margin-top: 32px;">
-          <a href="mailto:modaperdeofficial@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #7B0323 0%, #C70039 100%); color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(123, 3, 35, 0.3); transition: all 0.3s;">
+          <a href="mailto:balkoluxofficial@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #7B0323 0%, #C70039 100%); color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(123, 3, 35, 0.3); transition: all 0.3s;">
             Yanıtla
           </a>
         </div>
@@ -113,16 +113,16 @@ export async function POST(req: Request): Promise<Response> {
         
         <div style="margin-bottom: 20px;">
           <p style="margin: 0 0 12px 0; font-size: 16px; color: #222222; font-weight: 700;">
-            Moda Perde
+            BalkoLüx
           </p>
           <p style="margin: 0 0 8px 0; font-size: 14px; color: #444444; line-height: 1.6;">
             📍 Mustafa Kökmen Blv. 91, Gaziantep / Türkiye
           </p>
           <p style="margin: 0 0 8px 0; font-size: 14px; color: #444444;">
-            📞 <a href="tel:+905333874074" style="color: #7B0323; text-decoration: none;">+90 533 387 40 74</a>
+            📞 <a href="tel:+905462255659" style="color: #7B0323; text-decoration: none;">+90 546 225 56 59</a>
           </p>
           <p style="margin: 0; font-size: 14px; color: #444444;">
-            ✉️ <a href="mailto:modaperdeofficial@gmail.com" style="color: #7B0323; text-decoration: none;">modaperdeofficial@gmail.com</a>
+            ✉️ <a href="mailto:balkoluxofficial@gmail.com" style="color: #7B0323; text-decoration: none;">balkoluxofficial@gmail.com</a>
           </p>
         </div>
 
@@ -135,7 +135,7 @@ export async function POST(req: Request): Promise<Response> {
 
         <p style="margin: 12px 0 0 0; font-size: 12px; color: #555555; line-height: 1.5;">
           Bu e-posta otomatik olarak oluşturulmuştur. Lütfen bu e-postayı yanıtlamayınız.<br/>
-          © ${new Date().getFullYear()} Moda Perde. Tüm hakları saklıdır.
+          © ${new Date().getFullYear()} BalkoLüx. Tüm hakları saklıdır.
         </p>
       </div>
 
@@ -148,7 +148,7 @@ export async function POST(req: Request): Promise<Response> {
     `;
 
     await transporter.sendMail({
-      from: `"Moda Perde" <${process.env.EMAIL_USER}>`,
+      from: `"BalkoLüx" <${process.env.EMAIL_USER}>`,
       to: recipients.join(", "),
       subject,
       text: message,

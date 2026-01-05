@@ -122,7 +122,7 @@ export default function DistanceSalesContract() {
                   </div>
                   <div className="flex items-center gap-4">
                     <Phone size={14} strokeWidth={1} />{" "}
-                    <span>+90 533 387 40 74</span>
+                    <span>+90 546 225 56 59</span>
                   </div>
                 </div>
               </div>

@@ -106,12 +106,12 @@ export default function Banner() {
             transition={{ delay: 0.6 }}
           >
             <Link
-              href={"/products"}
+              href={"/contact"}
               className="group relative inline-flex items-center gap-6 px-12 py-6 bg-transparent overflow-hidden border border-stone-800 hover:border-stone-400 transition-all duration-700"
             >
               <div className="absolute inset-0 w-0 bg-white group-hover:w-full transition-all duration-700 ease-[0.19,1,0.22,1]" />
               <span className="relative z-10 text-[11px] tracking-[0.4em] uppercase text-stone-200 group-hover:text-stone-950 font-bold">
-                Hemen İncele
+                Hemen İletişime Geç
               </span>
               <ArrowRight
                 size={16}

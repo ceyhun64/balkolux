@@ -87,9 +87,8 @@ export default function PaymentOptions() {
         </section>
 
         <p className="mt-3">
-          Herhangi bir sorunuz varsa, bizimle{" "}
-          <strong>info@modaperde.com</strong> adresi üzerinden iletişime
-          geçebilirsiniz.
+          Herhangi bir sorunuz varsa, bizimle <strong>info@.com</strong> adresi
+          üzerinden iletişime geçebilirsiniz.
         </p>
       </div>
 

@@ -347,7 +347,7 @@ Saygılarımızla,
 
       // 1B. Admin bilgilendirme maili
       await sendMail(
-        ["modaperdeofficial@gmail.com"],
+        ["balkoluxofficial@gmail.com"],
         `🔔 Yeni Sipariş Kaydı - Acil İşlem Gerekiyor: #${order.id}`,
         `
 Sayın Yönetici,
@@ -531,7 +531,7 @@ Gerekli operasyonel adımların tamamlandığından emin olunuz.
 `;
 
     await sendMail(
-      ["modaperdeofficial@gmail.com"],
+      ["balkoluxofficial@gmail.com"],
       `✅ Sipariş Durumu Değişikliği: #${updatedOrder.id}`,
       adminMessage
     );

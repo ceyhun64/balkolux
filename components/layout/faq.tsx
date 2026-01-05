@@ -63,7 +63,7 @@ export default function FaqSection() {
             Herhangi bir sorunla karşılaşırsanız, müşteri hizmetlerimize
             ulaşmaktan çekinmeyin!
             <br />
-            <span className="font-medium">+90 533 387 40 74</span> |{" "}
+            <span className="font-medium">+90 546 225 56 59</span> |{" "}
             <span className="font-medium">info@modaperde.com</span>
           </p>
         </>

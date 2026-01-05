@@ -164,7 +164,7 @@ export default function AboutPage() {
           <SectionTitle subtitle="Bize Ulaşın" title="Bir Hayaliniz mi Var?" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: Phone, label: "Telefon", val: "+90 533 387 40 74" },
+              { icon: Phone, label: "Telefon", val: "+90 546 225 56 59" },
               { icon: Mail, label: "E-Posta", val: "hello@balkolux.com" },
               { icon: Instagram, label: "Sosyal Medya", val: "@balkolux" },
               { icon: MapPin, label: "Showroom", val: "Nizip, Gaziantep" },
