@@ -18,7 +18,7 @@ export default function Banner() {
 
   // Varsayılan İçerikler
   const defaultContent: BannerData = {
-    title: "Hayalinizdeki Salonu Beraber Tasarlayalım.",
+    title: "Hayalinizdeki Bahçeyi Beraber Tasarlayalım.",
     subtitle:
       "Kişiye özel kumaş seçkisi ve hassas ölçülendirme disipliniyle, mekanınızın ruhuna eşlik eden rafine çözümler sunuyoruz.",
   };
