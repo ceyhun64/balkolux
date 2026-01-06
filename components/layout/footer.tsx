@@ -172,17 +172,7 @@ export default function Footer() {
               © {currentYear} BALKOLÜX.
             </div>
 
-            <div className="flex-1 flex justify-center items-center gap-2">
-              <span className="text-stone-400 text-[9px] uppercase tracking-[0.3em]">
-                Design by
-              </span>
-              <a href="https://jhun.com.tr" target="_blank">
-                <GradientText
-                  className="text-xl font-bold font-mono tracking-tighter"
-                  text=".jhun{ }"
-                />
-              </a>
-            </div>
+            
 
             <div className="flex-1 flex justify-end">
               <Image
