@@ -66,23 +66,58 @@
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
+/* ⚡ Critical CSS - İlk render için gerekli stiller */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    /* GPU hızlandırma */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ⚡ Font-display stratejisi için fallback */
+  html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
   }
 }
 
-button {
+/* ⚡ Performance Optimizations */
+button,
+a[href] {
   @apply cursor-pointer;
+  /* Touch delay kaldır */
+  touch-action: manipulation;
 }
 
-link {
-  @apply cursor-pointer;
+/* ⚡ Smooth Scrolling - Sadece destekleyen tarayıcılarda */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
+/* ⚡ Will-change optimizasyonu - Sadece gerektiğinde */
+.animate-transform {
+  will-change: transform;
+}
+
+.animate-opacity {
+  will-change: opacity;
+}
+
+/* Animasyon bitince will-change'i kaldır */
+.animate-transform:not(:hover),
+.animate-opacity:not(:hover) {
+  will-change: auto;
+}
+
+/* ⚡ Optimize Scrollbar - Daha hafif */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -93,13 +128,63 @@ link {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #4f4f4f, #272727);
+  background: #4f4f4f;
   border-radius: 999px;
   transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #555, #222);
+  background: #555;
 }
 
+/* ⚡ Image Loading States - Layout shift önleme */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
 
+img[loading="lazy"] {
+  /* Lazy loading için placeholder */
+  background: oklch(0.95 0 0);
+}
+
+/* ⚡ Reduce Motion için accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ⚡ Focus Visible - Daha iyi accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ⚡ Custom Scrollbar için class */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

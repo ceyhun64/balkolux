@@ -8,19 +8,12 @@ import Products from "@/components/modules/home/products";
 import ProductsRow from "@/components/modules/home/newArrivals";
 import ShopServices from "@/components/modules/home/services";
 import Testimonials from "@/components/layout/testimonial";
+import HomePage from "@/components/modules/home/homePage";
 
 export default function Home() {
   return (
     <div>
-      <Navbar />
-      <HeroSection />
-      <CategoriesSection />
-      <Products />
-      <Banner />
-      <ShopServices />
-      <Testimonials />
-      <ProductsRow />
-      <Footer />
+      <HomePage />
     </div>
   );
 }

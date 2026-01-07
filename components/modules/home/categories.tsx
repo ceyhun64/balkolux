@@ -12,18 +12,17 @@ interface CategoryData {
   href: string;
 }
 
-// Yeni kategori verileri: Bahçe ve Balkon Mobilyaları
 const initialCategories: CategoryData[] = [
   {
     id: 1,
     name: "BAHÇE MOBİLYALARI",
-    image: "/categories/garden.jpg", // Bu isimde bir görseliniz olduğundan emin olun
+    image: "/categories/garden.jpg",
     href: "/products/seating_sets",
   },
   {
     id: 2,
     name: "BALKON MOBİLYALARI",
-    image: "/categories/balcony.avif", // Bu isimde bir görseliniz olduğundan emin olun
+    image: "/categories/balcony.avif",
     href: "/products/table_sets",
   },
 ];
@@ -61,7 +60,7 @@ export default function CategoriesSection() {
           </Link>
         </div>
 
-        {/* Grid Yapısı - 2 Kategori için lg:grid-cols-2 olarak güncellendi */}
+        {/* Grid Yapısı */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-16">
           {loading
             ? Array.from({ length: 2 }).map((_, i) => (
@@ -85,13 +84,21 @@ function PremiumCategoryCard({ category }: { category: CategoryData }) {
       href={category.href}
       className="group relative block overflow-hidden bg-gray-50 aspect-[8/5]"
     >
-      {/* Görsel Katmanı */}
+      {/* ⚡ Optimize Edilmiş Görsel */}
       <div className="relative w-full h-full">
         <Image
           src={category.image}
           alt={category.name}
           fill
-          className="object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-1000 ease-out group-hover:scale-105"
+          loading="lazy" // Lazy load - viewport'a girmeden yükleme
+          quality={80} // Kalite optimizasyonu
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" // Responsive sizes
+          className="object-cover transition-all duration-1000 ease-out will-change-transform group-hover:scale-105"
+          style={{
+            filter: "grayscale(30%)",
+          }}
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity duration-700" />
       </div>
@@ -99,9 +106,8 @@ function PremiumCategoryCard({ category }: { category: CategoryData }) {
       {/* İçerik Katmanı */}
       <div className="absolute inset-0 p-8 flex flex-col justify-end">
         <div className="flex items-end justify-between">
-          {/* pt-4 (padding-top) ekleyerek yazının yukarı kayarken kesilmesini engelledik */}
           <div className="overflow-hidden pt-4">
-            <h3 className="text-white text-xl md:text-2xl font-light tracking-[0.15em] transform transition-transform duration-500 uppercase group-hover:-translate-y-1">
+            <h3 className="text-white text-xl md:text-2xl font-light tracking-[0.15em] transform transition-transform duration-500 uppercase will-change-transform group-hover:-translate-y-1">
               {category.name}
             </h3>
             <p className="text-white/90 text-[10px] tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-700 delay-100 uppercase">
@@ -109,7 +115,7 @@ function PremiumCategoryCard({ category }: { category: CategoryData }) {
             </p>
           </div>
 
-          <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
+          <div className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 will-change-transform">
             <ArrowUpRight className="w-5 h-5" />
           </div>
         </div>

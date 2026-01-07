@@ -58,19 +58,18 @@ export default function ProductCard({ product }: { product: ProductData }) {
 
           {/* Animasyonlu Resim Alanı */}
           <motion.div
-            className="flex h-full w-[200%]"
+            className="flex h-full w-[200%] "
             animate={{ x: isHovered && product.subImage ? "-50%" : "0%" }}
             transition={{ duration: 0.8, ease: [0.6, 0.01, -0.05, 0.95] }}
           >
             {/* İlk Resim */}
-            <div className="relative h-full w-1/2 p-2">
-              {" "}
+            <div className="relative h-full w-1/2 p-2 ">
               {/* p-2: Kenarlara çok yapışmaması için opsiyonel */}
               <Image
                 src={product.mainImage}
                 alt={product.title}
                 fill
-                className="object-contain" // 'cover' yerine 'contain' kullanarak görselin tamamını sığdırıyoruz
+                className="object-contain " // 'cover' yerine 'contain' kullanarak görselin tamamını sığdırıyoruz
                 priority
               />
             </div>
