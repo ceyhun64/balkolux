@@ -11,30 +11,30 @@ const heroes = [
     id: 1,
     title: "Dış Mekanda Konfor Sanatı",
     subtitle: "Premium Rattan & İroko Koleksiyonu",
-    image: "/heroes/1.webp",
+    image: "/heroes/1001.webp",
     href: "/products",
   },
-  {
-    id: 2,
-    title: "Yıldızların Altında Akşam Yemeği",
-    subtitle: "Modern Sandalye ve Mobilya Takımları",
-    image: "/heroes/2.webp",
-    href: "/products",
-  },
-  {
-    id: 3,
-    title: "Doğayla Bütünleşen Tasarımlar",
-    subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
-    image: "/heroes/3.webp",
-    href: "/products",
-  },
-  {
-    id: 4,
-    title: "Güneşin Keyfini Sürün",
-    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
-    image: "/heroes/4.webp",
-    href: "/products",
-  },
+  // {
+  //   id: 2,
+  //   title: "Yıldızların Altında Akşam Yemeği",
+  //   subtitle: "Modern Sandalye ve Mobilya Takımları",
+  //   image: "/heroes/1002.webp",
+  //   href: "/products",
+  // },
+  // {
+  //   id: 3,
+  //   title: "Doğayla Bütünleşen Tasarımlar",
+  //   subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
+  //   image: "/heroes/1003.webp",
+  //   href: "/products",
+  // },
+  // {
+  //   id: 4,
+  //   title: "Güneşin Keyfini Sürün",
+  //   subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
+  //   image: "/heroes/1004.webp",
+  //   href: "/products",
+  // },
 ];
 
 export default function HeroSection() {
