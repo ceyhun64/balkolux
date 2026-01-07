@@ -70,11 +70,12 @@ export default function KvkkPage() {
                   <div className="space-y-1">
                     <p className="flex items-center gap-2">
                       <MapPin size={14} className="text-stone-500" />
-                      Mustafa Kökmen Bulvarı No: 91, 27700 Nizip / Gaziantep
+                      Esentepe bulvarı prof necmettin erbakan bulvarı no353,
+                      01150 Çukurova/Adana{" "}
                     </p>
                     <p className="flex items-center gap-2">
                       <Mail size={14} className="text-stone-500" />
-                      info@balkolux.com
+                      balkoluxofficial@gmail.com
                     </p>
                     <p className="flex items-center gap-2">
                       <Phone size={14} className="text-stone-500" />
@@ -326,9 +327,9 @@ export default function KvkkPage() {
                     <p className="text-[12px] text-stone-700">
                       Balkolux Bahçe ve Balkon Mobilyaları
                       <br />
-                      Mustafa Kökmen Bulvarı No: 91, 27700 Nizip / Gaziantep
-                      <br />
-                      E-posta: kvkk@balkolux.com
+                      Esentepe bulvarı prof necmettin erbakan bulvarı no353,
+                      01150 Çukurova/Adana <br />
+                      E-posta: balkoluxofficial@gmail.com
                     </p>
                   </div>
                 </div>
@@ -400,7 +401,7 @@ export default function KvkkPage() {
                 <p className="text-[9px] tracking-widest text-stone-500 uppercase font-semibold">
                   E-Posta
                 </p>
-                <p className="text-xs text-stone-700">kvkk@balkolux.com</p>
+                <p className="text-xs text-stone-700">balkoluxofficial@gmail.com</p>
               </div>
               <div className="space-y-2">
                 <p className="text-[9px] tracking-widest text-stone-500 uppercase font-semibold">
@@ -413,7 +414,8 @@ export default function KvkkPage() {
                   Adres
                 </p>
                 <p className="text-xs text-stone-700">
-                  Mustafa Kökmen Blv. 91, Nizip/Gaziantep
+                  Esentepe bulvarı prof necmettin erbakan bulvarı no353, 01150
+                  Çukurova/Adana
                 </p>
               </div>
             </div>

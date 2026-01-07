@@ -142,7 +142,7 @@ export default function PaymentOptions() {
                 Siparişinizi tamamladıktan sonra, banka hesap bilgilerimiz
                 e-posta adresinize otomatik olarak gönderilecektir. Havale veya
                 EFT işleminizi gerçekleştirdikten sonra dekont/makbuzunuzu
-                info@balkolux.com adresine iletebilirsiniz.
+                balkoluxofficial@gmail.com adresine iletebilirsiniz.
               </p>
               <div className="bg-amber-50 border border-amber-200 p-6 space-y-3">
                 <p className="text-[11px] font-bold text-amber-900 uppercase tracking-wide">
@@ -315,7 +315,7 @@ export default function PaymentOptions() {
                 <p className="text-[10px] text-stone-400 uppercase tracking-wide mb-1">
                   E-posta
                 </p>
-                <p className="text-sm">info@balkolux.com</p>
+                <p className="text-sm">balkoluxofficial@gmail.com</p>
               </div>
             </div>
             <div className="flex items-center gap-4">

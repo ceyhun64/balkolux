@@ -294,12 +294,11 @@ export default function PersonalDataConsent() {
                 </p>
                 <div className="border-t border-green-300 pt-4 space-y-2 text-[12px] text-stone-700">
                   <p>
-                    <strong>Başvuru Adresi:</strong> Balkolux Bahçe ve Balkon
-                    Mobilyaları, Mustafa Kökmen Bulvarı No: 91, 27700 Nizip /
-                    Gaziantep
+                    <strong>Başvuru Adresi:</strong> Esentepe bulvarı prof
+                    necmettin erbakan bulvarı no353, 01150 Çukurova/Adana
                   </p>
                   <p>
-                    <strong>E-posta:</strong> kvkk@balkolux.com
+                    <strong>E-posta:</strong> info@balkolux.com
                   </p>
                   <p className="text-[11px] text-stone-600 italic pt-2">
                     Başvurularım, talebimin niteliğine göre en geç 30 (otuz) gün
@@ -360,9 +359,8 @@ export default function PersonalDataConsent() {
                 <p className="text-sm text-stone-700 leading-relaxed">
                   Balkolux Bahçe ve Balkon Mobilyaları
                   <br />
-                  Mustafa Kökmen Bulvarı No: 91
-                  <br />
-                  27700 Nizip / Gaziantep — Türkiye
+                  Esentepe bulvarı prof necmettin erbakan bulvarı no353, 01150
+                  Çukurova/Adana
                 </p>
               </div>
             </div>
@@ -384,8 +382,12 @@ export default function PersonalDataConsent() {
                 <p className="text-[10px] text-stone-500 uppercase tracking-wide font-semibold mb-2">
                   E-posta
                 </p>
-                <p className="text-sm text-stone-700">info@balkolux.com</p>
-                <p className="text-sm text-stone-700">kvkk@balkolux.com</p>
+                <p className="text-sm text-stone-700">
+                  balkoluxofficial@gmail.com
+                </p>
+                <p className="text-sm text-stone-700">
+                  balkoluxofficial@gmail.com
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-4 bg-white border border-stone-200 p-6">

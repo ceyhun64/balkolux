@@ -111,7 +111,7 @@ export default function RootLayout({
     logo: "https://balkolux.com/logo/og-image.png",
     image: "https://balkolux.com/og-image.png",
     telephone: "+90-276-XXX-XXXX", // Uşak kodu ile güncelleyin
-    email: "info@balkolux.com",
+    email: "balkoluxofficial@gmail.com",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Mobilyacılar Sitesi No:XX", // Adresi güncelleyin

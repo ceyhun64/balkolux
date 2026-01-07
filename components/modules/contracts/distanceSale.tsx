@@ -50,13 +50,15 @@ export default function DistanceSalesContract() {
                     <span className="text-stone-900 font-semibold block mb-2">
                       Balkolux Bahçe ve Balkon Mobilyaları
                     </span>
-                    Mustafa Kökmen Bulvarı No: 91 <br />
-                    27700 Nizip / Gaziantep — Türkiye
+                    Esentepe bulvarı prof necmettin erbakan bulvarı no353, 01150
+                    Çukurova/Adana
                     <br />
                     <span className="block mt-2">
                       Telefon: +90 546 225 56 59
                     </span>
-                    <span className="block">E-posta: info@balkolux.com</span>
+                    <span className="block">
+                      E-posta: balkoluxofficial@gmail.com
+                    </span>
                     <span className="block">Mersis No: 0123456789012345</span>
                   </address>
                 </div>
@@ -165,7 +167,7 @@ export default function DistanceSalesContract() {
                 <ul className="space-y-3">
                   {[
                     "Cayma hakkı süresi içinde ürün kullanılmamış, ambalajı açılmamış ve zarar görmemiş olmalıdır.",
-                    "Cayma bildirimini info@balkolux.com adresine veya +90 546 225 56 59 numaralı telefona yapabilirsiniz.",
+                    "Cayma bildirimini balkoluxofficial@gmail.com adresine veya +90 546 225 56 59 numaralı telefona yapabilirsiniz.",
                     "Ürün faturası, iade formu ve teslimat belgesi iade ile birlikte gönderilmelidir.",
                     "Ürün iadesi, cayma bildirimi tarihinden itibaren 10 gün içinde yapılmalıdır.",
                   ].map((item, i) => (
@@ -309,7 +311,7 @@ export default function DistanceSalesContract() {
                 <div className="space-y-4 text-stone-300 text-xs font-medium tracking-wide">
                   <div className="flex items-center gap-4">
                     <Mail size={14} strokeWidth={1.5} />
-                    <span>legal@balkolux.com</span>
+                    <span>balkoluxofficial@gmail.com</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <Phone size={14} strokeWidth={1.5} />
@@ -317,7 +319,10 @@ export default function DistanceSalesContract() {
                   </div>
                   <div className="flex items-center gap-4">
                     <MapPin size={14} strokeWidth={1.5} />
-                    <span>Mustafa Kökmen Blv. 91, Nizip/Gaziantep</span>
+                    <span>
+                      Esentepe bulvarı prof necmettin erbakan bulvarı no353,
+                      01150 Çukurova/Adana
+                    </span>
                   </div>
                 </div>
               </div>
