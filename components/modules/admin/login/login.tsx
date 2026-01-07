@@ -77,7 +77,7 @@ export default function AdminLogin() {
           >
             <div className="relative w-24 h-12">
               <Image
-                src="/logo/logoblack.png"
+                src="/logo/logoblack.webp"
                 alt="BalkoLüx Logo"
                 fill
                 priority

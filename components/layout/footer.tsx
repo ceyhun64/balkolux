@@ -81,7 +81,7 @@ export default function Footer() {
           <div className="md:col-span-3 space-y-8">
             <Link href="/" className="inline-block">
               <Image
-                src="/logo/logo2.png"
+                src="/logo/logo.webp"
                 alt="BalkoLüx"
                 width={130}
                 height={40}

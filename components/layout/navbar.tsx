@@ -161,7 +161,7 @@ export default function Navbar() {
                 className="block transition-transform duration-500 hover:scale-[1.03]"
               >
                 <Image
-                  src="/logo/logo2.png"
+                  src="/logo/logo.webp"
                   alt="itals"
                   width={90}
                   height={32}

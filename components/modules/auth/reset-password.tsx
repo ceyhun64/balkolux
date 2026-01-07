@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-[400px] bg-white border border-gray-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 md:p-10 flex flex-col gap-8"
+        className="w-full max-w-[400px] bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 md:p-10 flex flex-col gap-8"
       >
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
@@ -81,7 +81,7 @@ export default function ResetPasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-12 rounded-xl border-gray-200 bg-gray-50/50 pr-12 transition-all focus:bg-white focus:ring-0 focus:border-gray-900"
+                className="h-12 border-gray-200 bg-gray-50/50 pr-12 transition-all focus:bg-white focus:ring-0 focus:border-gray-900"
               />
               <button
                 type="button"
@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className={`h-12 w-full rounded-xl bg-gray-900 text-white font-medium shadow-sm transition-all hover:bg-black active:scale-[0.98] ${
+            className={`h-12 w-full bg-gray-900 text-white font-medium shadow-sm transition-all hover:bg-black active:scale-[0.98] ${
               isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
         <div className="flex flex-col items-center gap-6">
           <Link
             href="/login"
-            className="text-sm font-medium text-gray-400 hover:text-gray-900 transition-colors"
+            className="text-sm font-medium text-gray-400 hover:text-stone-950 transition-colors"
           >
             ← Giriş Ekranına Dön
           </Link>

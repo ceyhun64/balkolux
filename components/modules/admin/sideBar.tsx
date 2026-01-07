@@ -99,7 +99,7 @@ export default function AdminSidebar(): React.ReactElement {
           className="inline-block hover:opacity-80 transition-opacity"
         >
           <Image
-            src="/logo/logoblack.png"
+            src="/logo/logoblack.webp"
             alt="BalkoLüx Logo"
             width={140}
             height={36}
@@ -205,7 +205,7 @@ export default function AdminSidebar(): React.ReactElement {
 
       {/* Mobile Top Bar */}
       <div className="md:hidden fixed top-0 left-0 w-full bg-white/70 backdrop-blur-xl border-b border-zinc-100 px-6 py-4 z-40 flex justify-between items-center">
-        <Image src="/logo/logoblack.png" alt="logo" width={100} height={26} />
+        <Image src="/logo/logoblack.webp" alt="logo" width={100} height={26} />
         <Button
           variant="ghost"
           size="icon"
