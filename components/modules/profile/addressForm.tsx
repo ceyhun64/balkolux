@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Cities from "@/public/city.json";
+import { toast } from "sonner";
 
 export interface AddressFormData {
   title: string;
@@ -34,9 +35,8 @@ export interface AddressFormProps {
   onSave: () => void;
 }
 
-// Minimal Input Stili
 const inputStyles =
-  "border-0 border-b border-zinc-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-zinc-900 transition-colors bg-transparent placeholder:text-zinc-300 h-10 shadow-none";
+  "border-0 border-b border-zinc-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-zinc-900 transition-colors bg-transparent placeholder:text-zinc-300 h-10 shadow-none w-full";
 
 export default function AdresForm({
   formData,
@@ -47,9 +47,6 @@ export default function AdresForm({
   const [districts, setDistricts] = useState<{ id: string; name: string }[]>(
     []
   );
-  const [neighborhoods, setNeighborhoods] = useState<
-    { id: string; name: string }[]
-  >([]);
 
   useEffect(() => {
     const cityArray = Object.entries(Cities).map(([id, name]) => ({
@@ -59,7 +56,6 @@ export default function AdresForm({
     setCities(cityArray);
   }, []);
 
-  // İlçe fetch
   useEffect(() => {
     if (!formData.city) return;
     const selectedCityId = cities.find((c) => c.name === formData.city)?.id;
@@ -71,48 +67,85 @@ export default function AdresForm({
       .catch(console.error);
   }, [formData.city, cities]);
 
-  // Mahalle fetch
-  useEffect(() => {
-    if (!formData.district) return;
-    const selectedDistrict = districts.find(
-      (d) => d.name === formData.district
-    );
-    if (!selectedDistrict) return;
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Türkiye telefon formatı kontrolü (0 ile başlayan 11 hane veya 5 ile başlayan 10 hane)
+    const phoneClean = formData.phone?.replace(/\D/g, "");
 
-    fetch(`/api/location/mahalleler/${selectedDistrict.id}`)
-      .then((res) => res.json())
-      .then((data) => setNeighborhoods(data))
-      .catch(console.error);
-  }, [formData.district, districts]);
+    if (!formData.title || formData.title.length < 2) {
+      toast.error("Lütfen geçerli bir adres başlığı giriniz.");
+      return false;
+    }
+    if (!formData.firstName || formData.firstName.length < 2) {
+      toast.error("Lütfen geçerli bir isim giriniz.");
+      return false;
+    }
+    if (!formData.lastName || formData.lastName.length < 2) {
+      toast.error("Lütfen geçerli bir soyisim giriniz.");
+      return false;
+    }
+    if (!formData.email || !emailRegex.test(formData.email)) {
+      toast.error("Lütfen geçerli bir e-posta adresi giriniz.");
+      return false;
+    }
+    if (!phoneClean || (phoneClean.length !== 10 && phoneClean.length !== 11)) {
+      toast.error("Telefon numarası 10 veya 11 hane olmalıdır.");
+      return false;
+    }
+    if (!formData.city) {
+      toast.error("Lütfen bir şehir seçiniz.");
+      return false;
+    }
+    if (!formData.district) {
+      toast.error("Lütfen bir ilçe seçiniz.");
+      return false;
+    }
+    if (!formData.tcno || formData.tcno.length !== 11) {
+      toast.error("TC Kimlik Numarası 11 hane olmalıdır.");
+      return false;
+    }
+    if (!formData.zip || formData.zip.length < 5) {
+      toast.error("Lütfen geçerli bir posta kodu giriniz.");
+      return false;
+    }
+    if (!formData.address || formData.address.length < 10) {
+      toast.error(
+        "Adres detayı çok kısa. Lütfen daha açıklayıcı bir adres giriniz."
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onSave();
+    }
+  };
 
   return (
-    <form
-      className="space-y-12 font-sans"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSave();
-      }}
-    >
+    <form className="space-y-12 font-sans" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-        {/* Adres Başlığı */}
+        {/* Adres Başlığı - Full Width */}
         <div className="space-y-2 md:col-span-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             Adres Başlığı *
           </Label>
           <Input
             className={inputStyles}
-            placeholder="Ev, İş vb."
+            placeholder="Örn: Ev Adresim"
             value={formData.title}
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
-            required
           />
         </div>
 
         {/* Ad & Soyad */}
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             Ad *
           </Label>
           <Input
@@ -121,11 +154,10 @@ export default function AdresForm({
             onChange={(e) =>
               setFormData({ ...formData, firstName: e.target.value })
             }
-            required
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             Soyad *
           </Label>
           <Input
@@ -134,42 +166,44 @@ export default function AdresForm({
             onChange={(e) =>
               setFormData({ ...formData, lastName: e.target.value })
             }
-            required
           />
         </div>
 
         {/* Email & Telefon */}
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             E-Posta *
           </Label>
           <Input
             type="email"
             className={inputStyles}
+            placeholder="ornek@alanadi.com"
             value={formData.email || ""}
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-            required
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             Telefon *
           </Label>
           <Input
             className={inputStyles}
+            placeholder="05XXXXXXXXX"
             value={formData.phone || ""}
             onChange={(e) =>
-              setFormData({ ...formData, phone: e.target.value })
+              setFormData({
+                ...formData,
+                phone: e.target.value.replace(/\D/g, ""),
+              })
             }
-            required
           />
         </div>
 
-        {/* Şehir & İlçe */}
+        {/* Şehir & İlçe - Full Width Elements in Grid */}
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             Şehir *
           </Label>
           <Select
@@ -184,10 +218,10 @@ export default function AdresForm({
               }));
             }}
           >
-            <SelectTrigger className="border-0 border-b border-zinc-200 rounded-none px-0 h-10 focus:ring-0 shadow-none">
-              <SelectValue placeholder="Seçiniz" />
+            <SelectTrigger className="w-full border-0 border-b border-zinc-200 rounded-none px-0 h-10 focus:ring-0 shadow-none">
+              <SelectValue placeholder="Şehir Seçiniz" />
             </SelectTrigger>
-            <SelectContent className="rounded-none border-zinc-100 shadow-xl">
+            <SelectContent className="rounded-none">
               {cities.map((c) => (
                 <SelectItem key={c.id} value={c.id} className="text-xs">
                   {c.name}
@@ -198,7 +232,7 @@ export default function AdresForm({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             İlçe *
           </Label>
           <Select
@@ -219,10 +253,10 @@ export default function AdresForm({
             }}
             disabled={!formData.city}
           >
-            <SelectTrigger className="border-0 border-b border-zinc-200 rounded-none px-0 h-10 focus:ring-0 shadow-none">
-              <SelectValue placeholder="Seçiniz" />
+            <SelectTrigger className="w-full border-0 border-b border-zinc-200 rounded-none px-0 h-10 focus:ring-0 shadow-none">
+              <SelectValue placeholder="İlçe Seçiniz" />
             </SelectTrigger>
-            <SelectContent className="rounded-none border-zinc-100 shadow-xl">
+            <SelectContent className="rounded-none">
               {districts.map((d) => (
                 <SelectItem
                   key={d.id}
@@ -238,42 +272,50 @@ export default function AdresForm({
 
         {/* TC No & Posta Kodu */}
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             TC Kimlik No *
           </Label>
           <Input
             maxLength={11}
             className={inputStyles}
             value={formData.tcno || ""}
-            onChange={(e) => setFormData({ ...formData, tcno: e.target.value })}
-            required
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                tcno: e.target.value.replace(/\D/g, ""),
+              })
+            }
           />
         </div>
         <div className="space-y-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             Posta Kodu *
           </Label>
           <Input
+            maxLength={5}
             className={inputStyles}
             value={formData.zip || ""}
-            onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
-            required
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                zip: e.target.value.replace(/\D/g, ""),
+              })
+            }
           />
         </div>
 
-        {/* Detaylı Adres */}
+        {/* Detaylı Adres - Full Width */}
         <div className="space-y-2 md:col-span-2">
-          <Label className="text-[10px] uppercase tracking-widest text-zinc-400 font-light">
+          <Label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400 font-light">
             Adres Detayı *
           </Label>
           <Input
             className={inputStyles}
-            placeholder="Sokak, Bina No, Daire..."
+            placeholder="Mahalle, Sokak, No, Daire..."
             value={formData.address}
             onChange={(e) =>
               setFormData({ ...formData, address: e.target.value })
             }
-            required
           />
         </div>
       </div>
@@ -281,7 +323,7 @@ export default function AdresForm({
       <div className="pt-6">
         <Button
           type="submit"
-          className="bg-zinc-950 hover:bg-zinc-800 text-white rounded-none px-12 py-6 text-[10px] tracking-[0.2em] uppercase transition-all duration-500"
+          className="w-full md:w-auto bg-zinc-950 hover:bg-zinc-800 text-white rounded-none px-16 py-7 text-[10px] tracking-[0.3em] uppercase transition-all duration-500"
         >
           ADRESİ KAYDET
         </Button>

@@ -15,7 +15,7 @@ interface CollectionMegaMenuProps {
 }
 
 const QUICK_LINKS = [
-  { label: "Hikayemiz", href: "/about" },
+  { label: "Hikayemiz", href: "/institutional/about" },
   { label: "Katalog", href: "/catalog" },
   { label: "Blog", href: "/blog" },
   { label: "İletişim", href: "/contact" },

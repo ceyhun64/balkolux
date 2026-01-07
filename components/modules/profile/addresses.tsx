@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // 1. Router import edildi
 import Sidebar from "./sideBar";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Edit, Trash2, PlusCircle, X, MapPin } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import AdresForm from "./addressForm";
@@ -42,11 +42,13 @@ interface AddressFormData {
 }
 
 export default function Adreslerim() {
+  const router = useRouter(); // 2. Router tanımlandı
   const [adresler, setAdresler] = useState<Address[]>([]);
   const [yeniAdresForm, setYeniAdresForm] = useState(false);
   const [duzenleForm, setDuzenleForm] = useState(false);
   const [duzenlenenAdres, setDuzenlenenAdres] = useState<Address | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false); // Auth kontrolü için state
 
   const initialFormData: AddressFormData = {
     title: "",
@@ -72,17 +74,28 @@ export default function Adreslerim() {
     const fetchAddresses = async () => {
       try {
         const res = await fetch("/api/address", { method: "GET" });
+
+        // 3. Oturum Kontrolü
+        if (res.status === 401) {
+          router.push("/login");
+          return;
+        }
+
+        if (!res.ok) throw new Error("Adresler yüklenemedi.");
+
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Adresler yüklenemedi.");
         setAdresler(data.addresses || []);
+        setIsAuthorized(true); // Kullanıcı yetkili
       } catch (error) {
-        toast.error("Adresler yüklenirken bir hata oluştu.");
+        console.error("Auth/Fetch error:", error);
+        toast.error("Oturum doğrulanamadı.");
+        router.push("/login");
       } finally {
         setLoading(false);
       }
     };
     fetchAddresses();
-  }, []);
+  }, [router]);
 
   const handleSil = async (id: number) => {
     try {
@@ -149,50 +162,68 @@ export default function Adreslerim() {
     }
   };
 
+  // Yükleme sırasında skeleton göster
+  if (loading)
+    return (
+      <div className="flex flex-col md:flex-row min-h-screen bg-[#FBFBFB]">
+        <Sidebar />
+        <main className="flex-1 px-4 py-10 md:px-12 lg:px-20">
+          <div className="max-w-5xl mx-auto">
+            <LoadingSkeleton />
+          </div>
+        </main>
+      </div>
+    );
+
+  // Yetkisizse render etme (router yönlendirmesi çalışana kadar)
+  if (!isAuthorized) return null;
+
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-white">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#FBFBFB] text-zinc-900">
       <Sidebar />
 
-      <main className="flex-1 px-6 py-12 md:px-16 lg:px-24">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
-            <div className="space-y-4">
-              <h1 className="text-4xl font-extralight tracking-tighter text-zinc-900 uppercase">
+      <main className="flex-1 px-4 py-10 md:px-12 lg:px-20">
+        <div className="max-w-5xl mx-auto">
+          {/* Header Section */}
+          <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="mb-8">
+              <h1 className="text-3xl font-light tracking-tight mb-2 italic">
                 Adreslerim
               </h1>
-              <div className="h-[1px] w-12 bg-zinc-900" />
-              <p className="text-[11px] tracking-[0.2em] text-zinc-400 uppercase leading-relaxed">
-                Kayıtlı teslimat ve fatura bilgilerinizi <br /> bu alandan
-                modernize edebilirsiniz.
+              <p className="text-zinc-500 text-[11px] uppercase tracking-[0.2em] font-light">
+                Teslimat ve fatura adreslerinizi buradan yönetin.
               </p>
             </div>
 
-            <Button
+            <button
               onClick={() => {
                 setYeniAdresForm(!yeniAdresForm);
                 setDuzenleForm(false);
                 setEkleFormData(initialFormData);
               }}
-              className="group flex items-center gap-2 rounded-none bg-zinc-900 text-white px-6 py-6 text-[10px] tracking-widest uppercase hover:bg-zinc-800 transition-all"
+              className="group flex items-center gap-3 border-b border-zinc-900 pb-1 text-[10px] tracking-[0.3em] uppercase transition-all hover:gap-5"
             >
-              {yeniAdresForm ? <X size={14} /> : <PlusCircle size={14} />}
-              <span>{yeniAdresForm ? "Vazgeç" : "Yeni Adres"}</span>
-            </Button>
+              {yeniAdresForm ? (
+                <X size={14} strokeWidth={1.5} />
+              ) : (
+                <Plus size={14} strokeWidth={1.5} />
+              )}
+              <span>{yeniAdresForm ? "Vazgeç" : "Yeni Ekle"}</span>
+            </button>
           </header>
 
           <AnimatePresence mode="wait">
-            {/* Formlar */}
             {(yeniAdresForm || duzenleForm) && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mb-20 p-8 border border-zinc-100 bg-zinc-50/30"
+                exit={{ opacity: 0, y: -5 }}
+                className="mb-24 p-10 bg-white border border-zinc-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)]"
               >
-                <h3 className="text-xs font-bold tracking-widest uppercase mb-8 text-zinc-800">
-                  {duzenleForm ? "Adresi Güncelle" : "Yeni Bilgiler"}
-                </h3>
+                <div className="flex items-center gap-2 mb-10 text-[10px] tracking-widest text-zinc-400 uppercase">
+                  <span className="w-4 h-[1px] bg-zinc-300" />
+                  {duzenleForm ? "Kayıt Güncelleme" : "Yeni Kayıt Oluşturma"}
+                </div>
                 <AdresForm
                   formData={duzenleForm ? duzenleFormData : ekleFormData}
                   setFormData={
@@ -203,57 +234,62 @@ export default function Adreslerim() {
               </motion.div>
             )}
 
-            {/* Adres Listesi */}
-            {!loading && !yeniAdresForm && !duzenleForm && (
+            {!yeniAdresForm && !duzenleForm && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="grid grid-cols-1 gap-12"
+                className="space-y-16"
               >
                 {adresler.length > 0 ? (
                   adresler.map((a) => (
                     <div
                       key={a.id}
-                      className="group flex flex-col md:flex-row justify-between items-start border-b border-zinc-100 pb-10 last:border-0 transition-colors"
+                      className="group relative flex flex-col md:flex-row justify-between items-start pb-12 border-b border-zinc-100 last:border-0"
                     >
-                      <div className="space-y-4 max-w-lg">
-                        <div className="flex items-center gap-3">
-                          <MapPin size={14} className="text-zinc-400" />
-                          <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-900">
+                      <div className="space-y-5 flex-1">
+                        <div className="flex items-center gap-4">
+                          <span className="text-[9px] tracking-[0.3em] text-zinc-300 uppercase font-medium">
+                            #{a.id}
+                          </span>
+                          <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-900">
                             {a.title}
                           </h3>
                         </div>
 
-                        <div className="space-y-1">
-                          <p className="text-xs font-medium text-zinc-800 uppercase tracking-tight">
+                        <div className="space-y-2">
+                          <p className="text-[12px] font-medium text-zinc-800 tracking-tight">
                             {a.firstName} {a.lastName}
                           </p>
-                          <p className="text-[13px] text-zinc-500 font-light leading-relaxed italic">
+                          <p className="text-[13px] text-zinc-500 font-light leading-relaxed max-w-md">
                             {a.address} <br />
-                            {a.neighborhood && `${a.neighborhood}, `}{" "}
-                            {a.district} / {a.city}
+                            <span className="text-zinc-400 text-[12px]">
+                              {a.neighborhood && `${a.neighborhood}, `}
+                              {a.district} / {a.city}
+                            </span>
                           </p>
                         </div>
 
-                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[10px] tracking-widest text-zinc-400 uppercase">
-                          <span>{a.phone}</span>
-                          {a.tcno && <span>TC: {a.tcno}</span>}
-                          <span>{a.country}</span>
+                        <div className="flex gap-8 text-[9px] tracking-[0.2em] text-zinc-400 uppercase pt-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1 h-1 rounded-full bg-zinc-200" />
+                            {a.phone}
+                          </div>
+                          {a.tcno && <span>{a.tcno}</span>}
                         </div>
                       </div>
 
-                      <div className="flex gap-4 mt-6 md:mt-0">
+                      <div className="flex md:flex-col gap-6 mt-8 md:mt-0 items-end">
                         <button
                           onClick={() => handleDuzenle(a)}
-                          className="text-[10px] tracking-[0.2em] uppercase text-zinc-400 hover:text-zinc-900 flex items-center gap-1 transition-all"
+                          className="text-[9px] tracking-[0.3em] uppercase text-zinc-400 hover:text-zinc-900 transition-colors py-1"
                         >
-                          <Edit size={12} /> Düzenle
+                          Düzenle
                         </button>
                         <button
                           onClick={() => handleSil(a.id)}
-                          className="text-[10px] tracking-[0.2em] uppercase text-zinc-300 hover:text-red-500 flex items-center gap-1 transition-all"
+                          className="text-[9px] tracking-[0.3em] uppercase text-zinc-300 hover:text-red-400 transition-colors py-1"
                         >
-                          <Trash2 size={12} /> Sil
+                          Kaldır
                         </button>
                       </div>
                     </div>
@@ -264,8 +300,6 @@ export default function Adreslerim() {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {loading && <LoadingSkeleton />}
         </div>
       </main>
     </div>
@@ -274,9 +308,9 @@ export default function Adreslerim() {
 
 function EmptyState() {
   return (
-    <div className="py-20 text-center border-t border-zinc-100">
-      <p className="text-xs tracking-widest text-zinc-400 uppercase mb-4 italic">
-        Kayıtlı adres bulunamadı
+    <div className="py-32 text-center">
+      <p className="text-[10px] tracking-[0.3em] text-zinc-300 uppercase italic">
+        Henüz bir adres tanımlanmadı
       </p>
     </div>
   );
@@ -284,11 +318,16 @@ function EmptyState() {
 
 function LoadingSkeleton() {
   return (
-    <div className="space-y-12">
-      {[1, 2].map((i) => (
-        <div key={i} className="border-b border-zinc-100 pb-10">
-          <Skeleton className="h-4 w-32 mb-4 bg-zinc-50" />
-          <Skeleton className="h-20 w-full bg-zinc-50" />
+    <div className="space-y-16">
+      <div className="mb-12">
+        <Skeleton className="h-10 w-48 mb-4 bg-zinc-100" />
+        <Skeleton className="h-4 w-64 bg-zinc-50" />
+      </div>
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="pb-12 border-b border-zinc-100">
+          <Skeleton className="h-3 w-24 mb-6 bg-zinc-100" />
+          <Skeleton className="h-4 w-48 mb-3 bg-zinc-50" />
+          <Skeleton className="h-12 w-full bg-zinc-50/50" />
         </div>
       ))}
     </div>

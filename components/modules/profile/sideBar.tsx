@@ -66,29 +66,31 @@ export default function Sidebar() {
 
   return (
     <aside className="w-full md:w-64 lg:w-72 md:min-h-screen bg-white">
-      <div className="flex flex-col py-12 px-6 md:px-8 h-full border-r border-zinc-100">
+      <div className="flex flex-col py-16 px-8 md:px-10 h-full border-r border-zinc-100/60">
         {/* User Identity Section */}
-        <div className="mb-16">
+        <div className="mb-20">
           {loading ? (
             <div className="space-y-4">
-              <Skeleton className="h-3 w-16 bg-zinc-50" />
-              <Skeleton className="h-6 w-32 bg-zinc-50" />
+              <Skeleton className="h-2 w-12 bg-zinc-50" />
+              <Skeleton className="h-5 w-24 bg-zinc-50" />
             </div>
           ) : (
-            <div className="flex flex-col">
-              <span className="text-[10px] tracking-[0.3em] text-zinc-400 uppercase font-light mb-2">
-                Hoş Geldiniz
+            <div className="flex flex-col group">
+              <span className="text-[9px] tracking-[0.4em] text-zinc-400 uppercase font-medium mb-3">
+                Üyelik Paneli
               </span>
-              <h2 className="text-xl font-extralight tracking-tight text-zinc-900 uppercase">
+              <h2 className="text-lg font-light tracking-tight text-zinc-900 uppercase">
                 {user ? `${user.name} ${user.surname}` : "Misafir"}
               </h2>
               {user && (
                 <button
                   onClick={handleLogout}
-                  className="mt-6 flex items-center gap-2 text-[10px] tracking-widest text-zinc-400 hover:text-zinc-950 transition-colors duration-300 uppercase"
+                  className="mt-6 flex items-center gap-2 text-[9px] tracking-[0.2em] text-zinc-400 hover:text-red-400 transition-all duration-300 uppercase w-fit"
                 >
-                  <LogOut size={12} strokeWidth={1.5} />
-                  <span>Güvenli Çıkış</span>
+                  <LogOut size={11} strokeWidth={1} />
+                  <span className="border-b border-transparent hover:border-red-400/30">
+                    Çıkış Yap
+                  </span>
                 </button>
               )}
             </div>
@@ -96,13 +98,13 @@ export default function Sidebar() {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="space-y-12">
+        <nav className="space-y-16">
           {Object.entries(menuItems).map(([category, items]) => (
-            <div key={category} className="space-y-4">
-              <h3 className="text-[10px] tracking-[0.4em] text-zinc-300 font-medium uppercase">
+            <div key={category} className="space-y-6">
+              <h3 className="text-[9px] tracking-[0.5em] text-zinc-400 font-semibold uppercase">
                 {category}
               </h3>
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {items.map((item) => {
                   const isActive = pathname === item.path;
                   return (
@@ -110,31 +112,43 @@ export default function Sidebar() {
                       <Link
                         href={item.path}
                         className={cn(
-                          "group flex items-center gap-4 py-3 text-sm transition-all duration-500 relative",
+                          "group flex items-center gap-4 py-2 text-[13px] transition-all duration-300 relative",
                           isActive
-                            ? "text-zinc-950 font-medium"
-                            : "text-zinc-400 hover:text-zinc-950"
+                            ? "text-zinc-950"
+                            : "text-zinc-500 hover:text-zinc-950"
                         )}
                       >
                         <item.icon
-                          size={16}
+                          size={15}
                           strokeWidth={isActive ? 1.5 : 1}
                           className={cn(
-                            "transition-colors",
+                            "transition-all duration-300",
                             isActive
                               ? "text-zinc-950"
                               : "text-zinc-300 group-hover:text-zinc-950"
                           )}
                         />
-                        <span className="tracking-tight font-light">
+                        <span
+                          className={cn(
+                            "tracking-wide transition-transform duration-300",
+                            isActive
+                              ? "translate-x-1"
+                              : "group-hover:translate-x-1"
+                          )}
+                        >
                           {item.name}
                         </span>
 
-                        {/* Active Indicator Line */}
+                        {/* Minimalist Active Indicator */}
                         {isActive && (
                           <motion.div
                             layoutId="activeTab"
-                            className="absolute left-[-24px] md:left-[-32px] w-1 h-4 bg-zinc-950"
+                            className="absolute left-[-32px] md:left-[-40px] w-[2px] h-3 bg-zinc-950"
+                            transition={{
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 30,
+                            }}
                           />
                         )}
                       </Link>
@@ -145,6 +159,13 @@ export default function Sidebar() {
             </div>
           ))}
         </nav>
+
+        {/* Footer Area - Optional refinement */}
+        <div className="mt-auto pt-10">
+          <p className="text-[8px] tracking-widest text-zinc-200 uppercase">
+            v1.0.4 BalkoLüx Access
+          </p>
+        </div>
       </div>
     </aside>
   );

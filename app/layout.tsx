@@ -6,6 +6,7 @@ import ScrollToTopButton from "@/components/layout/scrollToTop";
 import { CartProvider } from "@/contexts/cartContext";
 import { FavoriteProvider } from "@/contexts/favoriteContext";
 import { Toaster } from "sonner";
+import CookieConsent from "@/components/layout/cookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -165,7 +166,10 @@ export default function RootLayout({
           <FavoriteProvider>
             <ClientLayoutWrapper>
               {/* Sayfa içeriği burada render edilir */}
-              <main className="min-h-screen font-sans">{children}</main>
+              <main className="min-h-screen font-sans">
+                {children}
+                <CookieConsent />
+              </main>
             </ClientLayoutWrapper>
 
             <ScrollToTopButton />

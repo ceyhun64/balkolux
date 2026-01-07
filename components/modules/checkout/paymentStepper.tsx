@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { Check } from "lucide-react"; // Opsiyonel: Daha estetik bir check ikonu için
 
 // --- Tipler ---
 interface StepIndicatorProps {
@@ -12,34 +15,54 @@ interface PaymentStepperProps {
 }
 
 // StepIndicator Component
-const StepIndicator: React.FC<StepIndicatorProps> = ({ step, currentStep, label }) => {
+const StepIndicator: React.FC<StepIndicatorProps> = ({
+  step,
+  currentStep,
+  label,
+}) => {
   const isActive = step === currentStep;
   const isCompleted = step < currentStep;
 
   return (
-    <div
-      className={`flex flex-col items-center w-1/2 ${
-        step > 1 ? "border-l pl-4 border-gray-200 " : ""
-      }`}
-    >
-      <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
-          isCompleted
-            ? "bg-green-500 text-white"
-            : isActive
-            ? "bg-primary text-primary-foreground"
-            : "bg-gray-200 text-gray-500 "
-        }`}
-      >
-        {isCompleted ? "✓" : step}
+    <div className="flex flex-1 items-center group">
+      {/* İçerik Konteynırı */}
+      <div className="flex flex-col items-center flex-1">
+        <div
+          className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500 ease-in-out border-2 ${
+            isCompleted
+              ? "bg-zinc-900 border-zinc-900 text-white"
+              : isActive
+              ? "bg-white border-zinc-900 text-zinc-900 shadow-sm"
+              : "bg-white border-zinc-200 text-zinc-400"
+          }`}
+        >
+          {isCompleted ? (
+            <span className="text-sm font-bold animate-in zoom-in duration-300">
+              ✓
+            </span>
+          ) : (
+            <span className="text-xs font-bold tracking-tighter">{step}</span>
+          )}
+
+          {/* Aktif adımda küçük bir parlama efekti */}
+          {isActive && (
+            <span className="absolute inset-0 rounded-full bg-zinc-900/5 animate-ping duration-[2000ms]" />
+          )}
+        </div>
+
+        <span
+          className={`mt-3 text-[11px] uppercase tracking-[0.1em] transition-colors duration-500 ${
+            isActive ? "text-zinc-900 font-bold" : "text-zinc-400 font-medium"
+          }`}
+        >
+          {label}
+        </span>
       </div>
-      <span
-        className={`mt-2 text-center text-xs transition-colors duration-300 ${
-          isActive ? "text-primary font-semibold" : "text-muted-foreground"
-        }`}
-      >
-        {label}
-      </span>
+
+      {/* Adımlar arası çizgi (sadece ilk adımın yanına) */}
+      {step === 1 && (
+        <div className="w-12 h-[1px] bg-zinc-100 mt-[-20px] hidden md:block" />
+      )}
     </div>
   );
 };
@@ -47,9 +70,9 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ step, currentStep, label 
 // PaymentStepper Component
 const PaymentStepper: React.FC<PaymentStepperProps> = ({ currentStep }) => {
   return (
-    <div className="flex justify-between mb-6 text-sm font-medium text-center">
+    <div className="w-full max-w-md mx-auto flex items-center justify-center mb-10 select-none">
       <StepIndicator step={1} currentStep={currentStep} label="Adres" />
-      <StepIndicator step={2} currentStep={currentStep} label="Kart Bilgileri" />
+      <StepIndicator step={2} currentStep={currentStep} label="Ödeme" />
     </div>
   );
 };

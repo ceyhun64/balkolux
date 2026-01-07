@@ -1,10 +1,19 @@
-// app/api/payment/route.ts
+// app/api/payment/route.ts - Taksit Farkı Düzeltildi
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
+// Taksit oranları
+const INSTALLMENT_RATES: { [key: number]: number } = {
+  1: 0,
+  2: 3.5,
+  3: 5.2,
+  6: 9.8,
+  9: 13.5,
+  12: 17.0,
+};
+
 /**
  * İyzipay için HMAC-SHA256 signature oluşturur
- * Format: HMAC-SHA256(randomKey + uri + requestBody)
  */
 function generateIyzicoSignature(
   randomKey: string,
@@ -46,7 +55,7 @@ function createAuthorizationHeader(
 }
 
 /**
- * Tarihleri İyzipay formatına çevirir (YYYY-MM-DD HH:mm:ss)
+ * Tarihleri İyzipay formatına çevirir
  */
 function formatDateForIyzipay(date: string | Date): string {
   const d = new Date(date);
@@ -60,23 +69,35 @@ function formatDateForIyzipay(date: string | Date): string {
 }
 
 /**
- * Fiyat hesaplama ve hizmet bedeli ekleme
+ * Fiyat hesaplama ve taksit farkı ekleme
  */
-function calculatePricing(basketItems: BasketItem[]) {
-  // Sepet toplamını hesapla
+function calculatePricing(basketItems: BasketItem[], installment: number = 1) {
+  // Sepet toplamı
   const subtotal = basketItems.reduce((sum, item) => {
     const price =
       typeof item.price === "string" ? parseFloat(item.price) : item.price;
     return sum + price;
   }, 0);
 
-  // %10 hizmet bedeli ekle
+  // %10 hizmet bedeli (KDV)
   const serviceFee = subtotal * 0.1;
-  const total = subtotal + serviceFee;
+
+  // Ara toplam (ürünler + KDV)
+  const baseTotal = subtotal + serviceFee;
+
+  // Taksit farkını hesapla
+  const installmentRate = INSTALLMENT_RATES[installment] || 0;
+  const installmentFee = baseTotal * (installmentRate / 100);
+
+  // Nihai toplam
+  const total = baseTotal + installmentFee;
 
   return {
     subtotal: parseFloat(subtotal.toFixed(2)),
     serviceFee: parseFloat(serviceFee.toFixed(2)),
+    baseTotal: parseFloat(baseTotal.toFixed(2)),
+    installmentFee: parseFloat(installmentFee.toFixed(2)),
+    installmentRate,
     total: parseFloat(total.toFixed(2)),
   };
 }
@@ -129,6 +150,7 @@ interface PaymentRequestBody {
   basketItems: BasketItem[];
   currency?: string;
   basketId?: string;
+  installment?: number;
 }
 
 /**
@@ -137,7 +159,6 @@ interface PaymentRequestBody {
  */
 export async function POST(req: NextRequest) {
   try {
-    // Request body'yi parse et
     const body: PaymentRequestBody = await req.json();
     const {
       paymentCard,
@@ -147,6 +168,7 @@ export async function POST(req: NextRequest) {
       basketItems,
       currency = "TRY",
       basketId,
+      installment = 1,
     } = body;
 
     // Environment variables kontrolü
@@ -173,10 +195,20 @@ export async function POST(req: NextRequest) {
       lastLoginDate: formatDateForIyzipay(buyer.lastLoginDate),
     };
 
-    // Fiyat hesaplaması (%10 hizmet bedeli dahil)
-    const pricing = calculatePricing(basketItems);
+    // Fiyat hesaplaması (TAKSİT FARKI DAHİL)
+    const pricing = calculatePricing(basketItems, installment);
 
-    // Sepet ürünleri (orijinal fiyatlarla)
+    console.log("💰 Fiyat Hesaplaması:", {
+      subtotal: pricing.subtotal,
+      serviceFee: pricing.serviceFee,
+      baseTotal: pricing.baseTotal,
+      installment: installment,
+      installmentRate: `%${pricing.installmentRate}`,
+      installmentFee: pricing.installmentFee,
+      total: pricing.total,
+    });
+
+    // Sepet ürünleri
     const formattedBasketItems = basketItems.map((item) => {
       const price =
         typeof item.price === "string" ? parseFloat(item.price) : item.price;
@@ -189,22 +221,34 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // Hizmet bedeli ürün olarak ekle
+    // Hizmet bedeli (KDV) ekle
     formattedBasketItems.push({
       id: "SERVICE_FEE",
-      name: "Hizmet Bedeli",
+      name: "Hizmet Bedeli (KDV %10)",
       category1: "Hizmet",
       itemType: "VIRTUAL",
       price: pricing.serviceFee.toFixed(2),
     });
 
+    // 🔥 TAKSİT FARKI EKLE (Eğer varsa)
+    if (installment > 1 && pricing.installmentFee > 0) {
+      formattedBasketItems.push({
+        id: "INSTALLMENT_FEE",
+        name: `Taksit Farkı (${installment} Taksit - %${pricing.installmentRate})`,
+        category1: "Hizmet",
+        itemType: "VIRTUAL",
+        price: pricing.installmentFee.toFixed(2),
+      });
+    }
+
     // İyzipay ödeme request body'si
     const paymentRequest = {
       locale: "tr",
       conversationId: Date.now().toString(),
-      price: pricing.total.toFixed(2),
-      paidPrice: pricing.total.toFixed(2),
+      price: pricing.total.toFixed(2), // 🔥 TAKSİT FARKLI TOPLAM
+      paidPrice: pricing.total.toFixed(2), // 🔥 TAKSİT FARKLI TOPLAM
       currency,
+      installment: installment,
       basketId: basketId || `B${Date.now()}`,
       paymentChannel: "WEB",
       paymentCard: {
@@ -233,10 +277,8 @@ export async function POST(req: NextRequest) {
       basketItems: formattedBasketItems,
     };
 
-    // Request body'yi JSON'a çevir
     const requestBody = JSON.stringify(paymentRequest);
 
-    // Authorization header'ı oluştur
     const uri = "/payment/auth";
     const { authorization, randomKey } = createAuthorizationHeader(
       apiKey,
@@ -245,11 +287,13 @@ export async function POST(req: NextRequest) {
       requestBody
     );
 
-    console.log("İyzipay ödeme isteği gönderiliyor...", {
+    console.log("📤 İyzipay ödeme isteği gönderiliyor...", {
       endpoint: `${baseUrl}${uri}`,
       subtotal: pricing.subtotal,
       serviceFee: pricing.serviceFee,
+      installmentFee: pricing.installmentFee,
       total: pricing.total,
+      installment: installment,
       itemCount: formattedBasketItems.length,
     });
 
@@ -265,7 +309,6 @@ export async function POST(req: NextRequest) {
       body: requestBody,
     });
 
-    // Response'u parse et
     const result = await response.json();
 
     // Başarılı ödeme kontrolü
@@ -274,6 +317,8 @@ export async function POST(req: NextRequest) {
         paymentId: result.paymentId,
         conversationId: result.conversationId,
         amount: pricing.total,
+        installment: installment,
+        installmentFee: pricing.installmentFee,
       });
 
       return NextResponse.json({
@@ -281,9 +326,13 @@ export async function POST(req: NextRequest) {
         paymentId: result.paymentId,
         conversationId: result.conversationId,
         fraudStatus: result.fraudStatus,
+        installment: installment,
         pricing: {
           subtotal: pricing.subtotal,
           serviceFee: pricing.serviceFee,
+          baseTotal: pricing.baseTotal,
+          installmentFee: pricing.installmentFee,
+          installmentRate: pricing.installmentRate,
           total: pricing.total,
         },
         ...result,

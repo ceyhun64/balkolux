@@ -204,9 +204,13 @@ const CartDropdown = forwardRef(
       }
     };
 
+    // Hesaplamalar
     const subtotal = cartItems.reduce((acc, item) => {
       return acc + item.product.price * item.quantity;
     }, 0);
+
+    const taxAmount = subtotal * 0.1; // %10 KDV
+    const total = subtotal + taxAmount; // Toplam
 
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -313,7 +317,7 @@ const CartDropdown = forwardRef(
           {/* Footer */}
           {cartItems.length > 0 && (
             <div className="border-t border-stone-100 p-8 space-y-6 bg-stone-50/30">
-              {/* Toplam */}
+              {/* Toplam Detayları */}
               <div className="space-y-3">
                 <div className="flex justify-between items-baseline">
                   <span className="text-[10px] uppercase tracking-[0.25em] text-stone-400 font-medium">
@@ -326,14 +330,28 @@ const CartDropdown = forwardRef(
                     })}
                   </span>
                 </div>
+
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-stone-400 font-medium">
+                    KDV (%10)
+                  </span>
+                  <span className="text-sm text-stone-600 font-light">
+                    ₺
+                    {taxAmount.toLocaleString("tr-TR", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+
                 <div className="h-[1px] bg-stone-200" />
+
                 <div className="flex justify-between items-baseline pt-1">
-                  <span className="text-xs uppercase tracking-[0.2em] text-stone-900">
+                  <span className="text-xs uppercase tracking-[0.2em] text-stone-900 font-bold">
                     Toplam
                   </span>
-                  <span className="text-xl text-stone-900">
+                  <span className="text-xl text-stone-900 font-semibold">
                     ₺
-                    {subtotal.toLocaleString("tr-TR", {
+                    {total.toLocaleString("tr-TR", {
                       minimumFractionDigits: 2,
                     })}
                   </span>

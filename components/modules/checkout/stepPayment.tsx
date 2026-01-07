@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -10,7 +12,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Loader2, Lock, CreditCard, Calendar, Shield } from "lucide-react";
+import {
+  Loader2,
+  Lock,
+  CreditCard,
+  Calendar,
+  Shield,
+  Receipt,
+  CheckCircle2,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface StepPaymentCardProps {
   holderName: string;
@@ -28,14 +45,24 @@ interface StepPaymentCardProps {
   totalPrice: number;
   setStep: (step: number) => void;
   isProcessing?: boolean;
+  selectedInstallment: number;
+  setSelectedInstallment: (value: number) => void;
 }
+
+const installmentOptions = [
+  { label: "Tek Çekim", count: 1, rate: 0 },
+  { label: "2 Taksit", count: 2, rate: 3.5 },
+  { label: "3 Taksit", count: 3, rate: 5.2 },
+  { label: "6 Taksit", count: 6, rate: 9.8 },
+  { label: "9 Taksit", count: 9, rate: 13.5 },
+  { label: "12 Taksit", count: 12, rate: 17.0 },
+];
 
 export default function StepPaymentCard({
   holderName,
   setHolderName,
   cardNumber,
   setCardNumber,
-  formattedCardNumber,
   expireMonth,
   setExpireMonth,
   expireYear,
@@ -46,55 +73,59 @@ export default function StepPaymentCard({
   totalPrice,
   setStep,
   isProcessing: externalProcessing,
+  selectedInstallment,
+  setSelectedInstallment,
 }: StepPaymentCardProps) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [focusedField, setFocusedField] = useState<string | null>(null);
-
   const processing = externalProcessing || isProcessing;
 
-  // Kart numarası formatlama (4'lü gruplar)
   const formatCardNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, "");
-    const formatted = cleaned.match(/.{1,4}/g)?.join(" ") || cleaned;
-    return formatted;
+    return cleaned.match(/.{1,4}/g)?.join(" ") || cleaned;
   };
 
-  // Kart tipi algılama
   const getCardType = (number: string) => {
     const cleaned = number.replace(/\s/g, "");
     if (/^4/.test(cleaned)) return "visa";
     if (/^5[1-5]/.test(cleaned)) return "mastercard";
-    if (/^3[47]/.test(cleaned)) return "amex";
     return "unknown";
   };
 
   const cardType = getCardType(cardNumber);
 
-  // Form validasyonları
-  const validateCardNumber = (num: string) => {
-    const cleaned = num.replace(/\s/g, "");
-    return cleaned.length === 16;
-  };
+  const installmentCalculation = useMemo(() => {
+    const selectedOption = installmentOptions.find(
+      (opt) => opt.count === selectedInstallment
+    );
+    if (!selectedOption)
+      return {
+        total: totalPrice,
+        monthly: totalPrice,
+        interestAmount: 0,
+        rate: 0,
+      };
+    const interestAmount = totalPrice * (selectedOption.rate / 100);
+    const total = totalPrice + interestAmount;
+    return {
+      total: parseFloat(total.toFixed(2)),
+      monthly: parseFloat((total / selectedOption.count).toFixed(2)),
+      interestAmount: parseFloat(interestAmount.toFixed(2)),
+      rate: selectedOption.rate,
+    };
+  }, [selectedInstallment, totalPrice]);
 
-  const validateExpiry = (month: string, year: string) => {
-    if (!month || !year) return false;
-    const monthNum = parseInt(month);
-    const yearNum = parseInt(year);
-    
-    if (monthNum < 1 || monthNum > 12) return false;
-    
-    const currentYear = new Date().getFullYear() % 100;
-    const currentMonth = new Date().getMonth() + 1;
-    
-    if (yearNum < currentYear) return false;
-    if (yearNum === currentYear && monthNum < currentMonth) return false;
-    
-    return true;
+  const validateCardNumber = (num: string) =>
+    num.replace(/\s/g, "").length === 16;
+  const validateExpiry = (m: string, y: string) => {
+    if (!m || !y) return false;
+    const now = new Date();
+    const currentYear = now.getFullYear() % 100;
+    const currentMonth = now.getMonth() + 1;
+    const mNum = parseInt(m);
+    const yNum = parseInt(y);
+    return yNum > currentYear || (yNum === currentYear && mNum >= currentMonth);
   };
-
-  const validateCVC = (cvcValue: string) => {
-    return cvcValue.length === 3;
-  };
+  const validateCVC = (v: string) => v.length === 3;
 
   const isFormValid =
     holderName.trim().length >= 3 &&
@@ -102,284 +133,244 @@ export default function StepPaymentCard({
     validateExpiry(expireMonth, expireYear) &&
     validateCVC(cvc);
 
-  const onClickPayment = async () => {
-    if (!isFormValid || processing) return;
-    setIsProcessing(true);
-    try {
-      await handlePayment();
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Güvenlik Bildirimi */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-        <Shield className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-        <div className="text-sm">
-          <p className="text-blue-900 font-medium mb-1">Güvenli Ödeme</p>
-          <p className="text-blue-700">
-            Kart bilgileriniz 256-bit SSL şifreleme ile korunmaktadır. 
-            Bilgileriniz asla saklanmaz veya paylaşılmaz.
-          </p>
+    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-500">
+      {/* Visual Card Preview - Minimalist Style */}
+      <div className="relative h-48 w-full bg-zinc-900 rounded-2xl p-6 text-white shadow-2xl overflow-hidden group border border-white/10">
+        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+          <CreditCard size={120} />
+        </div>
+        <div className="relative h-full flex flex-col justify-between">
+          <div className="flex justify-between items-start">
+            <div className="w-12 h-8 bg-zinc-700/50 rounded-md" />
+            <div className="h-6 uppercase tracking-widest text-[10px] font-medium opacity-50">
+              Secure Payment
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-xl tracking-[0.25em] font-mono">
+              {formatCardNumber(cardNumber) || "•••• •••• •••• ••••"}
+            </div>
+            <div className="flex justify-between items-end">
+              <div className="space-y-1">
+                <div className="text-[10px] uppercase opacity-40 tracking-tighter">
+                  Card Holder
+                </div>
+                <div className="text-sm tracking-wide truncate max-w-[180px]">
+                  {holderName || "AD SOYAD"}
+                </div>
+              </div>
+              <div className="text-right space-y-1">
+                <div className="text-[10px] uppercase opacity-40 tracking-tighter">
+                  Expires
+                </div>
+                <div className="text-sm font-mono">
+                  {expireMonth || "MM"}/{expireYear || "YY"}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Ödeme Kartı */}
-      <Card>
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Lock className="w-5 h-5 text-green-600" />
-              Kart Bilgileri
-            </CardTitle>
-            <div className="flex gap-2">
-              {/* Kart logoları */}
-              <img 
-                src="/cards/visa.svg" 
-                alt="Visa" 
-                className={`h-8 ${cardType === 'visa' ? 'opacity-100' : 'opacity-30'} transition-opacity`}
-                onError={(e) => e.currentTarget.style.display = 'none'}
-              />
-              <img 
-                src="/cards/mastercard.svg" 
-                alt="Mastercard" 
-                className={`h-8 ${cardType === 'mastercard' ? 'opacity-100' : 'opacity-30'} transition-opacity`}
-                onError={(e) => e.currentTarget.style.display = 'none'}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Left Side: Form */}
+        <div className="md:col-span-7 space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label
+                htmlFor="holderName"
+                className="text-xs uppercase tracking-widest text-zinc-500"
+              >
+                Kart Sahibi
+              </Label>
+              <Input
+                id="holderName"
+                placeholder="AD SOYAD"
+                value={holderName}
+                disabled={processing}
+                className="border-zinc-200 focus:border-zinc-900 focus:ring-0 rounded-none border-t-0 border-x-0 px-0 h-10 transition-all"
+                onChange={(e) => setHolderName(e.target.value.toUpperCase())}
               />
             </div>
-          </div>
-          <CardDescription>
-            Ödeme bilgilerinizi güvenli bir şekilde girin
-          </CardDescription>
-        </CardHeader>
 
-        <CardContent className="space-y-5">
-          {/* Kart Sahibi */}
-          <div className="space-y-2">
-            <Label htmlFor="holderName" className="text-sm font-medium flex items-center gap-2">
-              <CreditCard className="w-4 h-4" />
-              Kart Sahibinin Adı Soyadı
-            </Label>
-            <Input
-              id="holderName"
-              placeholder="AD SOYAD"
-              value={holderName}
-              autoComplete="cc-name"
-              disabled={processing}
-              className={`h-12 text-base ${
-                focusedField === "holderName" ? "ring-2 ring-blue-500" : ""
-              }`}
-              onFocus={() => setFocusedField("holderName")}
-              onBlur={() => setFocusedField(null)}
-              onChange={(e) => {
-                const value = e.target.value.toUpperCase();
-                // Sadece harfler ve boşluk
-                if (/^[A-ZİĞÜŞÖÇ\s]*$/.test(value)) {
-                  setHolderName(value);
-                }
-              }}
-            />
-            {holderName && holderName.length < 3 && (
-              <p className="text-xs text-amber-600">
-                En az 3 karakter giriniz
-              </p>
-            )}
-          </div>
-
-          {/* Kart Numarası */}
-          <div className="space-y-2">
-            <Label htmlFor="cardNumber" className="text-sm font-medium">
-              Kart Numarası
-            </Label>
-            <div className="relative">
+            <div className="space-y-2">
+              <Label
+                htmlFor="cardNumber"
+                className="text-xs uppercase tracking-widest text-zinc-500"
+              >
+                Kart Numarası
+              </Label>
               <Input
                 id="cardNumber"
-                placeholder="1234 5678 9012 3456"
+                placeholder="0000 0000 0000 0000"
                 maxLength={19}
                 value={formatCardNumber(cardNumber)}
-                autoComplete="cc-number"
                 disabled={processing}
-                className={`h-12 text-base pl-4 pr-12 ${
-                  focusedField === "cardNumber" ? "ring-2 ring-blue-500" : ""
-                }`}
-                onFocus={() => setFocusedField("cardNumber")}
-                onBlur={() => setFocusedField(null)}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "");
-                  if (value.length <= 16) {
-                    setCardNumber(value);
-                  }
-                }}
+                className="border-zinc-200 focus:border-zinc-900 focus:ring-0 rounded-none border-t-0 border-x-0 px-0 h-10 transition-all font-mono"
+                onChange={(e) =>
+                  setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 16))
+                }
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <CreditCard className="w-5 h-5 text-gray-400" />
-              </div>
-            </div>
-            {cardNumber && !validateCardNumber(cardNumber) && (
-              <p className="text-xs text-amber-600">
-                16 haneli kart numaranızı giriniz
-              </p>
-            )}
-          </div>
-
-          {/* Son Kullanma Tarihi ve CVC */}
-          <div className="grid grid-cols-2 gap-4">
-            {/* Son Kullanma Tarihi */}
-            <div className="space-y-2">
-              <Label className="text-sm font-medium flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Son Kullanma Tarihi
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="expireMonth"
-                  placeholder="AA"
-                  maxLength={2}
-                  value={expireMonth}
-                  autoComplete="cc-exp-month"
-                  disabled={processing}
-                  className={`h-12 text-base text-center ${
-                    focusedField === "expireMonth" ? "ring-2 ring-blue-500" : ""
-                  }`}
-                  onFocus={() => setFocusedField("expireMonth")}
-                  onBlur={() => setFocusedField(null)}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    if (value.length <= 2) {
-                      const monthNum = parseInt(value);
-                      if (value === "" || (monthNum >= 0 && monthNum <= 12)) {
-                        setExpireMonth(value);
-                      }
-                    }
-                  }}
-                />
-                <span className="flex items-center text-gray-400 font-bold">/</span>
-                <Input
-                  id="expireYear"
-                  placeholder="YY"
-                  maxLength={2}
-                  value={expireYear}
-                  autoComplete="cc-exp-year"
-                  disabled={processing}
-                  className={`h-12 text-base text-center ${
-                    focusedField === "expireYear" ? "ring-2 ring-blue-500" : ""
-                  }`}
-                  onFocus={() => setFocusedField("expireYear")}
-                  onBlur={() => setFocusedField(null)}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    if (value.length <= 2) {
-                      setExpireYear(value);
-                    }
-                  }}
-                />
-              </div>
-              {expireMonth && expireYear && !validateExpiry(expireMonth, expireYear) && (
-                <p className="text-xs text-red-600">
-                  Geçersiz tarih
-                </p>
-              )}
             </div>
 
-            {/* CVC */}
-            <div className="space-y-2">
-              <Label htmlFor="cvc" className="text-sm font-medium flex items-center gap-2">
-                <Lock className="w-4 h-4" />
-                CVC/CVV
-              </Label>
-              <div className="relative">
+            <div className="grid grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-widest text-zinc-500">
+                  Son Kullanma
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="AA"
+                    maxLength={2}
+                    value={expireMonth}
+                    className="border-zinc-200 focus:border-zinc-900 focus:ring-0 rounded-none border-t-0 border-x-0 px-0 h-10 transition-all text-center w-full"
+                    onChange={(e) =>
+                      setExpireMonth(e.target.value.replace(/\D/g, ""))
+                    }
+                  />
+                  <span className="text-zinc-300">/</span>
+                  <Input
+                    placeholder="YY"
+                    maxLength={2}
+                    value={expireYear}
+                    className="border-zinc-200 focus:border-zinc-900 focus:ring-0 rounded-none border-t-0 border-x-0 px-0 h-10 transition-all text-center w-full"
+                    onChange={(e) =>
+                      setExpireYear(e.target.value.replace(/\D/g, ""))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="cvc"
+                  className="text-xs uppercase tracking-widest text-zinc-500"
+                >
+                  CVC
+                </Label>
                 <Input
                   id="cvc"
                   type="password"
                   placeholder="•••"
                   maxLength={3}
                   value={cvc}
-                  autoComplete="cc-csc"
-                  disabled={processing}
-                  className={`h-12 text-base text-center ${
-                    focusedField === "cvc" ? "ring-2 ring-blue-500" : ""
-                  }`}
-                  onFocus={() => setFocusedField("cvc")}
-                  onBlur={() => setFocusedField(null)}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    if (value.length <= 3) {
-                      setCvc(value);
-                    }
-                  }}
+                  className="border-zinc-200 focus:border-zinc-900 focus:ring-0 rounded-none border-t-0 border-x-0 px-0 h-10 transition-all text-center tracking-widest"
+                  onChange={(e) => setCvc(e.target.value.replace(/\D/g, ""))}
                 />
               </div>
-              <p className="text-xs text-gray-500">
-                Kartınızın arkasındaki 3 haneli kod
-              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Payment Summary & Installments */}
+        <div className="md:col-span-5 space-y-4">
+          <div className="bg-zinc-50 border border-zinc-100 p-5 rounded-xl space-y-4">
+            <div className="space-y-1">
+              <Label className="text-[10px] uppercase tracking-widest text-zinc-400">
+                Taksit Seçimi
+              </Label>
+              <Select
+                value={selectedInstallment.toString()}
+                onValueChange={(value) => setSelectedInstallment(Number(value))}
+                disabled={processing}
+              >
+                <SelectTrigger className="bg-transparent border-none shadow-none p-0 h-auto focus:ring-0 text-zinc-900 font-medium">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-zinc-100 shadow-xl">
+                  {installmentOptions.map((opt) => (
+                    <SelectItem
+                      key={opt.count}
+                      value={opt.count.toString()}
+                      className="py-3 px-4 focus:bg-zinc-50"
+                    >
+                      <div className="flex justify-between items-center w-full min-w-[200px]">
+                        <span>{opt.label}</span>
+                        <span className="text-xs text-zinc-400">
+                          %{opt.rate} vade
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2 pt-4 border-t border-zinc-200/60">
+              <div className="flex justify-between text-xs text-zinc-500">
+                <span>Ara Toplam</span>
+                <span>₺{totalPrice.toFixed(2)}</span>
+              </div>
+              {selectedInstallment > 1 && (
+                <div className="flex justify-between text-xs text-orange-600/80 font-medium">
+                  <span>Vade Farkı (%{installmentCalculation.rate})</span>
+                  <span>
+                    +₺{installmentCalculation.interestAmount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-end pt-2">
+                <span className="text-xs font-semibold text-zinc-900 uppercase tracking-tighter">
+                  Toplam
+                </span>
+                <span className="text-xl font-bold tracking-tight text-zinc-900">
+                  ₺{installmentCalculation.total.toFixed(2)}
+                </span>
+              </div>
+              {selectedInstallment > 1 && (
+                <p className="text-[10px] text-zinc-400 text-right italic font-light">
+                  {selectedInstallment} taksit x ₺
+                  {installmentCalculation.monthly.toFixed(2)}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Ödeme Özeti */}
-          <div className="bg-gray-50 rounded-lg p-4 mt-6 border border-gray-200">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Ödenecek Tutar:</span>
-              <span className="text-2xl font-bold text-gray-900">
-                ₺{totalPrice.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-
-        <CardFooter className="flex flex-col sm:flex-row gap-3 pt-6 border-t">
-          <Button
-            variant="outline"
-            onClick={() => setStep(1)}
-            disabled={processing}
-            className="w-full sm:w-auto h-12"
-          >
-            ← Geri Dön
-          </Button>
-          <Button
-            onClick={onClickPayment}
-            disabled={!isFormValid || processing}
-            className="w-full sm:flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {processing ? (
-              <span className="flex items-center justify-center gap-2">
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={async () => {
+                if (isFormValid && !processing) {
+                  setIsProcessing(true);
+                  try {
+                    await handlePayment();
+                  } finally {
+                    setIsProcessing(false);
+                  }
+                }
+              }}
+              disabled={!isFormValid || processing}
+              className="w-full h-12 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl shadow-lg transition-all active:scale-[0.98]"
+            >
+              {processing ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
-                Ödeme İşleniyor...
-              </span>
-            ) : (
-              <span className="flex items-center justify-center gap-2">
-                <Lock className="w-5 h-5" />
-                {`₺${totalPrice.toFixed(2)} Öde`}
-              </span>
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4 mr-2" /> Ödemeyi Tamamla
+                </>
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setStep(1)}
+              disabled={processing}
+              className="text-zinc-400 text-xs hover:text-zinc-900 transition-colors"
+            >
+              ← Bilgileri Güncelle
+            </Button>
+          </div>
+        </div>
+      </div>
 
-      {/* Alt Bilgilendirme */}
-      <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-        <h4 className="font-semibold text-gray-900 text-sm">
-          Güvenli Ödeme Garantisi
-        </h4>
-        <ul className="space-y-2 text-sm text-gray-600">
-          <li className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
-            <span>Tüm ödemeler PCI DSS standartlarına uygun olarak işlenir</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
-            <span>Kart bilgileriniz hiçbir şekilde saklanmaz</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
-            <span>3D Secure ile ekstra güvenlik katmanı</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
-            <span>Ödeme başarısız olursa paranız anında iade edilir</span>
-          </li>
-        </ul>
+      {/* Trust Badges */}
+      <div className="flex items-center justify-center gap-6 opacity-30 grayscale hover:grayscale-0 transition-all duration-500 pt-4">
+        <div className="flex items-center gap-1.5 grayscale">
+          <img src="/cards/visa.svg" alt="Visa" className="h-4" />
+          <img src="/cards/mastercard.svg" alt="Mastercard" className="h-4" />
+        </div>
+        <div className="h-4 w-[1px] bg-zinc-300" />
+        <div className="flex items-center gap-1.5 text-[10px] font-medium tracking-tight uppercase">
+          <Shield size={12} /> SSL SECURE
+        </div>
       </div>
     </div>
   );

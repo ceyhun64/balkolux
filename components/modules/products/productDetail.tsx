@@ -77,7 +77,6 @@ export default function ProductDetailPage() {
 
     const item = {
       productId: product.id,
-      quantity,
       title: product.title,
       price: product.price,
       image: product.mainImage,
@@ -85,8 +84,12 @@ export default function ProductDetailPage() {
 
     // Misafir kullanıcı için sepete ekle
     if (!isLoggedIn) {
-      addToGuestCart(item);
-      toast.success("Ürün sepete eklendi.");
+      addToGuestCart(item, quantity); // ✅ quantity parametresi eklendi
+      toast.success(
+        `${quantity} adet ürün sepete eklendi! Toplam: ₺${(
+          product.price * quantity
+        ).toLocaleString("tr-TR")}`
+      );
       window.dispatchEvent(new CustomEvent("cartUpdated"));
       return;
     }
@@ -96,14 +99,14 @@ export default function ProductDetailPage() {
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(item),
+        body: JSON.stringify({ ...item, quantity }), // ✅ quantity eklendi
         credentials: "include",
       });
 
       const data = await res.json();
       if (res.ok) {
         toast.success(
-          `Ürün sepete eklendi! Toplam: ₺${(
+          `${quantity} adet ürün sepete eklendi! Toplam: ₺${(
             product.price * quantity
           ).toLocaleString("tr-TR")}`
         );
@@ -271,7 +274,7 @@ export default function ProductDetailPage() {
                 </div>
                 <div className="flex items-center gap-4 text-[11px] text-stone-500 tracking-wide font-light">
                   <ShieldCheck size={16} strokeWidth={1} />
-                  <span>2 Yıl Moda Perde tasarım garantisi</span>
+                  <span>2 Yıl BalkoLüx tasarım garantisi</span>
                 </div>
               </div>
             </div>

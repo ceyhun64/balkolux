@@ -10,6 +10,11 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ subtotal }: CartSummaryProps) {
+  // Hesaplamalar
+  const taxRate = 0.1; // %10 KDV
+  const taxAmount = subtotal * taxRate;
+  const total = subtotal + taxAmount;
+
   // Para birimi formatlayıcı
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("tr-TR", {
@@ -26,6 +31,7 @@ export default function CartSummary({ subtotal }: CartSummaryProps) {
         </h2>
 
         <div className="space-y-4">
+          {/* Ara Toplam */}
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500 font-light">Ara Toplam</span>
             <span className="text-zinc-900 font-medium">
@@ -33,6 +39,15 @@ export default function CartSummary({ subtotal }: CartSummaryProps) {
             </span>
           </div>
 
+          {/* KDV Tutarı */}
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-zinc-500 font-light">KDV (%10)</span>
+            <span className="text-zinc-900 font-medium">
+              {formatCurrency(taxAmount)}
+            </span>
+          </div>
+
+          {/* Teslimat */}
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500 font-light">Teslimat</span>
             <span className="text-zinc-400 text-[11px] tracking-tight uppercase">
@@ -40,14 +55,15 @@ export default function CartSummary({ subtotal }: CartSummaryProps) {
             </span>
           </div>
 
+          {/* Genel Toplam */}
           <div className="pt-6 border-t border-zinc-200 flex justify-between items-baseline">
             <span className="text-base font-light text-zinc-900">Toplam</span>
             <div className="text-right">
               <span className="text-2xl font-medium tracking-tight text-zinc-950">
-                {formatCurrency(subtotal)}
+                {formatCurrency(total)}
               </span>
               <p className="text-[10px] text-zinc-400 mt-1 font-light">
-                KDV Dahildir
+                KDV Dahil Toplam Tutar
               </p>
             </div>
           </div>

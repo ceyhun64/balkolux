@@ -5,24 +5,23 @@ import {
   Package,
   Truck,
   Mail,
-  ChevronRight,
   Home,
+  ArrowRight,
+  Info,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function PaymentSuccessPage() {
   const [countdown, setCountdown] = useState(5);
   const router = useRouter();
-  // Sayaç
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => prev - 1);
     }, 1000);
-
     return () => clearInterval(timer);
   }, []);
 
-  // Redirect işlemi (setState dışında)
   useEffect(() => {
     if (countdown <= 0) {
       router.push("/");
@@ -33,173 +32,138 @@ export default function PaymentSuccessPage() {
     {
       icon: Mail,
       title: "E-posta Onayı",
-      description: "Sipariş detayları e-posta adresinize gönderildi",
+      description: "Detaylar adresinize gönderildi",
       status: "completed",
     },
     {
       icon: Package,
       title: "Sipariş Hazırlanıyor",
-      description: "Ürünleriniz paketleniyor",
+      description: "Ürünleriniz özenle paketleniyor",
       status: "in-progress",
     },
     {
       icon: Truck,
       title: "Kargoya Verilecek",
-      description: "Kargo takip numaranız e-posta ile bildirilecek",
+      description: "Takip numarası iletilecektir",
       status: "pending",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center p-4 font-sans">
-      <div className="max-w-2xl w-full">
-        {/* Success Card */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500">
-          {/* Header with Icon */}
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-8 text-center relative overflow-hidden">
-            {/* Decorative circles */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+    <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-6 font-sans text-zinc-950">
+      <div className="max-w-xl w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        {/* Success Header */}
+        <div className="text-center space-y-4">
+          <div className="relative mx-auto w-20 h-20 mb-6">
+            <div className="absolute inset-0 bg-zinc-900 rounded-full animate-ping opacity-5"></div>
+            <div className="relative bg-white rounded-full w-20 h-20 flex items-center justify-center shadow-sm border border-zinc-100">
+              <CheckCircle
+                className="w-10 h-10 text-zinc-900"
+                strokeWidth={1.5}
+              />
+            </div>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">
+            Ödeme Başarılı
+          </h1>
+          <p className="text-zinc-500 text-sm max-w-xs mx-auto leading-relaxed">
+            Siparişiniz başarıyla alındı ve işleme konuldu. Teşekkür ederiz.
+          </p>
+        </div>
 
-            <div className="relative z-10">
-              <div className="inline-block p-4 bg-white rounded-full mb-4 animate-bounce">
-                <CheckCircle
-                  className="w-16 h-16 text-green-600"
-                  strokeWidth={2.5}
-                />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                Ödeme Başarılı!
-              </h1>
-              <p className="text-green-50 text-lg">
-                Siparişiniz başarıyla alındı
-              </p>
+        {/* Content Card */}
+        <div className="bg-white rounded-[2.5rem] border border-zinc-100 shadow-sm p-8 md:p-10 space-y-10">
+          {/* Next Steps List */}
+          <div className="space-y-6">
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+              Sonraki Adımlar
+            </h2>
+            <div className="grid gap-4">
+              {nextSteps.map((step, index) => {
+                const Icon = step.icon;
+                return (
+                  <div
+                    key={index}
+                    className={`group flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 ${
+                      step.status === "completed"
+                        ? "bg-zinc-50/50 border-zinc-100"
+                        : "bg-white border-zinc-100/50"
+                    }`}
+                  >
+                    <div
+                      className={`p-2.5 rounded-xl ${
+                        step.status === "completed"
+                          ? "bg-zinc-900 text-white"
+                          : "bg-zinc-100 text-zinc-400"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <h3
+                        className={`text-sm font-bold ${
+                          step.status === "pending"
+                            ? "text-zinc-400"
+                            : "text-zinc-900"
+                        }`}
+                      >
+                        {step.title}
+                      </h3>
+                      <p className="text-xs text-zinc-500">
+                        {step.description}
+                      </p>
+                    </div>
+                    {step.status === "in-progress" && (
+                      <div className="w-4 h-4 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Content */}
-          <div className="p-6 md:p-8">
-            {/* Success Message */}
-            <div className="mb-8 text-center">
-              <p className="text-gray-600 leading-relaxed">
-                Siparişiniz başarıyla alındı ve işleme alındı. Sipariş detayları
-                ve kargo takip bilgileri e-posta adresinize gönderilecektir.
-              </p>
-            </div>
+          {/* Info Box */}
+          <div className="flex gap-4 p-5 bg-zinc-50 rounded-2xl border border-zinc-100">
+            <Info className="w-5 h-5 text-zinc-900 shrink-0" />
+            <p className="text-[13px] leading-relaxed text-zinc-600">
+              Sipariş durumunu <strong>Hesabım &gt; Siparişlerim</strong>{" "}
+              kısmından takip edebilirsiniz.
+            </p>
+          </div>
 
-            {/* Next Steps */}
-            <div className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span>Sonraki Adımlar</span>
-              </h2>
-              <div className="space-y-4">
-                {nextSteps.map((step, index) => {
-                  const Icon = step.icon;
-                  return (
-                    <div
-                      key={index}
-                      className={`flex items-start gap-4 p-4 rounded-xl transition-all ${
-                        step.status === "completed"
-                          ? "bg-green-50 border border-green-200"
-                          : step.status === "in-progress"
-                          ? "bg-blue-50 border border-blue-200"
-                          : "bg-gray-50 border border-gray-200"
-                      }`}
-                    >
-                      <div
-                        className={`p-2 rounded-lg flex-shrink-0 ${
-                          step.status === "completed"
-                            ? "bg-green-500"
-                            : step.status === "in-progress"
-                            ? "bg-blue-500"
-                            : "bg-gray-400"
-                        }`}
-                      >
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 mb-1">
-                          {step.title}
-                        </h3>
-                        <p className="text-sm text-gray-600">
-                          {step.description}
-                        </p>
-                      </div>
-                      {step.status === "completed" && (
-                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                      )}
-                      {step.status === "in-progress" && (
-                        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Info Box */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-              <div className="flex items-start gap-3">
-                <svg
-                  className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <div>
-                  <p className="text-sm font-semibold text-blue-900 mb-1">
-                    Önemli Bilgi
-                  </p>
-                  <p className="text-sm text-blue-800">
-                    Siparişinizin durumunu "Siparişlerim" sayfasından takip
-                    edebilirsiniz. Herhangi bir sorun yaşarsanız müşteri
-                    hizmetlerimizle iletişime geçebilirsiniz.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => (window.location.href = "/profile/orders")}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-600/30"
-              >
-                <Package className="w-5 h-5" />
-                Siparişlerimi Görüntüle
-              </button>
-              <button
-                onClick={() => (window.location.href = "/")}
-                className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 px-6 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
-              >
-                <Home className="w-5 h-5" />
-                Ana Sayfaya Dön
-              </button>
-            </div>
-
-            {/* Auto Redirect Notice */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">
-                {countdown > 0 ? (
-                  <>
-                    Ana sayfaya yönlendiriliyorsunuz...{" "}
-                    <span className="font-semibold text-gray-700">
-                      {countdown}s
-                    </span>
-                  </>
-                ) : (
-                  "Yönlendiriliyor..."
-                )}
-              </p>
-            </div>
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              onClick={() => (window.location.href = "/profile/orders")}
+              className="group flex items-center justify-center gap-2 bg-zinc-900 text-white px-6 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-zinc-800 active:scale-95"
+            >
+              <Package className="w-4 h-4" />
+              Siparişlerim
+              <ArrowRight className="w-3 h-3 opacity-0 -ml-2 group-hover:opacity-100 group-hover:ml-0 transition-all" />
+            </button>
+            <button
+              onClick={() => (window.location.href = "/")}
+              className="flex items-center justify-center gap-2 bg-white text-zinc-900 border border-zinc-200 px-6 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-zinc-50 active:scale-95"
+            >
+              <Home className="w-4 h-4" />
+              Ana Sayfa
+            </button>
           </div>
         </div>
 
+        {/* Countdown Footer */}
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-3 px-4 py-2 bg-white rounded-full border border-zinc-100 shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-zinc-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-500"></span>
+            </span>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">
+              Yönlendiriliyor:{" "}
+              <span className="text-zinc-900 ml-1">{countdown}s</span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

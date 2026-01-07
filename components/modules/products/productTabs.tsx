@@ -65,6 +65,7 @@ export default function ProductTabs({
     { label: "12 Taksit", count: 12, rate: 17.0 },
   ];
 
+  
   useEffect(() => {
     async function fetchUser() {
       try {

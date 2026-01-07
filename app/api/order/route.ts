@@ -1,55 +1,14 @@
-// app/api/order/route.ts
+// app/api/order/route.ts - Taksit Desteği Eklendi
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
 interface BasketItem {
-  id: number; // productId
-  productId: number;
-  name: string; // ürün adı
-  totalPrice: number; // unitPrice
-  unitPrice: number;
-  category?: string; // ürün kategorisi
-  quantity?: number; // ürün adedi
-}
-
-interface Address {
-  firstName?: string;
-  lastName?: string;
-  address: string;
-  district: string;
-  city: string;
-  zipCode?: string;
-  zip?: string;
-  phone: string;
-  country: string;
-  tcno?: string;
-}
-
-interface CreateOrderBody {
-  userId: number;
-  basketItems: BasketItem[];
-  shippingAddress: Address;
-  billingAddress: Address;
-  totalPrice: number;
-  paidPrice: number;
-  currency?: string;
-  paymentMethod?: string;
-  transactionId?: string;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-}
-
-interface UpdateOrderBody {
-  orderId: number;
-  status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
-}
-
-interface BasketItem {
   id: number;
+  productId?: number;
   name: string;
-  price: number;
-  category1?: string;
+  totalPrice: number;
+  unitPrice: number;
+  category?: string;
   quantity?: number;
 }
 
@@ -73,6 +32,7 @@ interface CreateOrderBody {
   billingAddress: Address;
   totalPrice: number;
   paidPrice: number;
+  baseTotalPrice?: number; // Taksitsiz toplam
   currency?: string;
   paymentMethod?: string;
   transactionId?: string;
@@ -81,6 +41,12 @@ interface CreateOrderBody {
   email?: string;
   paymentCard: any;
   buyer: any;
+  installment?: number; // Taksit sayısı
+}
+
+interface UpdateOrderBody {
+  orderId: number;
+  status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 }
 
 // Helper: mail gönder
@@ -107,12 +73,14 @@ export async function POST(req: NextRequest) {
       billingAddress,
       totalPrice,
       paidPrice,
+      baseTotalPrice,
       currency,
       paymentMethod,
       firstName,
       lastName,
       email,
       paymentCard,
+      installment = 1, // Varsayılan: tek çekim
     } = body;
 
     if (!userId || !basketItems || basketItems.length === 0) {
@@ -122,7 +90,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // --- Iyzipay uyumlu buyer objesi ---
+    // Buyer objesi
     const buyer = {
       id: body.buyer?.id?.toString() || userId.toString(),
       name: body.buyer?.buyerName || body.buyer?.name || "",
@@ -140,7 +108,7 @@ export async function POST(req: NextRequest) {
       ip: body.buyer?.ip || "127.0.0.1",
     };
 
-    // --- Iyzipay uyumlu shipping & billing adres ---
+    // Shipping & Billing adres
     const shipping = {
       contactName: `${buyer.name} ${buyer.surname}`.trim(),
       city: shippingAddress.city ?? "",
@@ -157,16 +125,16 @@ export async function POST(req: NextRequest) {
       zipCode: billingAddress.zip ?? billingAddress.zipCode ?? "",
     };
 
-    // --- Iyzipay uyumlu basketItems ---
+    // Basket items formatlama
     const basketItemsFormatted = basketItems.map((item) => ({
       id: item.id.toString(),
       name: item.name ?? "Ürün",
-      category1: item.category1 ?? "Kategori",
+      category1: item.category ?? "Kategori",
       itemType: "PHYSICAL",
-      price: Number(item.price).toFixed(2),
+      price: Number(item.totalPrice || item.unitPrice).toFixed(2),
     }));
 
-    // --- Iyzipay uyumlu paymentCard ---
+    // Payment card formatlama
     const paymentCardFormatted = {
       cardHolderName: paymentCard.cardHolderName,
       cardNumber: paymentCard.cardNumber,
@@ -175,7 +143,7 @@ export async function POST(req: NextRequest) {
       cvc: paymentCard.cvc,
     };
 
-    // --- Iyzipay payload ---
+    // Payment API payload (taksit bilgisi eklendi)
     const paymentPayload = {
       paymentCard: paymentCardFormatted,
       buyer,
@@ -184,15 +152,16 @@ export async function POST(req: NextRequest) {
       basketItems: basketItemsFormatted,
       currency: currency ?? "TRY",
       basketId: "B" + Date.now(),
+      installment: installment, // Taksit sayısı
     };
 
-    // --- Payment API çağrısı (APP ROUTER için düzeltildi) ---
-    // App Router'da internal API çağrısı için base URL oluştur
+    // Payment API çağrısı
     const protocol = req.headers.get("x-forwarded-proto") || "http";
     const host = req.headers.get("host") || "localhost:3000";
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`;
 
     console.log("🔄 Payment API çağrılıyor:", `${baseUrl}/api/payment`);
+    console.log("💳 Taksit sayısı:", installment);
 
     const paymentRes = await fetch(`${baseUrl}/api/payment`, {
       method: "POST",
@@ -202,7 +171,6 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(paymentPayload),
     });
 
-    // Response'u kontrol et
     if (!paymentRes.ok) {
       const errText = await paymentRes.text();
       console.error("❌ Payment API HTTP hatası:", paymentRes.status, errText);
@@ -218,7 +186,6 @@ export async function POST(req: NextRequest) {
     const paymentResult = await paymentRes.json();
     console.log("💳 Payment API response:", paymentResult);
 
-    // İyzipay başarı kontrolü
     if (!paymentResult || paymentResult.status !== "success") {
       console.error("❌ İyzipay ödeme hatası:", paymentResult);
       return NextResponse.json(
@@ -236,7 +203,7 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ Ödeme başarılı! Sipariş oluşturuluyor...");
 
-    // --- Ödeme başarılı, veritabanına kaydet ---
+    // Veritabanına kaydet
     const order = await prisma.order.create({
       data: {
         userId: Number(userId),
@@ -246,6 +213,7 @@ export async function POST(req: NextRequest) {
         currency: currency || "TRY",
         paymentMethod: paymentMethod || "iyzipay",
         transactionId: paymentResult?.paymentId || null,
+        installment: installment, // Taksit sayısı veritabanına kaydediliyor
         items: {
           create: basketItems.map((item) => ({
             product: {
@@ -296,9 +264,16 @@ export async function POST(req: NextRequest) {
         maximumFractionDigits: 2,
       });
 
-    // --- Mail Gönderimi ---
+    // Taksit bilgisini formatlama
+    const installmentText =
+      installment > 1 ? `${installment} Taksit` : "Tek Çekim";
+
+    const monthlyPayment =
+      installment > 1 ? (Number(totalPrice) / installment).toFixed(2) : null;
+
+    // Mail Gönderimi
     try {
-      // 1A. Müşteri onay maili
+      // Müşteri onay maili
       if (buyer.email) {
         await sendMail(
           [buyer.email],
@@ -308,13 +283,24 @@ Sayın ${firstName || ""} ${lastName || ""},
 
 **MODA PERDE** üzerinden vermiş olduğunuz **#${
             order.id
-          }** numaralı siparişiniz başarıyla oluşturulmuş ve ödemesi onaylanmıştır. Siparişiniz, en kısa sürede titizlikle hazırlanmaya başlanacaktır.
+          }** numaralı siparişiniz başarıyla oluşturulmuş ve ödemesi onaylanmıştır.
 
 **Sipariş Detayları:**
 * **Sipariş Numarası:** #${order.id}
 * **Sipariş Tarihi:** ${new Date().toLocaleDateString("tr-TR")}
+* **Ödeme Şekli:** ${installmentText}
+${
+  monthlyPayment
+    ? `* **Aylık Ödeme:** ${formatPrice(monthlyPayment)} ${currency}`
+    : ""
+}
 * **Toplam Tutar (KDV Dahil):** ${formatPrice(totalPrice)} ${currency || "TRY"}
 * **Ödenen Tutar (KDV Dahil):** ${formatPrice(paidPrice)} ${currency || "TRY"}
+${
+  baseTotalPrice && installment > 1
+    ? `* **Taksitsiz Tutar:** ${formatPrice(baseTotalPrice)} ${currency}`
+    : ""
+}
 * **Ödeme Yöntemi:** ${paymentMethod || "Kredi Kartı"}
 
 **Sipariş Edilen Ürünler:**
@@ -335,6 +321,14 @@ ${basketItems
 * **İl/İlçe:** ${shippingAddress.city} / ${shippingAddress.district}
 * **Telefon:** ${shippingAddress.phone}
 
+${
+  installment > 1
+    ? `\n**Taksit Bilgisi:**\nÖdemeniz ${installment} taksit olarak alınacaktır. Her ay ${formatPrice(
+        monthlyPayment
+      )} ${currency} tutarında ödeme kartınızdan çekilecektir.`
+    : ""
+}
+
 Siparişinizin tüm aşamaları hakkında e-posta ile bilgilendirileceksiniz.
 
 Bizi tercih ettiğiniz için teşekkür eder, iyi günler dileriz.
@@ -345,19 +339,25 @@ Saygılarımızla,
         );
       }
 
-      // 1B. Admin bilgilendirme maili
+      // Admin bilgilendirme maili
       await sendMail(
         ["balkoluxofficial@gmail.com"],
         `🔔 Yeni Sipariş Kaydı - Acil İşlem Gerekiyor: #${order.id}`,
         `
 Sayın Yönetici,
 
-Web sitesi üzerinden yeni bir sipariş başarıyla alınmış ve ödemesi onaylanmıştır. Aşağıdaki detaylara göre siparişin en kısa sürede işleme alınması gerekmektedir.
+Web sitesi üzerinden yeni bir sipariş başarıyla alınmış ve ödemesi onaylanmıştır.
 
 **Genel Sipariş Bilgileri:**
 * **Sipariş Numarası:** #${order.id}
 * **Müşteri ID:** ${userId}
 * **Müşteri E-posta:** ${buyer.email || "Belirtilmemiş"}
+* **Ödeme Şekli:** ${installmentText}
+${
+  monthlyPayment
+    ? `* **Aylık Ödeme:** ${formatPrice(monthlyPayment)} ${currency}`
+    : ""
+}
 * **Ödenen Tutar:** ${formatPrice(paidPrice)} ${currency || "TRY"}
 * **Ödeme Yöntemi:** ${paymentMethod || "Kredi Kartı"}
 
@@ -383,7 +383,6 @@ Lütfen siparişin detaylarını kontrol ederek üretim ve gönderim sürecini b
       );
     } catch (mailErr) {
       console.error("⚠️ Mail gönderimi sırasında hata:", mailErr);
-      // Ödeme ve sipariş başarılı ise mail hatası siparişi iptal etmez
     }
 
     return NextResponse.json({ status: "success", order, paymentResult });
@@ -456,10 +455,6 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
       },
     });
 
-    // Kullanıcı bilgilendirme maili
-    // ... (Veritabanı güncellemesi yapıldı)
-
-    // Durumların Türkçe karşılıkları
     const statusMap: { [key in UpdateOrderBody["status"]]: string } = {
       pending: "Beklemede",
       paid: "Ödeme Alındı (Hazırlanıyor)",
@@ -470,14 +465,12 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
 
     const turkishStatus = statusMap[updatedOrder.status] || updatedOrder.status;
 
-    // 2A. Kullanıcı bilgilendirme maili
-    /* ... PATCH fonksiyonu içinde ... */
-    // 2A. Kullanıcı bilgilendirme maili (Güncellenmiş)
+    // Kullanıcı bilgilendirme maili
     if (updatedOrder.user?.email) {
       let specificNote = "";
       if (updatedOrder.status === "shipped") {
         specificNote =
-          "Siparişiniz kargo firmasına teslim edilmiştir. Takip numaranızı e-postanıza ekleyerek [Takip Bağlantısı] üzerinden güncel durumu izleyebilirsiniz."; // Eğer takip no eklenebilirse daha iyi olur.
+          "Siparişiniz kargo firmasına teslim edilmiştir. Takip numaranızı e-postanıza ekleyerek güncel durumu izleyebilirsiniz.";
       } else if (updatedOrder.status === "delivered") {
         specificNote =
           "Siparişiniz başarıyla adresinize teslim edilmiştir. Ürünlerimizle ilgili deneyiminizi bizimle paylaşmanız bizi mutlu edecektir.";
@@ -486,7 +479,7 @@ export async function PATCH(req: NextRequest): Promise<NextResponse> {
           "Talebiniz üzerine veya operasyonel bir nedenle siparişiniz iptal edilmiştir. Geri ödeme süreciniz bankanıza bağlı olarak kısa süre içinde başlatılacaktır.";
       } else if (updatedOrder.status === "paid") {
         specificNote =
-          "Ödemeniz alınmış olup, siparişiniz hazırlanma aşamasına geçmiştir. Tahmini teslimat süreci hakkında bilgi almak için bizimle iletişime geçebilirsiniz.";
+          "Ödemeniz alınmış olup, siparişiniz hazırlanma aşamasına geçmiştir.";
       }
 
       const userMessage = `
@@ -500,11 +493,8 @@ ${specificNote ? `\n${specificNote}` : ""}
 
 Güncel sipariş bilgilerinizi web sitemizdeki hesabınız üzerinden de takip edebilirsiniz.
 
-Her türlü soru ve destek talebiniz için Müşteri Hizmetlerimiz ile iletişime geçebilirsiniz.
-
 Saygılarımızla,
 **MODA PERDE Ekibi**
-[Web Sitenizin Adresi veya İletişim Bilgileri]
 `;
 
       await sendMail(
@@ -513,21 +503,15 @@ Saygılarımızla,
         userMessage
       );
     }
-    /* ... */
 
-    // 2B. Admin bilgilendirme maili
-    /* ... PATCH fonksiyonu içinde ... */
-    // 2B. Admin bilgilendirme maili (Güncellenmiş)
+    // Admin bilgilendirme maili
     const adminMessage = `
 **#${
       updatedOrder.id
     }** numaralı siparişin durumu başarılı bir şekilde güncellenmiştir.
 
 **Yeni Durum:** **${turkishStatus}** (${updatedOrder.status})
-**Güncelleyen Kullanıcı/Sistem:** Admin Panel / Otomatik Sistem
 **Güncelleme Zamanı:** ${new Date().toLocaleString("tr-TR")}
-
-Gerekli operasyonel adımların tamamlandığından emin olunuz.
 `;
 
     await sendMail(
@@ -535,7 +519,7 @@ Gerekli operasyonel adımların tamamlandığından emin olunuz.
       `✅ Sipariş Durumu Değişikliği: #${updatedOrder.id}`,
       adminMessage
     );
-    /* ... */
+
     return NextResponse.json({ status: "success", order: updatedOrder });
   } catch (error: any) {
     console.error("Order PATCH Error:", error);

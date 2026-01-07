@@ -26,6 +26,7 @@ export default function Footer() {
         { label: "İletişim", href: "/contact" },
         { label: "Neden Biz", href: "/institutional/why_us" },
         { label: "Kargo Takip", href: "/track-order" },
+        { label: "Çerez Politikası", href: "/institutional/cookie_policy" },
       ],
     },
     alisveris: {
@@ -171,8 +172,6 @@ export default function Footer() {
             <div className="flex-1 text-[9px] uppercase tracking-[0.2em] text-stone-400">
               © {currentYear} BALKOLÜX.
             </div>
-
-            
 
             <div className="flex-1 flex justify-end">
               <Image
