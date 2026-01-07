@@ -8,13 +8,10 @@ import { FavoriteProvider } from "@/contexts/favoriteContext";
 import { Toaster } from "sonner";
 import CookieConsent from "@/components/layout/cookieConsent";
 
-// ⚡ Font Optimizasyonu - Preload + Display Swap
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
-  preload: true,
-  adjustFontFallback: true,
 });
 
 const playfairDisplay = Playfair_Display({
@@ -22,26 +19,28 @@ const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-playfair",
-  preload: true,
-  adjustFontFallback: true,
 });
 
+// ✅ SEO & Viewport Ayarları
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#1a1a1a",
+  themeColor: "#1a1a1a", // Lüks mobilya için daha koyu/sofistike bir ton
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://balkolux.com"),
+  metadataBase: new URL("https://balkolux.com"), // Domain adresinizi güncelleyin
+
   title: {
     default:
       "BalkoLüx | Lüks Bahçe ve Balkon Mobilyaları – Oturma Takımları, Salıncak ve Barbekü",
     template: "%s | BalkoLüx",
   },
+
   description:
     "BalkoLüx ile dış mekan yaşamınızı sanata dönüştürün. Premium bahçe oturma takımları, yemek masaları, lüks salıncaklar, şezlonglar ve profesyonel barbekü sistemleri. Uşak'ın dünyaya açılan mobilya markası.",
+
   keywords: [
     "bahçe mobilyası",
     "balkon mobilyaları",
@@ -59,9 +58,11 @@ export const metadata: Metadata = {
     "konforlu dış mekan",
     "bahçe dekorasyonu",
   ],
+
   authors: [{ name: "BalkoLüx" }],
   creator: "BalkoLüx",
   publisher: "BalkoLüx",
+
   openGraph: {
     type: "website",
     locale: "tr_TR",
@@ -79,6 +80,7 @@ export const metadata: Metadata = {
       },
     ],
   },
+
   twitter: {
     card: "summary_large_image",
     title: "BalkoLüx | Lüks Bahçe ve Balkon Mobilyaları",
@@ -86,9 +88,11 @@ export const metadata: Metadata = {
       "Bahçenize zarafet katan oturma grupları ve salıncak modelleri BalkoLüx'te.",
     images: ["/og-image.png"],
   },
+
   alternates: {
     canonical: "https://balkolux.com",
   },
+
   category: "furniture",
 };
 
@@ -97,6 +101,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // ✅ Yapılandırılmış Veri (JSON-LD) - Mobilya Mağazası Spesifik
   const storeJsonLd = {
     "@context": "https://schema.org",
     "@type": "FurnitureStore",
@@ -105,11 +110,11 @@ export default function RootLayout({
     url: "https://balkolux.com",
     logo: "https://balkolux.com/logo/og-image.png",
     image: "https://balkolux.com/og-image.png",
-    telephone: "+90-276-XXX-XXXX",
+    telephone: "+90-276-XXX-XXXX", // Uşak kodu ile güncelleyin
     email: "balkoluxofficial@gmail.com",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Mobilyacılar Sitesi No:XX",
+      streetAddress: "Mobilyacılar Sitesi No:XX", // Adresi güncelleyin
       addressLocality: "Uşak",
       addressRegion: "Uşak",
       postalCode: "64000",
@@ -135,7 +140,7 @@ export default function RootLayout({
         closes: "19:00",
       },
     ],
-    priceRange: "₺₺₺",
+    priceRange: "₺₺₺", // Premium segment olduğu için
   };
 
   return (
@@ -144,41 +149,10 @@ export default function RootLayout({
       className={`${playfairDisplay.variable} ${geistSans.variable}`}
     >
       <head>
-        {/* ⚡ Favicon - Optimize */}
-        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-        {/* ⚡ CRITICAL: Preconnect to External Domains */}
-        <link
-          rel="preconnect"
-          href="https://www.transparenttextures.com"
-          crossOrigin="anonymous"
-        />
-        <link rel="dns-prefetch" href="https://www.transparenttextures.com" />
-        <link
-          rel="preconnect"
-          href="https://res.cloudinary.com"
-          crossOrigin="anonymous"
-        />
-
-        {/* ⚡ Preload Critical Images (LCP) */}
-        <link
-          rel="preload"
-          as="image"
-          href="/heroes/1001.webp"
-          type="image/webp"
-          fetchPriority="high"
-        />
-
-        {/* ⚡ Preload Logo */}
-        <link
-          rel="preload"
-          as="image"
-          href="/logo/logo.webp"
-          type="image/webp"
-        />
-
-        {/* JSON-LD */}
+        {/* JSON-LD Verileri */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
@@ -190,6 +164,7 @@ export default function RootLayout({
         <CartProvider>
           <FavoriteProvider>
             <ClientLayoutWrapper>
+              {/* Sayfa içeriği burada render edilir */}
               <main className="min-h-screen font-sans">
                 {children}
                 <CookieConsent />
@@ -205,20 +180,29 @@ export default function RootLayout({
                 style: {
                   borderRadius: "0px",
                   padding: "14px 26px",
+
+                  // Glass surface
                   background:
                     "linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.65))",
                   backdropFilter: "blur(16px) saturate(180%)",
                   WebkitBackdropFilter: "blur(16px) saturate(180%)",
+
                   color: "#111111",
+
+                  /* 🔥 ÇERÇEVEYİ TAMAMEN KALDIR */
                   border: "none",
                   outline: "none",
+
+                  /* Hafif derinlik (kenar yok) */
                   boxShadow:
                     "0 8px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.5)",
+
                   fontFamily: "var(--font-geist-sans), sans-serif",
                   fontSize: "12px",
                   fontWeight: "500",
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
+
                   minWidth: "260px",
                   lineHeight: "1.6",
                 },

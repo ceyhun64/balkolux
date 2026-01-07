@@ -1,31 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, memo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { Heart, User, X, Search, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import dynamic from "next/dynamic";
 
-// ⚡ Lazy Load - Ağır Componentleri Dinamik Yükle
-const CartDropdown = dynamic(() => import("./cartDropdown"), {
-  loading: () => <div className="w-8 h-8" />,
-});
-
-const CollectionMegaMenu = dynamic(() => import("./collectionMegaMenu"), {
-  loading: () => null,
-});
-
-const UserMegaMenu = dynamic(() => import("./userMegaMenu"), {
-  loading: () => null,
-});
-
-const MobileNavSheet = dynamic(() => import("./mobileNavSheet"), {
-  loading: () => null,
-});
-
+import CartDropdown from "./cartDropdown";
 import { useFavorite } from "@/contexts/favoriteContext";
+import MobileNavSheet from "./mobileNavSheet";
+import CollectionMegaMenu from "./collectionMegaMenu";
+import UserMegaMenu from "./userMegaMenu";
 
 interface Product {
   id: number;
@@ -35,53 +21,7 @@ interface Product {
   category: string;
 }
 
-// ⚡ Memo ile gereksiz re-render'ları önle
-const SearchResult = memo(function SearchResult({
-  product,
-  onClose,
-}: {
-  product: Product;
-  onClose: () => void;
-}) {
-  return (
-    <Link
-      href={`/products/${product.id}`}
-      className="flex items-center gap-4 px-5 py-4 hover:bg-white/5 transition-all border-b border-white/5 group"
-      onClick={onClose}
-    >
-      <div className="relative aspect-square w-23 h-16 bg-white overflow-hidden shrink-0">
-        <Image
-          src={product.mainImage}
-          alt={product.title}
-          fill
-          sizes="80px"
-          className="object-contain group-hover:scale-110 transition-transform duration-500"
-        />
-      </div>
-
-      <div className="flex flex-col min-w-0 gap-0.5">
-        <p className="text-[11px] text-white/40 uppercase tracking-[0.1em] font-medium">
-          {product.category}
-        </p>
-        <p className="text-[13px] text-white font-light group-hover:text-stone-300 transition-colors truncate">
-          {product.title}
-        </p>
-        <p className="text-[12px] text-white/60 mt-1">
-          {product.price.toLocaleString("tr-TR", {
-            style: "currency",
-            currency: "TRY",
-          })}
-        </p>
-      </div>
-
-      <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-        <ChevronRight size={14} className="text-white/30" />
-      </div>
-    </Link>
-  );
-});
-
-function Navbar() {
+export default function Navbar() {
   const pathname = usePathname() || "/";
   const isHomePage = pathname === "/";
 
@@ -111,50 +51,37 @@ function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<{ name?: string; email?: string } | null>(
+    null
+  );
 
   const { favorites } = useFavorite();
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // ⚡ Ürünleri bir kere fetch et
   useEffect(() => {
-    let isMounted = true;
-
     const fetchProducts = async () => {
       try {
         setIsLoadingProducts(true);
         const res = await fetch("/api/products");
-        if (!res.ok || !isMounted) return;
-
+        if (!res.ok) throw new Error();
         const data = await res.json();
-        if (isMounted) {
-          setProducts(data.products || []);
-        }
+        setProducts(data.products || []);
       } catch (error) {
         console.error(error);
       } finally {
-        if (isMounted) {
-          setIsLoadingProducts(false);
-        }
+        setIsLoadingProducts(false);
       }
     };
-
     fetchProducts();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
-  // ⚡ Optimize edilmiş arama - useMemo ile
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return [];
-    const query = searchQuery.toLowerCase();
     return products
-      .filter((p) => p.title.toLowerCase().includes(query))
+      .filter((p) => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
       .slice(0, 6);
   }, [searchQuery, products]);
 
-  // ⚡ Click outside - Passive event listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -164,35 +91,15 @@ function Navbar() {
         setSearchOpen(false);
       }
     };
-
-    document.addEventListener("mousedown", handleClickOutside, {
-      passive: true,
-    });
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ⚡ Scroll - Throttled
   useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 20);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleSearchClose = () => {
-    setSearchOpen(false);
-    setSearchQuery("");
-  };
 
   const getNavbarBg = () => {
     if (scrolled) return "bg-zinc-950/30 backdrop-blur-2xl py-3 shadow-lg";
@@ -207,9 +114,9 @@ function Navbar() {
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-in-out text-white ${getNavbarBg()}`}
       >
         <div className="max-w-[1600px] mx-auto px-4 md:px-12">
-          {/* ÜST SATIR */}
+          {/* ÜST SATIR: Hamburger - Logo - İkonlar */}
           <div className="flex items-center justify-between">
-            {/* SOL: Hamburger */}
+            {/* SOL: Hamburger (Menü Butonu) */}
             <div className="flex items-center flex-1">
               <button
                 onClick={() => setCollectionOpen(!collectionOpen)}
@@ -248,7 +155,7 @@ function Navbar() {
               </button>
             </div>
 
-            {/* ORTA: Logo */}
+            {/* ORTA: Logo (Mobilde sola kaydırılmış) */}
             <div className="flex-none flex justify-start md:justify-center -ml-18 md:ml-0 mb-4">
               <Link
                 href="/"
@@ -259,16 +166,16 @@ function Navbar() {
                   alt="balkolux"
                   width={90}
                   height={32}
-                  sizes="(max-width: 768px) 90px, 180px"
                   className="brightness-0 invert object-contain md:w-[180px] md:h-[64px]"
                   priority
                 />
               </Link>
             </div>
 
-            {/* SAĞ: Arama & İkonlar */}
+            {/* SAĞ: Arama (Desktop) & İkonlar */}
             <div className="flex items-center justify-end gap-1 md:gap-5 flex-1 md:flex-1">
-              {/* DESKTOP ARAMA */}
+              {/* DESKTOP ARAMA (Sadece MD ve üzeri) */}
+              {/* DESKTOP ARAMA (Sadece MD ve üzeri) */}
               <div
                 ref={searchRef}
                 className="relative hidden md:flex items-center"
@@ -277,7 +184,7 @@ function Navbar() {
                   <motion.div
                     initial={false}
                     animate={{
-                      width: searchOpen ? 300 : 0,
+                      width: searchOpen ? 300 : 0, // Genişliği biraz artırdık
                       opacity: searchOpen ? 1 : 0,
                     }}
                     transition={{ type: "spring", stiffness: 220, damping: 28 }}
@@ -313,7 +220,7 @@ function Navbar() {
                   </button>
                 </div>
 
-                {/* Desktop Sonuçlar */}
+                {/* Desktop Sonuçlar Popover - MOBİL STİLİNE UYARLANDI */}
                 <AnimatePresence>
                   {searchOpen && searchQuery && (
                     <motion.div
@@ -329,15 +236,53 @@ function Navbar() {
                       ) : filteredProducts.length > 0 ? (
                         <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
                           {filteredProducts.map((product) => (
-                            <SearchResult
+                            <Link
                               key={product.id}
-                              product={product}
-                              onClose={handleSearchClose}
-                            />
+                              href={`/products/${product.id}`}
+                              className="flex items-center gap-4 px-5 py-4 hover:bg-white/5 transition-all border-b border-white/5 group"
+                              onClick={() => {
+                                setSearchOpen(false);
+                                setSearchQuery("");
+                              }}
+                            >
+                              {/* Ürün Görseli - Mobil Stili gibi kare/dikdörtgen temiz yapı */}
+                              <div className="relative aspect-square w-23 h-16 bg-white overflow-hidden shrink-0">
+                                <Image
+                                  src={product.mainImage}
+                                  alt={product.title}
+                                  fill
+                                  className="object-contain group-hover:scale-110 transition-transform duration-500"
+                                />
+                              </div>
+
+                              {/* Ürün Detayları */}
+                              <div className="flex flex-col min-w-0 gap-0.5">
+                                <p className="text-[11px] text-white/40 uppercase tracking-[0.1em] font-medium">
+                                  {product.category}
+                                </p>
+                                <p className="text-[13px] text-white font-light group-hover:text-stone-300 transition-colors truncate">
+                                  {product.title}
+                                </p>
+                                <p className="text-[12px] text-white/60 mt-1">
+                                  {product.price.toLocaleString("tr-TR", {
+                                    style: "currency",
+                                    currency: "TRY",
+                                  })}
+                                </p>
+                              </div>
+
+                              <div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ChevronRight
+                                  size={14}
+                                  className="text-white/30"
+                                />
+                              </div>
+                            </Link>
                           ))}
 
+                          {/* Alt Bilgi */}
                           <div className="p-4 bg-white/5 text-center">
-                            <Link href="/products">
+                            <Link href={`/products`}>
                               <button className="text-[9px] uppercase tracking-[0.3em] text-white/40 hover:text-white transition-colors">
                                 Tüm Sonuçları Gör
                               </button>
@@ -390,28 +335,43 @@ function Navbar() {
             </div>
           </div>
 
-          {/* ALT SATIR: Mobil Arama */}
+          {/* ALT SATIR: Mobil Arama Çubuğu (Sadece MD Altı) */}
           <div className="mt-1 md:hidden">
             <div className="relative flex items-center h-10 bg-white/10 backdrop-blur-md px-3 rounded-sm">
-              <Search size={16} className="text-white/40 mr-2" />
+              <Search
+                size={16}
+                className="text-white/40 mr-2"
+                aria-hidden="true"
+              />
+
               <input
                 type="text"
                 placeholder="Ürün veya koleksiyon ara..."
+                aria-label="Ürün veya koleksiyon ara"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setSearchOpen(true)}
                 className="w-full bg-transparent text-[13px] text-white placeholder:text-white/30 focus:outline-none"
               />
+
               {searchQuery && (
                 <X
                   size={14}
                   className="text-white/40 cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Arama metnini temizle"
                   onClick={() => setSearchQuery("")}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      setSearchQuery("");
+                    }
+                  }}
                 />
               )}
             </div>
 
-            {/* Mobil Sonuçlar */}
+            {/* Mobil Arama Sonuçları */}
             <AnimatePresence>
               {searchOpen && searchQuery && (
                 <motion.div
@@ -430,7 +390,10 @@ function Navbar() {
                         <Link
                           key={product.id}
                           href={`/products/${product.id}`}
-                          onClick={handleSearchClose}
+                          onClick={() => {
+                            setSearchOpen(false);
+                            setSearchQuery("");
+                          }}
                           className="flex items-center gap-3 p-3 border-b border-white/5 active:bg-white/10"
                         >
                           <div className="relative h-full w-1/5 p-4">
@@ -438,7 +401,6 @@ function Navbar() {
                               src={product.mainImage}
                               alt={product.title}
                               fill
-                              sizes="60px"
                               className="object-contain bg-white"
                             />
                           </div>
@@ -465,32 +427,21 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* Menü Bileşenleri - Lazy Loaded */}
-      {collectionOpen && (
-        <CollectionMegaMenu
-          collectionOpen={collectionOpen}
-          setCollectionOpen={setCollectionOpen}
-          collectionLink={collectionLink}
-        />
-      )}
-
-      {userMenuOpen && (
-        <UserMegaMenu
-          userMenuOpen={userMenuOpen}
-          setUserMenuOpen={setUserMenuOpen}
-        />
-      )}
-
-      {mobileOpen && (
-        <MobileNavSheet
-          isOpen={mobileOpen}
-          onClose={() => setMobileOpen(false)}
-          links={[]}
-        />
-      )}
+      {/* Menü Bileşenleri */}
+      <CollectionMegaMenu
+        collectionOpen={collectionOpen}
+        setCollectionOpen={setCollectionOpen}
+        collectionLink={collectionLink}
+      />
+      <UserMegaMenu
+        userMenuOpen={userMenuOpen}
+        setUserMenuOpen={setUserMenuOpen}
+      />
+      <MobileNavSheet
+        isOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        links={[]}
+      />
     </>
   );
 }
-
-// ⚡ Export memo ile optimize et
-export default memo(Navbar);

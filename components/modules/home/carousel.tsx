@@ -51,7 +51,7 @@ export default function HeroSection() {
 
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden">
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         <motion.div
           key={current}
           initial={{ opacity: 0 }}
@@ -60,31 +60,26 @@ export default function HeroSection() {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          {/* ⚡ Optimize Edilmiş Görsel - Priority + Sizes */}
+          {/* Arka Plan Görseli - Kenarlarda hafif vinyet ile */}
           <div className="relative w-full h-full">
             <Image
               src={heroes[current].image}
               alt={heroes[current].title}
               fill
-              priority={current === 0} // İlk görsel için priority
-              quality={85} // Kalite optimizasyonu
-              sizes="100vw" // Responsive sizing
-              className="object-cover"
-              placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+              className="object-cover scale-105 animate-subtle-zoom"
+              priority
             />
-
-            {/* Minimal Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
+            {/* Minimal Overlay: Sadece metnin okunabilirliği için soft bir geçiş */}
+            <div className="absolute inset-0 bg-black/10" />
           </div>
 
-          {/* İçerik Alanı - Will-change ve Transform ile optimize */}
+          {/* İçerik Alanı */}
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
             <motion.span
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-white text-[10px] md:text-xs tracking-[0.5em] uppercase mb-6 font-medium will-change-transform"
+              className="text-white text-[10px] md:text-xs tracking-[0.5em] uppercase mb-6 font-medium"
             >
               {heroes[current].subtitle}
             </motion.span>
@@ -93,7 +88,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-white text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight leading-[1.1] max-w-4xl mb-12 will-change-transform"
+              className="text-white text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight leading-[1.1] max-w-4xl mb-12"
             >
               {heroes[current].title.split(" ").map((word, i) => (
                 <span key={i} className={i === 1 ? "font-normal italic" : ""}>
@@ -106,7 +101,6 @@ export default function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8, duration: 1 }}
-              className="will-change-transform"
             >
               <Link
                 href={heroes[current].href}
@@ -124,7 +118,7 @@ export default function HeroSection() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Progress Bar - GPU Accelerated */}
+      {/* Modern Progress Bar Navigasyon */}
       <div className="absolute bottom-12 left-0 right-0 flex justify-center items-center gap-8 z-20">
         {heroes.map((_, i) => (
           <button
@@ -133,7 +127,7 @@ export default function HeroSection() {
             className="group relative py-4"
           >
             <div
-              className={`h-[1px] transition-all duration-700 will-change-transform ${
+              className={`h-[1px] transition-all duration-700 ${
                 current === i
                   ? "w-16 bg-white"
                   : "w-8 bg-white/30 group-hover:bg-white/60"
@@ -151,6 +145,20 @@ export default function HeroSection() {
           </button>
         ))}
       </div>
+
+      <style jsx global>{`
+        @keyframes subtle-zoom {
+          from {
+            transform: scale(1);
+          }
+          to {
+            transform: scale(1.1);
+          }
+        }
+        .animate-subtle-zoom {
+          animation: subtle-zoom 20s infinite alternate ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }
