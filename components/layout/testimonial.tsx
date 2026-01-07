@@ -120,7 +120,7 @@ const Testimonials: React.FC = () => {
                       <span className="text-[13px] font-bold text-stone-900 tracking-widest uppercase">
                         {t.name}
                       </span>
-                      <span className="text-[10px] text-stone-400 font-medium tracking-[0.2em] uppercase mt-1">
+                      <span className="text-[10px] text-stone-500 font-medium tracking-[0.2em] uppercase mt-1">
                         {t.role}
                       </span>
                     </div>
