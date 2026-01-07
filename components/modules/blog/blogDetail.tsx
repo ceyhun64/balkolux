@@ -131,7 +131,7 @@ export default function BlogDetailPage() {
               Yazar
             </span>
             <span className="text-sm font-medium tracking-tight">
-              Moda Perde Tasarım Ekibi
+              BalkoLüx Tasarım Ekibi
             </span>
           </div>
           <Link

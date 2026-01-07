@@ -1,150 +1,171 @@
 "use client";
 
 import React from "react";
-import { Phone, Globe, CircleCheck } from "lucide-react";
-import Image from "next/image"; // Image bileşenini import ediyoruz
+import { motion } from "framer-motion";
+import { Plus, ArrowRight, Instagram, Phone } from "lucide-react";
+import Image from "next/image";
 
 export default function WhyChooseUsPage() {
   const advantages = [
     {
-      title: "Üreticiden Tüketiciye Doğrudan Satış",
+      id: "01",
+      title: "Atölyeden Doğrudan",
       description:
-        "Aracı yok, ekstra maliyet yok! Ürünlerimizi kendi fabrikamızda üretiyor, son kullanıcıya doğrudan ulaştırıyoruz. Hem kaliteyi garanti ediyor hem de en uygun fiyatlarla perde sahibi olmanızı sağlıyoruz.",
+        "Aracıları ortadan kaldıran şeffaf üretim süreciyle, zanaatkarlığı fabrikadan balkonunuza taşıyoruz.",
     },
     {
-      title: "Yüksek Kalite Standartları",
+      id: "02",
+      title: "Dört Mevsim Formu",
       description:
-        '"Her plise NowArt kalitesinde değildir." Sloganımız sadece bir söz değil, üretim felsefemizdir. Kullanılan kumaşlardan mekanizmalara kadar her bileşen özenle seçilir ve kalite kontrol testlerinden geçirilir.',
+        "UV korumalı dokular ve paslanmaz iskeletler ile estetiği doğa şartlarına karşı koruyoruz.",
     },
     {
-      title: "Ölçüye Özel Üretim",
+      id: "03",
+      title: "Antropometrik Konfor",
       description:
-        "Her pencere farklıdır; bu nedenle her perde de özel olmalıdır. Standart ölçülerle değil, yaşam alanınıza tam uyum sağlayan ölçülerle üretim yapıyoruz. Cam balkon, salon, çocuk odası, ofis veya farklı alanlara özel ölçü alım desteği sağlıyoruz.",
+        "Vücut ergonomisine uyumlu eğimler ve yüksek yoğunluklu minderler ile konforu standartlaştırıyoruz.",
     },
     {
-      title: "Geniş Ürün Yelpazesi",
+      id: "04",
+      title: "Sürdürülebilir Tercihler",
       description:
-        "Plise perdeden zebralara, storlardan fonlara kadar onlarca farklı model ve renk seçeneği sunuyoruz. Her zevke, her dekorasyona, her ihtiyaca özel perde çözümleriyle yanınızdayız.",
-    },
-    {
-      title: "Estetik & Fonksiyonelliği Bir Arada Sunuyoruz",
-      description:
-        "Perdelerimiz sadece şık değil, aynı zamanda kullanışlıdır. Güneş ışığını kontrol etme, ısı yalıtımı sağlama, pratik kullanım gibi özellikler sayesinde yaşam konforunuzu artırır.",
-    },
-    {
-      title: "Hızlı ve Güvenli Teslimat",
-      description:
-        "Üretimden montaja kadar tüm süreci titizlikle yönetiyoruz. Sipariş sonrası süreçlerimiz şeffaftır. Ürünleriniz, zarar görmeyecek şekilde özenle paketlenerek adresinize zamanında teslim edilir.",
-    },
-    {
-      title: "Müşteri Memnuniyeti Odaklı Hizmet",
-      description:
-        "Müşterilerimizin memnuniyeti bizim en büyük referansımızdır. Satış öncesi ve sonrası süreçlerde her zaman ulaşılabilir bir ekip sizi karşılar.",
-    },
-    {
-      title: "Kurumsal Güvence",
-      description:
-        "Şanlıurfa Haliliye bulunan fabrikamızda üretim yapan köklü bir firmayız. Tescilli markamız, belgelenmiş kalite sistemlerimiz ve profesyonel kadromuzla size güven veriyoruz.",
-    },
-    {
-      title: "Instagram’dan Gerçek Proje Paylaşımları",
-      description:
-        "Instagram hesaplarımızda (@NowArtperde ve @NowArt.tekstil) üretimden montaja kadar tüm süreçleri şeffaf şekilde paylaşıyoruz. Gerçek projeleri ve müşteri yorumlarını görebilirsiniz.",
-    },
-    {
-      title: "Uygun Fiyat Politikası & Kampanyalar",
-      description:
-        "Kaliteli perde herkesin hakkı! Dönemsel kampanyalar ve özel fiyat avantajları sunuyoruz. Açılışa özel plise perde fiyatlarımız KDV dahil 350 TL’den başlamaktadır.",
+        "Sertifikalı iroko ahşabı ve geri dönüştürülebilir bileşenler ile doğaya olan borcumuzu ödüyoruz.",
     },
   ];
 
-  // Kullanmak istediğiniz belirli görsel yollarını belirliyoruz
-  const image1 = "/heroes/10.webp"; // İlk görsel
-  const image2 = "/heroes/20.webp"; // İkinci görsel
-
-  // Bir görsel bileşeni oluşturma helper'ı (Önceki koddan)
-  const ImageBlock = ({ src, alt }: { src: string; alt: string }) => (
-    <div className="my-8 rounded-xs overflow-hidden shadow-xl border border-gray-100">
-      <Image
-        src={src}
-        alt={alt}
-        width={1200} // Maksimum genişlik
-        height={500} // Oranları korumak için tahmini yükseklik
-        className="w-full h-auto object-cover"
-        priority={false}
-      />
-    </div>
-  );
-
   return (
-    <div className="max-w-7xl mx-auto px-6 py-16 space-y-16 font-sans">
-      {/* Başlık */}
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold text-gray-900">
-          Neden Bizi Tercih Etmelisiniz?
-        </h1>
-        <p className="text-gray-500">NowArt - 22 Nisan 2025</p>
-      </div>
+    <div className="bg-[#FCFBFA] text-[#1a1a1a] font-light selection:bg-emerald-100">
+      {/* 1. Hero Bölümü: Saf Minimalizm */}
+      <section className="max-w-7xl mx-auto px-6 pt-32 pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-3xl"
+        >
+          <span className="text-[10px] tracking-[0.4em] uppercase text-emerald-700 font-semibold mb-6 block">
+            Küratörlük & Zanaat
+          </span>
+          <h1 className="text-5xl md:text-7xl font-extralight tracking-tighter leading-[1.1] mb-8">
+            Dış mekanı <br />
+            <span className="italic serif text-stone-400">yeniden</span> hayal
+            edin.
+          </h1>
+          <p className="text-lg text-stone-500 max-w-xl leading-relaxed">
+            BalkoLüx, bahçe ve balkonları sadece birer alan değil; sessizliğin,
+            kahkahaların ve anıların merkezine dönüştüren bir tasarım
+            stüdyosudur.
+          </p>
+        </motion.div>
+      </section>
 
-      {/* Tanıtım */}
-      <div className="space-y-6 text-gray-700 leading-relaxed">
-        <p>
-          Perde bir evin veya iş yerinin sadece dekorasyon parçası değil, aynı
-          zamanda mahremiyetin, konforun ve şıklığın tamamlayıcısıdır. Biz,
-          NowArt Mekanik Perde Sistemleri olarak bu bakış açısıyla üretim
-          yapıyor, müşterilerimize sadece ürün değil; memnuniyet, güven ve
-          kalite sunuyoruz.
-        </p>
-        {/* Görsel 1'i buraya ekliyoruz */}
-        <ImageBlock src={image1} alt="Neden NowArt" />
-        <p>
-          Sizi neden NowArt’i tercih eden binlerce mutlu müşterinin arasına
-          bekliyoruz? İşte cevabı:
-        </p>
-      </div>
+      {/* 2. Büyük Görsel: Sinematik Etki */}
+      <section className="px-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1 }}
+          className="max-w-7xl mx-auto h-[70vh] relative overflow-hidden rounded-[2px]"
+        >
+          <Image
+            src="/why_us/1.webp"
+            alt="Minimalist Dış Mekan"
+            fill
+            className="object-cover duration-1000 ease-in-out"
+          />
+        </motion.div>
+      </section>
 
-      {/* Avantajlar Listesi */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {advantages.map((adv, idx) => (
-          <div
-            key={idx}
-            className="bg-gray-50 p-4 rounded-xs shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow"
-          >
-            <CircleCheck className="text-[#92e676] w-6 h-6 mt-1 flex-shrink-0" />
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800">
+      {/* 3. Avantajlar: Dergi Düzeni (Grid) */}
+      <section className="max-w-7xl mx-auto px-6 py-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-20">
+          {advantages.map((adv) => (
+            <motion.div
+              key={adv.id}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="space-y-6 group"
+            >
+              <span className="text-xs font-mono text-stone-300 block mb-4 group-hover:text-emerald-600 transition-colors">
+                // {adv.id}
+              </span>
+              <h3 className="text-xl font-normal tracking-tight border-b border-stone-100 pb-4">
                 {adv.title}
               </h3>
-              <p className="text-gray-700 text-sm mt-1">{adv.description}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+              <p className="text-sm text-stone-500 leading-relaxed font-light">
+                {adv.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
-      {/* Görsel 2'yi avantajlar listesinden sonra ekliyoruz */}
-      <ImageBlock src={image2} alt="NowArt farkı" />
-
-      {/* İletişim */}
-      <div className="bg-blue-50 p-8 rounded-xs shadow-lg space-y-4 border border-blue-200">
-        <h2 className="text-2xl font-bold text-blue-900 mb-4">
-          Biz Hazırız, Ya Siz?
-        </h2>
-        <p className="text-indigo-900">
-          NowArt ailesi olarak, yaşam alanlarınızı daha şık, konforlu ve
-          işlevsel hale getirmek için buradayız. Kaliteyi yakından görmek ve
-          doğru perdeyle tanışmak için siz de bizimle iletişime geçin.
-        </p>
-        <div className="space-y-2 text-indigo-900">
-          <div className="flex items-center gap-3">
-            <Phone className="w-5 h-5 text-[#92e676]" />
-            <span> +90 546 225 56 59</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Globe className="w-5 h-5 text-[#92e676]" />
-            <span> nowartplicell.com</span>
+      {/* 4. İkinci Görsel Blok: Asimetrik Yerleşim */}
+      <section className="max-w-7xl mx-auto px-6 pb-32 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+        <div className="md:col-span-7 relative h-[500px] rounded-sm overflow-hidden">
+          <Image
+            src="/why_us/2.webp"
+            alt="Detay Tasarımı"
+            fill
+            className="object-cover"
+          />
+        </div>
+        <div className="md:col-span-5 space-y-8 md:pl-12">
+          <h2 className="text-3xl font-extralight leading-snug">
+            Her detayın bir <br /> <span className="italic">anlamı</span> var.
+          </h2>
+          <p className="text-stone-500 text-sm leading-relaxed">
+            Bizim için tasarım; en küçük dikişten, en büyük iskelete kadar
+            uzanan bütünsel bir disiplindir. Ham maddeyi estetikle, estetiği
+            konforla birleştiriyoruz.
+          </p>
+          <div className="flex gap-4">
+            <Instagram className="w-5 h-5 text-stone-300 hover:text-emerald-600 cursor-pointer transition-colors" />
+            <span className="text-[10px] uppercase tracking-widest text-stone-400">
+              @balkolux_design
+            </span>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* 5. Minimal Footer / CTA */}
+      <footer className="bg-white border-t border-stone-100 py-24 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+          <div className="space-y-2 text-center md:text-left">
+            <h4 className="text-[10px] tracking-[0.5em] uppercase text-stone-400">
+              İletişime Geçin
+            </h4>
+            <p className="text-2xl font-extralight tracking-tighter">
+              Yeni bir hikayeye başlayalım.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-8">
+            <a
+              href="tel:905462255659"
+              className="group flex items-center gap-3"
+            >
+              <div className="w-12 h-12 rounded-full border border-stone-100 flex items-center justify-center group-hover:border-emerald-600 transition-all">
+                <Phone className="w-4 h-4 text-stone-400 group-hover:text-emerald-600" />
+              </div>
+              <span className="text-sm font-medium tracking-tight">
+                +90 546 225 56 59
+              </span>
+            </a>
+
+            <a
+              href="https://balkolux.com"
+              className="group flex items-center gap-3 bg-[#1a1a1a] text-white px-8 py-4 rounded-full hover:bg-emerald-800 transition-all"
+            >
+              <span className="text-xs uppercase tracking-[0.2em] font-bold">
+                Koleksiyonu Keşfet
+              </span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

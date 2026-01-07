@@ -3,16 +3,11 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  note?: string;
-  profile?: string;
-  width?: number;
-  height?: number;
-  m2?: number;
-  device?: string;
   product: {
     title: string;
     mainImage: string;
     category: string;
+    description: string;
   };
 }
 
@@ -45,4 +40,6 @@ export interface FormattedOrder {
   updatedAt: string;
   items: OrderItem[];
   addresses: Address[];
+  currency: string;
+  installment?: number;
 }

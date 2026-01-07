@@ -122,7 +122,7 @@ export default function MobileNavSheet({
               <div className="relative w-18 h-12">
                 <Image
                   src="/logo/logo.webp"
-                  alt="Moda Perde 6"
+                  alt="BalkoLüx"
                   fill
                   quality={100}
                   className="object-contain"
@@ -163,7 +163,7 @@ export default function MobileNavSheet({
           </p>
           {/* Sosyal medya/ek bağlantılar buraya eklenebilir */}
           <div className="mt-2 text-xs text-zinc-400">
-            © 2025 Moda Perde. Tüm hakları saklıdır.
+            © 2025 BalkoLüx. Tüm hakları saklıdır.
           </div>
         </SheetFooter>
       </SheetContent>

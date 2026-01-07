@@ -204,7 +204,7 @@ export default function AdminDashboard() {
         <div className="grid gap-4 mb-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {kpiData.map((card) => (
             <Link key={card.id} href={card.href}>
-              <Card className="bg-white border-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition-all duration-300 group rounded-2xl">
+              <Card className="bg-white py-3 border-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)] transition-all duration-300 group rounded-2xl">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                   <div
                     className={`p-2 rounded-xl bg-slate-50 ${card.color} group-hover:scale-110 transition-transform`}

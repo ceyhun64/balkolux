@@ -50,7 +50,7 @@ export async function POST(req: Request): Promise<Response> {
 
   <div style="background: #ffffff; border-radius: 16px; padding: 16px; display: inline-block; margin-bottom: 16px; box-shadow: 0 8px 28px rgba(0,0,0,0.10); position: relative; z-index: 1;">
     <img 
-      src="cid:modaperde-logo" 
+      src="cid:balkolux-logo" 
       alt="BalkoLüx Logo" 
       style="width: 110px; height: auto; display: block;"
     />
@@ -157,7 +157,7 @@ export async function POST(req: Request): Promise<Response> {
         {
           filename: "logo.webp", // Filename belirtilmeli ama görünmez
           path: "./public/logo/logo.webp",
-          cid: "modaperde-logo", // Content-ID ile gömülü kullanım
+          cid: "balkolux-logo", // Content-ID ile gömülü kullanım
           contentDisposition: "inline", // Inline olarak göm
         },
       ],

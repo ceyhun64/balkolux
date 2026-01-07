@@ -281,7 +281,7 @@ export async function POST(req: NextRequest) {
           `
 Sayın ${firstName || ""} ${lastName || ""},
 
-**MODA PERDE** üzerinden vermiş olduğunuz **#${
+**BALKOLÜX** üzerinden vermiş olduğunuz **#${
             order.id
           }** numaralı siparişiniz başarıyla oluşturulmuş ve ödemesi onaylanmıştır.
 
@@ -334,7 +334,7 @@ Siparişinizin tüm aşamaları hakkında e-posta ile bilgilendirileceksiniz.
 Bizi tercih ettiğiniz için teşekkür eder, iyi günler dileriz.
 
 Saygılarımızla, 
-**MODA PERDE Ekibi**
+**BALKOLÜX Ekibi**
 `
         );
       }
@@ -494,7 +494,7 @@ ${specificNote ? `\n${specificNote}` : ""}
 Güncel sipariş bilgilerinizi web sitemizdeki hesabınız üzerinden de takip edebilirsiniz.
 
 Saygılarımızla,
-**MODA PERDE Ekibi**
+**BALKOLÜX Ekibi**
 `;
 
       await sendMail(

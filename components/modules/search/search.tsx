@@ -175,7 +175,7 @@ export default function DefaultSearch() {
                 <div className="relative w-18 h-12 md:w-22 md:h-14 lg:w-26 lg:h-16">
                   <Image
                     src="/logo/logo.webp"
-                    alt="Moda Perde"
+                    alt="BalkoLüx"
                     fill
                     quality={100}
                     className="object-contain"
