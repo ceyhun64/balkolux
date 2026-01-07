@@ -105,7 +105,7 @@ export default function Footer() {
                 className="object-contain brightness-0 invert opacity-80"
               />
             </Link>
-            <p className="text-stone-500 text-[13px] leading-relaxed font-light max-w-[240px]">
+            <p className="text-stone-400 text-[13px] leading-relaxed font-light max-w-[240px]">
               Yaşam alanlarınıza lüks ve zarafet katan modern tasarımlar.
             </p>
 
@@ -138,7 +138,7 @@ export default function Footer() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="text-[13px] font-light text-stone-500 hover:text-white transition-colors duration-300"
+                        className="text-[13px] font-light text-stone-300 hover:text-white transition-colors duration-300"
                       >
                         {link.label}
                       </Link>

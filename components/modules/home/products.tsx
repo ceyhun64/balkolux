@@ -92,7 +92,7 @@ export default function Products() {
         {/* Footer Action - Industrial & Elegant */}
         <footer className="border-t border-stone-100 pt-16 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="space-y-1">
-            <p className="text-xs font-bold tracking-widest uppercase text-stone-400">
+            <p className="text-xs font-bold tracking-widest uppercase text-stone-600">
               Keşfetmeye Devam Et
             </p>
             <p className="text-stone-900 font-serif italic text-xl">

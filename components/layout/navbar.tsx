@@ -121,6 +121,7 @@ export default function Navbar() {
               <button
                 onClick={() => setCollectionOpen(!collectionOpen)}
                 className="group flex items-center gap-4 outline-none transition-opacity hover:opacity-70"
+                aria-label="hamburger menu"
               >
                 <div className="flex flex-col gap-1.5 items-start">
                   <motion.span

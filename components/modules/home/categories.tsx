@@ -42,7 +42,7 @@ export default function CategoriesSection() {
         {/* Başlık Alanı */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <div className="max-w-2xl">
-            <span className="text-[10px] tracking-[0.6em] text-neutral-400 font-semibold uppercase mb-4 block">
+            <span className="text-[10px] tracking-[0.6em] text-neutral-600 font-semibold uppercase mb-4 block">
               Dış Mekan Koleksiyonu 2026
             </span>
             <h2 className="text-4xl md:text-6xl font-light tracking-tight text-neutral-900 leading-[1.1]">

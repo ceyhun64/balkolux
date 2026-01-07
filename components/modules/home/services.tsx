@@ -39,7 +39,7 @@ const CardItem = ({ icon: Icon, title, desc, index }: any) => (
       <h3 className="text-[11px] font-bold text-stone-900 tracking-[0.4em] uppercase">
         {title}
       </h3>
-      <p className="text-[13px] text-stone-400 leading-relaxed font-light max-w-[220px]">
+      <p className="text-[13px] text-stone-600 leading-relaxed font-light max-w-[220px]">
         {desc}
       </p>
     </div>
@@ -64,7 +64,7 @@ export default function ShopServices() {
             <motion.span
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              className="text-[10px] tracking-[0.6em] text-stone-400 uppercase mb-6 block"
+              className="text-[10px] tracking-[0.6em] text-stone-600 uppercase mb-6 block"
             >
               BalkoLüx Standartları
             </motion.span>
@@ -75,7 +75,7 @@ export default function ShopServices() {
               mimari disiplinle buluşması.
             </h2>
           </div>
-          <p className="text-stone-400 font-light text-xs max-w-[240px] leading-relaxed italic">
+          <p className="text-stone-600 font-light text-xs max-w-[240px] leading-relaxed italic">
             "Sadece mobilya değil, açık havada geçen her anı daha değerli
             kılacak bir estetik anlayışı."
           </p>

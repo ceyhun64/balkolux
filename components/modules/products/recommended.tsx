@@ -135,7 +135,7 @@ export default function YeniUrunlerCarousel() {
 
           {/* Özel Tasarım Progress Bar */}
           <div className="mt-12 flex items-center justify-start px-4 gap-4">
-            <span className="text-[10px] font-mono text-stone-400">
+            <span className="text-[10px] font-mono text-stone-600">
               0{current + 1}
             </span>
             <div className="relative h-[2px] w-32 bg-stone-100 overflow-hidden">
@@ -146,7 +146,7 @@ export default function YeniUrunlerCarousel() {
                 style={{ scaleX: 1 / (products.length / 4) }}
               />
             </div>
-            <span className="text-[10px] font-mono text-stone-400">
+            <span className="text-[10px] font-mono text-stone-600">
               0{products.length}
             </span>
           </div>
