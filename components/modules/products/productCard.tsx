@@ -31,7 +31,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
   };
 
   return (
-    <div 
+    <div
       className="group relative w-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -39,27 +39,33 @@ export default function ProductCard({ product }: { product: ProductData }) {
       <Link href={`/products/${product.id}`}>
         {/* Ana Konteyner: 5/3 oranını burada sabitliyoruz */}
         <div className="relative aspect-[5/3] w-full overflow-hidden bg-white">
-          
           {/* Favori Butonu - z-index ile en üstte tutuyoruz */}
+          {/* Favori Butonu - DÜZELTİLDİ */}
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-4 right-4 z-20 transition-all duration-300"
-            aria-label="favori ürüne git"
+            className="absolute top-2 right-2 z-20 p-3 transition-all duration-300 group/fav"
+            /* p-3 ekleyerek tıklama alanını genişlettik (44px+ hedefi için) */
+            aria-label={`${product.title} ürününü favorilere ekle`}
           >
             <Heart
-              className={`h-5 w-5 ${favorited ? "fill-stone-800 text-stone-800" : "text-stone-400"}`}
+              className={`h-6 w-6 ${
+                // İkon boyutunu hafif artırmak tıklamayı kolaylaştırır
+                favorited ? "fill-stone-800 text-stone-800" : "text-stone-400"
+              } group-hover/fav:scale-110 transition-transform`}
               strokeWidth={1.2}
             />
           </button>
 
           {/* Animasyonlu Resim Alanı */}
-          <motion.div 
-            className="flex h-full w-[200%]" 
+          <motion.div
+            className="flex h-full w-[200%]"
             animate={{ x: isHovered && product.subImage ? "-50%" : "0%" }}
             transition={{ duration: 0.8, ease: [0.6, 0.01, -0.05, 0.95] }}
           >
             {/* İlk Resim */}
-            <div className="relative h-full w-1/2 p-2"> {/* p-2: Kenarlara çok yapışmaması için opsiyonel */}
+            <div className="relative h-full w-1/2 p-2">
+              {" "}
+              {/* p-2: Kenarlara çok yapışmaması için opsiyonel */}
               <Image
                 src={product.mainImage}
                 alt={product.title}
@@ -79,7 +85,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
               />
             </div>
           </motion.div>
-          
+
           {/* Quick Look Overlay */}
           <div className="absolute inset-0  opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center p-4 pointer-events-none">
             <div className="bg-white/95 backdrop-blur-sm w-full py-3 text-center text-[10px] font-bold tracking-[0.2em] uppercase text-stone-900 border border-stone-100 shadow-sm">
@@ -91,7 +97,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
         {/* İçerik Alanı */}
         <div className="py-5 flex flex-col items-start space-y-1.5">
           <div className="flex justify-between items-start w-full">
-            <span className="text-[9px] uppercase tracking-[0.4em] text-stone-400 font-bold">
+            <span className="text-[9px] uppercase tracking-[0.4em] text-stone-600 font-bold">
               {product.category}
             </span>
             {discount > 0 && (
@@ -100,7 +106,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
               </span>
             )}
           </div>
-          
+
           <h3 className="text-[14px] font-sans text-stone-800 tracking-tight leading-snug">
             {product.title}
           </h3>
@@ -109,7 +115,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
             <span className="text-sm font-semibold text-stone-900">
               {product.price.toLocaleString("tr-TR")} TL
             </span>
-            <span className="text-[10px] text-stone-400 line-through font-light">
+            <span className="text-[10px] text-stone-600 line-through font-light">
               {oldPrice.toLocaleString("tr-TR")} TL
             </span>
           </div>

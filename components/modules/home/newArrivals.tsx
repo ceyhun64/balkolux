@@ -48,7 +48,9 @@ export default function YeniUrunlerCarousel() {
     if (!api) return;
     onSelect();
     api.on("select", onSelect);
-    return () => { api.off("select", onSelect); };
+    return () => {
+      api.off("select", onSelect);
+    };
   }, [api, onSelect]);
 
   useEffect(() => {
@@ -78,7 +80,6 @@ export default function YeniUrunlerCarousel() {
   return (
     <div className="bg-background py-24 lg:py-32 overflow-hidden">
       <div className="container mx-auto px-6 relative">
-        
         {/* Header - Asimetrik ve Modern */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 px-4 gap-8">
           <div className="space-y-4">
@@ -95,16 +96,18 @@ export default function YeniUrunlerCarousel() {
 
           {/* Minimal Navigasyon Kontrolleri */}
           <div className="flex items-center gap-6">
-            <button 
+            <button
               onClick={() => api?.scrollPrev()}
               className="p-2 text-stone-300 hover:text-stone-900 transition-colors"
+              aria-label="sola kay"
             >
               <ArrowLeft strokeWidth={1.2} size={28} />
             </button>
             <div className="h-12 w-[1px] bg-stone-100 hidden md:block" />
-            <button 
+            <button
               onClick={() => api?.scrollNext()}
               className="p-2 text-stone-300 hover:text-stone-900 transition-colors"
+              aria-label="sağa kay"
             >
               <ArrowRight strokeWidth={1.2} size={28} />
             </button>
@@ -138,19 +141,18 @@ export default function YeniUrunlerCarousel() {
               0{current + 1}
             </span>
             <div className="relative h-[2px] w-32 bg-stone-100 overflow-hidden">
-               <motion.div 
-                 initial={false}
-                 animate={{ x: `${(current / (products.length - 1)) * 100}%` }}
-                 className="absolute inset-0 w-full h-full bg-stone-900 origin-left"
-                 style={{ scaleX: 1 / (products.length / 4) }}
-               />
+              <motion.div
+                initial={false}
+                animate={{ x: `${(current / (products.length - 1)) * 100}%` }}
+                className="absolute inset-0 w-full h-full bg-stone-900 origin-left"
+                style={{ scaleX: 1 / (products.length / 4) }}
+              />
             </div>
             <span className="text-[10px] font-mono text-stone-400">
               0{products.length}
             </span>
           </div>
         </div>
-
       </div>
     </div>
   );

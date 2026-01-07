@@ -173,6 +173,7 @@ export default function Footer() {
                 type="submit"
                 disabled={loading}
                 className="absolute right-0 bottom-3 text-stone-500 hover:text-amber-500 transition-colors"
+                aria-label="abone ol"
               >
                 {loading ? (
                   <span className="text-[10px]">...</span>

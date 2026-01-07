@@ -72,15 +72,18 @@ export default function ProductCard({ id, onRemove }: ProductCardProps) {
         {/* Ana Konteyner: 5/3 oranı */}
         <div className="relative aspect-[5/3] w-full overflow-hidden bg-white">
           {/* Favori Butonu */}
+          {/* Favori Butonu - DÜZELTİLDİ */}
           <button
             onClick={handleFavoriteClick}
-            className="absolute top-4 right-4 z-20 transition-all duration-300"
-            aria-label="ürüne git"
+            className="absolute top-2 right-2 z-20 p-3 transition-all duration-300 group/fav"
+            /* p-3 ekleyerek tıklama alanını genişlettik (44px+ hedefi için) */
+            aria-label={`${product.title} ürününü favorilere ekle`}
           >
             <Heart
-              className={`h-5 w-5 ${
+              className={`h-6 w-6 ${
+                // İkon boyutunu hafif artırmak tıklamayı kolaylaştırır
                 favorited ? "fill-stone-800 text-stone-800" : "text-stone-400"
-              }`}
+              } group-hover/fav:scale-110 transition-transform`}
               strokeWidth={1.2}
             />
           </button>
