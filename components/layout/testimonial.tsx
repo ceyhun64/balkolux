@@ -69,7 +69,7 @@ const Testimonials: React.FC = () => {
 
       {/* Header */}
       <div className="max-w-4xl mx-auto text-center px-6 mb-24 relative z-10">
-        <h2 className="text-[10px] font-bold tracking-[0.5em] text-stone-400 uppercase mb-4">
+        <h2 className="text-[10px] font-bold tracking-[0.5em] text-stone-500 uppercase mb-4">
           Outdoor Experience
         </h2>
         <h3 className="text-4xl md:text-6xl font-serif text-stone-900 leading-tight">
@@ -133,7 +133,7 @@ const Testimonials: React.FC = () => {
       </div>
 
       {/* Trust Badges / Stats */}
-      <div className="mt-20 flex justify-center items-center gap-12 px-2 opacity-30 grayscale pointer-events-none">
+      <div className="mt-20 flex justify-center items-center gap-12 px-2 opacity-60 grayscale pointer-events-none">
         <span className=" text-[8px] md:text-[10px] font-bold tracking-[0.3em] text-stone-900 uppercase">
           UV Dayanım Sertifikası
         </span>

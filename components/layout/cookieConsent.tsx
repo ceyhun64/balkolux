@@ -43,14 +43,14 @@ export default function CookieConsent() {
             <div className="space-y-6">
               {/* Başlık Bölümü */}
               <div className="space-y-1">
-                <h4 className="text-[10px] tracking-[0.3em] text-zinc-400 uppercase font-medium">
+                <h4 className="text-[10px] tracking-[0.3em] text-zinc-600 uppercase font-medium">
                   Gizlilik ve Çerezler
                 </h4>
                 <div className="h-[1px] w-6 bg-zinc-900" />
               </div>
 
               {/* Metin */}
-              <p className="text-[12px] text-zinc-500 leading-relaxed font-light">
+              <p className="text-[12px] text-zinc-600 leading-relaxed font-light">
                 Size en iyi dijital deneyimi sunmak için çerezleri kullanıyoruz.
                 Web sitemizi kullanarak bunu kabul etmiş olursunuz.
                 <Link
@@ -71,7 +71,7 @@ export default function CookieConsent() {
                 </button>
                 <button
                   onClick={() => setIsVisible(false)}
-                  className="w-full h-11 border border-zinc-100 text-zinc-400 text-[10px] tracking-[0.2em] uppercase transition-all hover:text-zinc-900 hover:border-zinc-900"
+                  className="w-full h-11 border border-zinc-100 text-zinc-600 text-[10px] tracking-[0.2em] uppercase transition-all hover:text-zinc-900 hover:border-zinc-900"
                 >
                   Daha Sonra
                 </button>

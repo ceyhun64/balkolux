@@ -45,7 +45,7 @@ const CardItem = ({ icon: Icon, title, desc, index }: any) => (
     </div>
 
     {/* Çok İnce Sıra Numarası Alt Köşede */}
-    <span className="absolute bottom-8 right-8 text-[10px] font-medium tracking-widest text-stone-200 uppercase italic">
+    <span className="absolute bottom-8 right-8 text-[10px] font-medium tracking-widest text-stone-500 uppercase italic">
       / 0{index + 1}
     </span>
 
