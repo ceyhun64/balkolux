@@ -162,7 +162,7 @@ export default function Navbar() {
               >
                 <Image
                   src="/logo/logo.webp"
-                  alt="itals"
+                  alt="balkolux"
                   width={90}
                   height={32}
                   className="brightness-0 invert object-contain md:w-[180px] md:h-[64px]"
