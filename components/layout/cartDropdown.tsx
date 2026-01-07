@@ -215,7 +215,10 @@ const CartDropdown = forwardRef(
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <button className=" relative p-2.5 hover:bg-white/10 rounded-full transition-colors group">
+          <button
+            className=" relative p-2.5 hover:bg-white/10 rounded-full transition-colors group"
+            aria-label="sepet"
+          >
             <ShoppingCart className="h-5 w-5 stroke-[1.5px] group-hover:scale-110 transition-transform" />
             <AnimatePresence>
               {showCount && cartItems.length > 0 && (

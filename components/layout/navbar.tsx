@@ -303,6 +303,7 @@ export default function Navbar() {
               <Link
                 href="/favorites"
                 className="p-2 md:p-2.5 hover:bg-white/10 rounded-full transition-all relative"
+                aria-label="favorilere git"
               >
                 <Heart
                   size={18}
@@ -321,6 +322,7 @@ export default function Navbar() {
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className="p-2 md:p-2.5 hover:bg-white/10 rounded-full transition-all"
+                aria-label="profil/giris"
               >
                 <User size={18} strokeWidth={1.2} className="text-white/70" />
               </button>
@@ -334,20 +336,35 @@ export default function Navbar() {
           {/* ALT SATIR: Mobil Arama Çubuğu (Sadece MD Altı) */}
           <div className="mt-1 md:hidden">
             <div className="relative flex items-center h-10 bg-white/10 backdrop-blur-md px-3 rounded-sm">
-              <Search size={16} className="text-white/40 mr-2" />
+              <Search
+                size={16}
+                className="text-white/40 mr-2"
+                aria-hidden="true"
+              />
+
               <input
                 type="text"
                 placeholder="Ürün veya koleksiyon ara..."
+                aria-label="Ürün veya koleksiyon ara"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setSearchOpen(true)}
                 className="w-full bg-transparent text-[13px] text-white placeholder:text-white/30 focus:outline-none"
               />
+
               {searchQuery && (
                 <X
                   size={14}
-                  className="text-white/40"
+                  className="text-white/40 cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Arama metnini temizle"
                   onClick={() => setSearchQuery("")}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      setSearchQuery("");
+                    }
+                  }}
                 />
               )}
             </div>
