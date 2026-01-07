@@ -41,58 +41,64 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-white via-amber-950/10 to-white px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#fafafa] px-4 selection:bg-red-100">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white/80 rounded-xs shadow-2xl p-10 flex flex-col gap-6"
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-[400px] bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 md:p-10 flex flex-col gap-8"
       >
-        <h1 className="text-3xl font-bold text-gray-900  text-center">
-          Şifremi Unuttum
-        </h1>
-        <p className="text-center text-gray-500 text-sm">
-          Şifrenizi almak için sistemimize kayıt olduğunuz e-posta adresinizi
-          girin.
-        </p>
+        <div className="space-y-2 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+            Şifremi Unuttum
+          </h1>
+          <p className="text-gray-500 text-sm leading-relaxed px-4">
+            E-posta adresinize bir sıfırlama linki göndereceğiz.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Label htmlFor="email" className="text-gray-700 ">
-            E-posta Adresiniz
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="example@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="rounded-lg bg-gray-50  border border-gray-300  focus:ring-2 focus:ring-red-500"
-          />
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div className="space-y-2">
+            <Label
+              htmlFor="email"
+              className="text-xs font-medium uppercase tracking-wider text-gray-400 ml-1"
+            >
+              E-posta
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="E-posta adresinizi giriniz"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="h-12  border-gray-200 bg-gray-50/50 transition-all focus:bg-white focus:ring-0 focus:border-gray-900"
+            />
+          </div>
 
           <Button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 rounded-xl bg-gradient-to-r from-[#7B0323] to-[#5E021A] text-white font-semibold shadow-lg transition-transform transform hover:scale-105 ${
-              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            className={`h-12 w-full  bg-gray-900 text-white font-medium shadow-sm transition-all hover:bg-black active:scale-[0.98] ${
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
-            {isLoading ? "Gönderiliyor..." : "Şifre Yenileme Linki Gönder"}
+            {isLoading ? "İşleniyor..." : "Bağlantı Gönder"}
           </Button>
         </form>
 
-        <div className="text-center mt-4">
+        <div className="flex flex-col items-center gap-6">
           <Link
             href="/login"
-            className="text-sm text-red-600 hover:underline "
+            className="text-sm font-medium text-gray-400 hover:text-stone-950 transition-colors"
           >
-            Giriş Ekranına Dön
+            ← Giriş Ekranına Dön
           </Link>
-        </div>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
-          © {new Date().getFullYear()} Moda Perde
-        </p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-300">
+            © {new Date().getFullYear()} BalkoLüx
+          </p>
+        </div>
       </motion.div>
     </div>
   );
