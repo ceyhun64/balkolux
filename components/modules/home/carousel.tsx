@@ -14,27 +14,27 @@ const heroes = [
     image: "/heroes/1001.webp",
     href: "/products",
   },
-  // {
-  //   id: 2,
-  //   title: "Yıldızların Altında Akşam Yemeği",
-  //   subtitle: "Modern Sandalye ve Mobilya Takımları",
-  //   image: "/heroes/1002.webp",
-  //   href: "/products",
-  // },
-  // {
-  //   id: 3,
-  //   title: "Doğayla Bütünleşen Tasarımlar",
-  //   subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
-  //   image: "/heroes/1003.webp",
-  //   href: "/products",
-  // },
-  // {
-  //   id: 4,
-  //   title: "Güneşin Keyfini Sürün",
-  //   subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
-  //   image: "/heroes/1004.webp",
-  //   href: "/products",
-  // },
+  {
+    id: 2,
+    title: "Yıldızların Altında Akşam Yemeği",
+    subtitle: "Modern Sandalye ve Mobilya Takımları",
+    image: "/heroes/1002.webp",
+    href: "/products",
+  },
+  {
+    id: 3,
+    title: "Doğayla Bütünleşen Tasarımlar",
+    subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
+    image: "/heroes/1003.webp",
+    href: "/products",
+  },
+  {
+    id: 4,
+    title: "Güneşin Keyfini Sürün",
+    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
+    image: "/heroes/1004.webp",
+    href: "/products",
+  },
 ];
 
 export default function HeroSection() {
