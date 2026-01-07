@@ -65,7 +65,7 @@ export default function WhyChooseUsPage() {
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
-          className="max-w-7xl mx-auto h-[70vh] relative overflow-hidden rounded-[2px]"
+          className="max-w-7xl mx-auto h-[25vh] md:h-[70vh] relative overflow-hidden rounded-[2px]"
         >
           <Image
             src="/why_us/1.webp"
@@ -103,7 +103,7 @@ export default function WhyChooseUsPage() {
 
       {/* 4. İkinci Görsel Blok: Asimetrik Yerleşim */}
       <section className="max-w-7xl mx-auto px-6 pb-32 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
-        <div className="md:col-span-7 relative h-[500px] rounded-sm overflow-hidden">
+        <div className="md:col-span-7 relative h-[200px] md:h-[500px] rounded-sm overflow-hidden">
           <Image
             src="/why_us/2.webp"
             alt="Detay Tasarımı"
