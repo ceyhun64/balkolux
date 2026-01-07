@@ -210,6 +210,7 @@ export default function Navbar() {
                   <button
                     onClick={() => setSearchOpen(!searchOpen)}
                     className="p-2.5 rounded-full hover:bg-white/10 transition-all active:scale-95"
+                    aria-label="Arama"
                   >
                     <Search
                       size={18}

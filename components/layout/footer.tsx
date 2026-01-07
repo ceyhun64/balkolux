@@ -10,13 +10,32 @@ import {
   MessageCircle,
 } from "lucide-react";
 import Image from "next/image";
-import { GradientText } from "../ui/shadcn-io/gradient-text/index";
 import { toast } from "sonner";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // --- Sosyal Medya Link Tanımlamaları ---
+  const whatsappNumber = "+90 546 225 56 59";
+  const whatsappLink = `https://wa.me/${whatsappNumber.replace(/[^\d]/g, "")}`;
+
+  const socialLinks = [
+    {
+      icon: Instagram,
+      href: "https://www.instagram.com/balkolux",
+      label: "Instagram",
+    },
+    {
+      icon: Facebook,
+      href: "https://www.facebook.com/balkolux",
+      label: "Facebook",
+    },
+    { icon: MessageCircle, href: whatsappLink, label: "WhatsApp" },
+    { icon: Phone, href: `tel:${whatsappNumber}`, label: "Telefon" },
+  ];
+  // ---------------------------------------
 
   const menuGroups = {
     kurumsal: {
@@ -61,7 +80,6 @@ export default function Footer() {
     if (!email.trim()) return;
     setLoading(true);
     try {
-      // API çağrısı simülasyonu
       await new Promise((resolve) => setTimeout(resolve, 1000));
       toast.success("Ayrıcalıklı dünyamıza hoş geldiniz.");
       setEmail("");
@@ -74,7 +92,6 @@ export default function Footer() {
 
   return (
     <footer className="bg-zinc-950 text-stone-400 relative overflow-hidden font-sans border-t border-white/5">
-      {/* Üst Kısım: Marka ve Linkler */}
       <div className="container mx-auto px-6 md:px-12 py-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
           {/* 1. Kolon: Marka Bilgisi */}
@@ -91,14 +108,19 @@ export default function Footer() {
             <p className="text-stone-500 text-[13px] leading-relaxed font-light max-w-[240px]">
               Yaşam alanlarınıza lüks ve zarafet katan modern tasarımlar.
             </p>
+
+            {/* Sosyal Medya İkonları - GÜNCELLENDİ */}
             <div className="flex items-center gap-5">
-              {[Instagram, Facebook, MessageCircle, Phone].map((Icon, i) => (
+              {socialLinks.map((social, i) => (
                 <a
                   key={i}
-                  href="#"
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-amber-600 transition-colors"
+                  aria-label={social.label}
                 >
-                  <Icon size={18} strokeWidth={1.5} />
+                  <social.icon size={18} strokeWidth={1.5} />
                 </a>
               ))}
             </div>
@@ -127,7 +149,7 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* 5. Kolon (Sağ Alt Köşe): Minimal Abone Olma Alanı */}
+          {/* 5. Kolon: BÜLTEN */}
           <div className="md:col-span-3 space-y-6 flex flex-col justify-end">
             <div className="space-y-3">
               <h4 className="text-stone-100 text-[10px] font-bold tracking-[0.3em] uppercase">
@@ -158,7 +180,6 @@ export default function Footer() {
                   <ArrowRight size={16} />
                 )}
               </button>
-              {/* Focus Line Animation */}
               <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-amber-600 transition-all duration-500 group-focus-within:w-full" />
             </form>
           </div>

@@ -94,7 +94,7 @@ export default function Barbecue() {
         <header className="max-w-3xl mb-16 space-y-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-[1px] bg-stone-900" />
-            <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-stone-400">
+            <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-stone-600">
               Küratörlü Koleksiyon
             </span>
           </div>

@@ -44,6 +44,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
           <button
             onClick={handleFavoriteClick}
             className="absolute top-4 right-4 z-20 transition-all duration-300"
+            aria-label="favori ürüne git"
           >
             <Heart
               className={`h-5 w-5 ${favorited ? "fill-stone-800 text-stone-800" : "text-stone-400"}`}

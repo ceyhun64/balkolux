@@ -84,7 +84,7 @@ export default function YeniUrunlerCarousel() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <span className="w-6 h-[1px] bg-stone-900" />
-              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-stone-400">
+              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-stone-600">
                 Yeni Sezon
               </span>
             </div>

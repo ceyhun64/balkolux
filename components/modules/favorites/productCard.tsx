@@ -75,6 +75,7 @@ export default function ProductCard({ id, onRemove }: ProductCardProps) {
           <button
             onClick={handleFavoriteClick}
             className="absolute top-4 right-4 z-20 transition-all duration-300"
+            aria-label="ürüne git"
           >
             <Heart
               className={`h-5 w-5 ${

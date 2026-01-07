@@ -35,6 +35,7 @@ export default function CookieConsent() {
             <button
               onClick={() => setIsVisible(false)}
               className="absolute top-4 right-4 text-zinc-300 hover:text-zinc-900 transition-colors"
+              aria-label="çerez modalı kapat"
             >
               <X size={14} strokeWidth={1.5} />
             </button>
