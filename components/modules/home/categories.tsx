@@ -104,7 +104,7 @@ function PremiumCategoryCard({ category }: { category: CategoryData }) {
             <h3 className="text-white text-xl md:text-2xl font-light tracking-[0.15em] transform transition-transform duration-500 uppercase group-hover:-translate-y-1">
               {category.name}
             </h3>
-            <p className="text-white/90 text-[10px] tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-700 delay-100 uppercase">
+            <p className="hidden md:block text-white/90 text-[10px] tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-700 delay-100 uppercase">
               Koleksiyonu Keşfet
             </p>
           </div>

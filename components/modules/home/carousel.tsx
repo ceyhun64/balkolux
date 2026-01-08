@@ -69,10 +69,11 @@ export default function HeroSection() {
               className="object-cover scale-105 animate-subtle-zoom"
               priority
             />
-            {/* Minimal Overlay: Sadece metnin okunabilirliği için soft bir geçiş */}
-            <div className="absolute inset-0 bg-black/10" />
-          </div>
 
+
+            {/* 2. Katman: Dinamik Gradyan (Metinlerin olduğu orta ve alt kısmı daha çok vurgular) */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-transparent" />
+          </div>
           {/* İçerik Alanı */}
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
             <motion.span

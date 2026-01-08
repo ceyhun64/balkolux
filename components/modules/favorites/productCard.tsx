@@ -82,7 +82,7 @@ export default function ProductCard({ id, onRemove }: ProductCardProps) {
             <Heart
               className={`h-6 w-6 ${
                 // İkon boyutunu hafif artırmak tıklamayı kolaylaştırır
-                favorited ? "fill-stone-800 text-stone-800" : "text-stone-400"
+                favorited ? "fill-stone-800 text-stone-800" : "text-stone-600"
               } group-hover/fav:scale-110 transition-transform`}
               strokeWidth={1.2}
             />
@@ -145,7 +145,7 @@ export default function ProductCard({ id, onRemove }: ProductCardProps) {
             <span className="text-sm font-semibold text-stone-900">
               {product.price.toLocaleString("tr-TR")} TL
             </span>
-            <span className="text-[10px] text-stone-400 line-through font-light">
+            <span className="text-[10px] text-stone-600 line-through font-light">
               {oldPrice.toLocaleString("tr-TR")} TL
             </span>
           </div>

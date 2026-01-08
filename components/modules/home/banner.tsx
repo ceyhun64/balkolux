@@ -29,6 +29,7 @@ export default function Banner() {
         const res = await fetch("/api/banner");
         const data = await res.json();
 
+        console.log(data);
         // API'den banners dizisi geliyor, ilk elemanı alıyoruz
         if (data.banners && data.banners.length > 0) {
           setBanner(data.banners[0]);
