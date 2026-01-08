@@ -122,6 +122,28 @@ export default function ProductDetailPage() {
     }
   };
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.title,
+          text: `${product.title} - BalkoLüx Tasarım`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.error("Paylaşım hatası:", error);
+      }
+    } else {
+      // Web Share API desteklenmiyorsa linki kopyala
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Ürün bağlantısı panoya kopyalandı.");
+      } catch (err) {
+        toast.error("Bağlantı kopyalanamadı.");
+      }
+    }
+  };
+
   if (loading) return <ProductDetailSkeleton />;
   if (!product)
     return (
@@ -260,7 +282,12 @@ export default function ProductDetailPage() {
                     />
                     {isFavorited(product.id) ? "Favorilerde" : "Favoriye Ekle"}
                   </button>
-                  <button className="w-12 h-12 border border-stone-200 flex items-center justify-center hover:border-stone-800 transition-all">
+                  {/* Eski halini bununla değiştirin */}
+                  <button
+                    onClick={handleShare}
+                    className="w-12 h-12 border border-stone-200 flex items-center justify-center hover:border-stone-800 transition-all active:scale-95"
+                    title="Paylaş"
+                  >
                     <Share2 size={14} className="text-stone-400" />
                   </button>
                 </div>
