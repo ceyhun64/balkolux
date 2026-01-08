@@ -11,6 +11,7 @@ import {
   CreditCard,
   Settings,
   ArrowRight,
+  Truck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -71,9 +72,9 @@ export default function UserMegaMenu({
 
   const menuItems = [
     { label: "Profilim", href: "/profile", icon: User },
-    { label: "Siparişlerim", href: "/profile/orders", icon: Package },
     { label: "Adreslerim", href: "/profile/addresses", icon: MapPin },
-    { label: "Ödemeler", href: "/profile/payments", icon: CreditCard },
+    { label: "Siparişlerim", href: "/profile/orders", icon: Package },
+    { label: "Kargo Takip", href: "/profile/cargo_tracking", icon: Truck },
   ];
 
   return (
@@ -128,7 +129,7 @@ export default function UserMegaMenu({
                     <h2 className="text-3xl font-serif italic text-stone-900">
                       {user.name} {user.surname}
                     </h2>
-                    <p className="text-[11px] text-stone-400 mt-2 tracking-wide font-light">
+                    <p className="text-[11px] text-stone-500 mt-2 tracking-wide font-light">
                       {user.email}
                     </p>
                   </motion.header>

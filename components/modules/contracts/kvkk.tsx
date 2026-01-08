@@ -70,7 +70,7 @@ export default function KvkkPage() {
                   <div className="space-y-1">
                     <p className="flex items-center gap-2">
                       <MapPin size={14} className="text-stone-500" />
-                      Esentepe bulvarı prof necmettin erbakan bulvarı no353,
+                      Esentepe Bulvarı Prof Necmettin Erbakan Bulvarı No353,
                       01150 Çukurova/Adana{" "}
                     </p>
                     <p className="flex items-center gap-2">
@@ -327,7 +327,7 @@ export default function KvkkPage() {
                     <p className="text-[12px] text-stone-700">
                       Balkolux Bahçe ve Balkon Mobilyaları
                       <br />
-                      Esentepe bulvarı prof necmettin erbakan bulvarı no353,
+                      Esentepe Bulvarı Prof Necmettin Erbakan Bulvarı No353,
                       01150 Çukurova/Adana <br />
                       E-posta: balkoluxofficial@gmail.com
                     </p>
@@ -414,7 +414,7 @@ export default function KvkkPage() {
                   Adres
                 </p>
                 <p className="text-xs text-stone-700">
-                  Esentepe bulvarı prof necmettin erbakan bulvarı no353, 01150
+                  Esentepe Bulvarı Prof Necmettin Erbakan Bulvarı No353, 01150
                   Çukurova/Adana
                 </p>
               </div>

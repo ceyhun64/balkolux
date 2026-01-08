@@ -239,7 +239,7 @@ export default function RegisterForm({ onLoginClick }: RegisterFormProps) {
               {/* Yasal Metin & Buton */}
               <div className="space-y-6 pt-4">
                 <p className="text-[10px] text-stone-400 leading-relaxed italic max-w-xl">
-                  "Kaydı Tamamla" butonuna basarak, üyelik sözleşmesini ve
+                  "Kaydı Tamamla" butonuna basarak, mesafeli satış sözleşmesini ve
                   kişisel verilerin korunması politikasını kabul etmiş
                   sayılırsınız.
                 </p>
@@ -278,7 +278,7 @@ export default function RegisterForm({ onLoginClick }: RegisterFormProps) {
                 </span>
               </div>
               <Link
-                href="/help"
+                href="/contact"
                 className="text-[9px] uppercase tracking-widest text-stone-400 hover:text-stone-900 transition-colors"
               >
                 Yardım Merkezi

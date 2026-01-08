@@ -22,14 +22,22 @@ export default function SocialSidebar() {
   const whatsappLink = `https://wa.me/${whatsappNumber.replace(/[^\d]/g, "")}`;
 
   const socialLinks = [
-    { name: "Instagram", link: "https://www.instagram.com/balkolux", icon: Instagram },
-    { name: "Facebook", link: "https://www.facebook.com/balkolux", icon: Facebook },
+    {
+      name: "Instagram",
+      link: "https://www.instagram.com/balkolux",
+      icon: Instagram,
+    },
+    {
+      name: "Facebook",
+      link: "https://www.facebook.com/p/Balkol%C3%BCx-Balkon-Bah%C3%A7e-Mobilyalar%C4%B1-61561591640222/",
+      icon: Facebook,
+    },
     { name: "WhatsApp", link: whatsappLink, icon: MessageCircle },
     { name: "Telefon", link: `tel:${whatsappNumber}`, icon: Phone },
   ];
 
   return (
-    <div className="fixed left-6 bottom-6 md:left-10 md:bottom-10 z-[40]">
+    <div className="fixed left-3 bottom-3 md:left-8 md:bottom-8 z-[40]">
       <div className="flex items-center gap-3">
         {/* ANA TETİKLEYİCİ BUTON */}
         <motion.button
@@ -37,7 +45,9 @@ export default function SocialSidebar() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className={`relative z-10 w-12 h-12 flex items-center justify-center rounded-full transition-all duration-500 shadow-xl ${
-            isOpen ? "bg-stone-900 text-white" : "bg-white/80 backdrop-blur-md text-stone-800 border border-stone-200"
+            isOpen
+              ? "bg-stone-900 text-white"
+              : "bg-white/80 backdrop-blur-md text-stone-800 border border-stone-200"
           }`}
           aria-label="İletişim"
         >
@@ -59,7 +69,9 @@ export default function SocialSidebar() {
               exit="hidden"
               variants={{
                 visible: { transition: { staggerChildren: 0.08 } },
-                hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+                hidden: {
+                  transition: { staggerChildren: 0.05, staggerDirection: -1 },
+                },
               }}
             >
               {socialLinks.map((item) => (
@@ -70,14 +82,14 @@ export default function SocialSidebar() {
                   rel="noopener noreferrer"
                   variants={{
                     hidden: { opacity: 0, x: -15, scale: 0.8 },
-                    visible: { opacity: 1, x: 0, scale: 1 }
+                    visible: { opacity: 1, x: 0, scale: 1 },
                   }}
                   className="group relative"
                 >
                   <div className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-stone-200 flex items-center justify-center text-stone-600 hover:text-stone-950 hover:border-stone-400 hover:shadow-lg transition-all duration-300">
                     <item.icon size={18} strokeWidth={1.2} />
                   </div>
-                  
+
                   {/* Tooltip - Sadece Desktop'ta */}
                   <span className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-stone-900 text-white text-[9px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded whitespace-nowrap">
                     {item.name}

@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { toast } from "sonner";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams?.get("token") ?? "";
@@ -20,7 +20,10 @@ export default function ResetPasswordPage() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) return;
+    if (!token) {
+      toast.error("Geçersiz veya eksik doğrulama kodu.");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -35,17 +38,12 @@ export default function ResetPasswordPage() {
 
       if (!res.ok) {
         toast.error(data.error || "Bir hata oluştu");
-        setIsLoading(false);
         return;
       }
 
       toast.success("Şifreniz başarıyla güncellendi!");
-
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+      setTimeout(() => router.push("/login"), 2000);
     } catch (err) {
-      console.error(err);
       toast.error("Sunucu hatası, tekrar deneyin.");
     } finally {
       setIsLoading(false);
@@ -53,70 +51,96 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#fafafa] px-4 selection:bg-red-100">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-[400px] bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 md:p-10 flex flex-col gap-8"
-      >
-        <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
-            Şifre Sıfırlama
-          </h1>
-          <p className="text-gray-500 text-sm leading-relaxed px-4">
-            Güvenliğiniz için lütfen yeni bir şifre belirleyin.
-          </p>
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full max-w-[380px] relative z-10"
+    >
+      {/* Header Bölümü */}
+      <div className="flex flex-col items-center mb-10 text-center">
+        <div className="w-12 h-12 bg-stone-950 rounded-full flex items-center justify-center mb-6 shadow-xl">
+          <Lock className="text-white w-5 h-5 font-light" strokeWidth={1.5} />
+        </div>
+        <h1 className="text-2xl font-serif text-stone-900 tracking-tight">
+          Yeni Şifre Belirle
+        </h1>
+        <p className="text-stone-400 text-sm mt-3 leading-relaxed font-light">
+          Lütfen hesabınız için güçlü ve yeni bir şifre oluşturun.
+        </p>
+      </div>
+
+      {/* Form Alanı */}
+      <form onSubmit={handleResetPassword} className="space-y-8">
+        <div className="relative group">
+          <Input
+            type={showPassword ? "text" : "password"}
+            placeholder="Yeni Şifreniz"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="h-14 border-0 border-b border-stone-200 rounded-none bg-transparent px-0 text-base focus-visible:ring-0 focus-visible:border-stone-950 transition-all placeholder:text-stone-300"
+          />
+          <button
+            type="button"
+            className="absolute right-0 bottom-3 text-stone-300 hover:text-stone-950 transition-colors"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? (
+              <EyeOff size={18} strokeWidth={1.5} />
+            ) : (
+              <Eye size={18} strokeWidth={1.5} />
+            )}
+          </button>
         </div>
 
-        <form onSubmit={handleResetPassword} className="flex flex-col gap-5">
-          <div className="relative space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-gray-400 ml-1">
-              Yeni Şifre
-            </label>
-            <div className="relative">
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-12 border-gray-200 bg-gray-50/50 pr-12 transition-all focus:bg-white focus:ring-0 focus:border-gray-900"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-900 transition-colors"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="h-14 w-full bg-stone-950 text-white rounded-none font-light tracking-[0.15em] uppercase text-xs transition-all hover:bg-stone-800 active:scale-[0.98] disabled:opacity-50"
+        >
+          {isLoading ? "Güncelleniyor..." : "Şifreyi Güncelle"}
+        </Button>
+      </form>
+
+      {/* Footer / Linkler */}
+      <div className="mt-12 flex flex-col items-center gap-8">
+        <Link
+          href="/login"
+          className="group flex items-center gap-2 text-xs font-medium text-stone-500 hover:text-stone-950 transition-colors tracking-widest uppercase"
+        >
+          <ArrowLeft className="w-3 h-3 transition-transform group-hover:-translate-x-1" />
+          Vazgeç ve Dön
+        </Link>
+
+        <div className="flex items-center gap-4 w-full">
+          <div className="h-[1px] bg-stone-300 flex-1" />
+          <p className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-light">
+            BalkoLüx © {new Date().getFullYear()}
+          </p>
+          <div className="h-[1px] bg-stone-300 flex-1" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// Next.js useSearchParams kullanımı için Suspense ile sarmalamak gerekir
+export default function ResetPasswordPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 relative overflow-hidden">
+      {/* İnce Arkaplan Dokusu */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:32px_32px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
+
+      <Suspense
+        fallback={
+          <div className="text-stone-400 font-light tracking-widest uppercase text-[10px]">
+            Yükleniyor...
           </div>
-
-          <Button
-            type="submit"
-            disabled={isLoading}
-            className={`h-12 w-full bg-gray-900 text-white font-medium shadow-sm transition-all hover:bg-black active:scale-[0.98] ${
-              isLoading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
-            {isLoading ? "Güncelleniyor..." : "Şifreyi Sıfırla"}
-          </Button>
-        </form>
-
-        <div className="flex flex-col items-center gap-6">
-          <Link
-            href="/login"
-            className="text-sm font-medium text-gray-400 hover:text-stone-950 transition-colors"
-          >
-            ← Giriş Ekranına Dön
-          </Link>
-
-          <p className="text-[10px] uppercase tracking-[0.2em] text-gray-300">
-            © {new Date().getFullYear()} BalkoLüx
-          </p>
-        </div>
-      </motion.div>
+        }
+      >
+        <ResetPasswordForm />
+      </Suspense>
     </div>
   );
 }

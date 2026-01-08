@@ -3,6 +3,7 @@
 import React from "react";
 import { MapPin, Phone, Mail, ArrowUpRight } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function DistanceSalesContract() {
   return (
@@ -50,7 +51,7 @@ export default function DistanceSalesContract() {
                     <span className="text-stone-900 font-semibold block mb-2">
                       Balkolux Bahçe ve Balkon Mobilyaları
                     </span>
-                    Esentepe bulvarı prof necmettin erbakan bulvarı no353, 01150
+                    Esentepe Bulvarı Prof Necmettin Erbakan Bulvarı No353, 01150
                     Çukurova/Adana
                     <br />
                     <span className="block mt-2">
@@ -320,21 +321,23 @@ export default function DistanceSalesContract() {
                   <div className="flex items-center gap-4">
                     <MapPin size={14} strokeWidth={1.5} />
                     <span>
-                      Esentepe bulvarı prof necmettin erbakan bulvarı no353,
+                      Esentepe Bulvarı Prof Necmettin Erbakan Bulvarı No353,
                       01150 Çukurova/Adana
                     </span>
                   </div>
                 </div>
               </div>
-              <button className="relative z-10 group flex items-center gap-4 border border-stone-700 px-8 py-4 hover:border-white transition-all duration-300">
-                <span className="text-[10px] tracking-[0.25em] uppercase font-bold">
-                  Müşteri Hizmetleri
-                </span>
-                <ArrowUpRight
-                  size={14}
-                  className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
-                />
-              </button>
+              <Link href="/contact">
+                <button className="relative z-10 group flex items-center gap-4 border border-stone-700 px-8 py-4 hover:border-white transition-all duration-300">
+                  <span className="text-[10px] tracking-[0.25em] uppercase font-bold">
+                    Müşteri Hizmetleri
+                  </span>
+                  <ArrowUpRight
+                    size={14}
+                    className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+                  />
+                </button>
+              </Link>
 
               {/* Dekoratif Arka Plan */}
               <div className="absolute -bottom-10 -right-10 text-[120px] font-serif text-white/[0.02] pointer-events-none select-none">

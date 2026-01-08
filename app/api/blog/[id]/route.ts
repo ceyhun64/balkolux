@@ -19,6 +19,36 @@ async function deleteImage(fileName?: string) {
   }
 }
 
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
+  const blogId = Number(id);
+
+  if (isNaN(blogId)) {
+    return NextResponse.json({ message: "Geçersiz ID" }, { status: 400 });
+  }
+
+  try {
+    const blog = await prisma.blog.findUnique({
+      where: { id: blogId },
+    });
+
+    if (!blog) {
+      return NextResponse.json({ message: "Blog bulunamadı" }, { status: 404 });
+    }
+
+    return NextResponse.json(blog);
+  } catch (err) {
+    console.error("Blog getirme hatası:", err);
+    return NextResponse.json(
+      { message: "Sunucu hatası oluştu" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(
   req: NextRequest,
   context: { params: Promise<{ id: string }> } // 👈 Promise olarak

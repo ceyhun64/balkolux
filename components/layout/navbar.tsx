@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import CartDropdown from "./cartDropdown";
 import { useFavorite } from "@/contexts/favoriteContext";
-import MobileNavSheet from "./mobileNavSheet";
 import CollectionMegaMenu from "./collectionMegaMenu";
 import UserMegaMenu from "./userMegaMenu";
 
@@ -437,11 +436,7 @@ export default function Navbar() {
         userMenuOpen={userMenuOpen}
         setUserMenuOpen={setUserMenuOpen}
       />
-      <MobileNavSheet
-        isOpen={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        links={[]}
-      />
+     
     </>
   );
 }

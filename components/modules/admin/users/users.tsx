@@ -24,8 +24,6 @@ import {
   Phone,
   MapPin,
   Users as UsersIcon,
-  CheckCircle2,
-  MoreVertical,
 } from "lucide-react";
 
 // --- Interfaces ---

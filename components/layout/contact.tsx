@@ -62,16 +62,40 @@ export default function Contact() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simüle edilmiş gönderim süreci
-    setTimeout(() => {
-      toast.success("Mesajınız nezaketle alındı.");
-      setFormData({ name: "", phone: "", email: "", message: "" });
+    try {
+      const response = await fetch("/api/send-mail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipients: ["balkoluxofficial@gmail.com"], // Mailin gideceği adres
+          subject: `Yeni Form Bildirimi: ${formData.name}`,
+          // API içindeki HTML şablonda "${message}" kısmına gidecek metin:
+          message: `Müşteri Adı: ${formData.name}\nTelefon: ${formData.phone}\nE-posta: ${formData.email}\n\nMesaj: ${formData.message}`,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(
+          "Mesajınız başarıyla iletildi. En kısa sürede dönüş yapılacaktır."
+        );
+        setFormData({ name: "", phone: "", email: "", message: "" });
+      } else {
+        toast.error(result.error || "Bir sorun oluştu.");
+      }
+    } catch (error) {
+      console.error("Gönderim hatası:", error);
+      toast.error("Şu anda mesajınız iletilemiyor. Lütfen daha sonra deneyin.");
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#FCFBFA] text-stone-800 font-light">
+    <div className="min-h-screen bg-zinc-50 text-stone-800 font-light">
       <main className="max-w-7xl mx-auto px-6 py-24 md:py-32">
         {/* HEADER */}
         <header className="max-w-3xl mb-24 space-y-4">
@@ -93,7 +117,7 @@ export default function Contact() {
             <MinimalContactItem
               icon={MapPin}
               label="Atölye & Adres"
-              value="Esentepe bulvarı prof necmettin erbakan bulvarı no353, 01150 Çukurova/Adana"
+              value="Esentepe Bulvarı Prof Necmettin Erbakan Bulvarı No353, 01150 Çukurova/Adana"
             />
             <MinimalContactItem
               icon={Phone}
@@ -101,7 +125,6 @@ export default function Contact() {
               value="+90 546 225 56 59"
               href="tel:+905462255659"
             />
-            0546 225 56 59
             <MinimalContactItem
               icon={Mail}
               label="E-posta"
@@ -118,7 +141,7 @@ export default function Contact() {
                 <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
                   <label
                     htmlFor="name"
-                    className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block"
+                    className="text-[10px] uppercase tracking-widest text-stone-600 mb-2 block"
                   >
                     Adınız Soyadınız
                   </label>
@@ -128,16 +151,38 @@ export default function Contact() {
                     type="text"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-200 font-light text-sm"
+                    className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-400 font-light text-sm"
                     placeholder="Örn: Selin Yılmaz"
                     required
                   />
                 </div>
+                {/* Telefon (Yeni Eklenen Alan) */}
+                <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
+                  <label
+                    htmlFor="phone"
+                    className="text-[10px] uppercase tracking-widest text-stone-600 mb-2 block"
+                  >
+                    Telefon Numaranız
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-400 font-light text-sm"
+                    placeholder="05xx xxx xx xx"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-y-12">
                 {/* E-posta */}
                 <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
                   <label
                     htmlFor="email"
-                    className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block"
+                    className="text-[10px] uppercase tracking-widest text-stone-600 mb-2 block"
                   >
                     E-posta
                   </label>
@@ -147,7 +192,7 @@ export default function Contact() {
                     type="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-200 font-light text-sm"
+                    className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-400 font-light text-sm"
                     placeholder="selin@example.com"
                     required
                   />
@@ -158,7 +203,7 @@ export default function Contact() {
               <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
                 <label
                   htmlFor="message"
-                  className="text-[10px] uppercase tracking-widest text-stone-400 mb-2 block"
+                  className="text-[10px] uppercase tracking-widest text-stone-600 mb-2 block"
                 >
                   Mesajınız
                 </label>
@@ -168,7 +213,7 @@ export default function Contact() {
                   value={formData.message}
                   onChange={handleChange}
                   rows={4}
-                  className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-200 font-light text-sm resize-none min-h-[100px]"
+                  className="w-full bg-transparent pb-3 outline-none text-stone-800 placeholder:text-stone-400 font-light text-sm resize-none min-h-[100px]"
                   placeholder="Projenizden bahsedin..."
                   required
                 />
@@ -177,7 +222,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group flex items-center gap-4 text-xs tracking-[0.3em] uppercase font-bold text-stone-900 disabled:opacity-50"
+                className="group flex items-center gap-4 text-xs tracking-[0.3em] uppercase font-bold text-stone-900 disabled:opacity-50 transition-opacity"
               >
                 {isLoading ? "Gönderiliyor..." : "Mesajı Gönder"}
                 <div className="w-10 h-10 rounded-full border border-stone-200 flex items-center justify-center group-hover:bg-stone-900 group-hover:text-white transition-all duration-500">
@@ -199,7 +244,7 @@ export default function Contact() {
         <section className="mt-32 transition-all duration-1000 overflow-hidden border border-stone-100">
           <div className="aspect-video md:aspect-[21/9] w-full bg-stone-100 relative">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3183.9616024599623!2d35.23440603988665!3d37.058398191523295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15288937bb30296f%3A0xba1e46a2a25b37f5!2sBalkoL%C3%BCX%20Balkon%20ve%20Bah%C3%A7e%20Mobilyalar%C4%B1!5e0!3m2!1str!2str!4v1767622279882!5m2!1str!2str"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3184.4447738241474!2d35.253046!3d37.04683!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15288f6916849427%3A0x6006456f917df9a0!2zRXNlbnRlcGUsIFByb2YuIERyLiBOZWNtZXR0aW4gRXJiYWthbiBCdWx2LiBObzozNTMsIDAxMTUwIMOHdWt1cm92YS9BZGFuYQ!5e0!3m2!1str!2str!4v1700000000000"
               width="100%"
               height="100%"
               style={{ border: 0 }}

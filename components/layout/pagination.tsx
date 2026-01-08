@@ -64,8 +64,8 @@ const DefaultPagination: React.FC<DefaultPaginationProps> = ({
               }}
               className={`transition-colors ${
                 page === currentPage
-                  ? "bg-stone-900 text-white"
-                  : "hover:bg-stone-200"
+                  ? "bg-stone-900 text-black"
+                  : "hover:bg-stone-600"
               }`}
             >
               {page}

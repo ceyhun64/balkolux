@@ -28,7 +28,7 @@ export default function Footer() {
     },
     {
       icon: Facebook,
-      href: "https://www.facebook.com/balkolux",
+      href: "https://www.facebook.com/p/Balkol%C3%BCx-Balkon-Bah%C3%A7e-Mobilyalar%C4%B1-61561591640222/",
       label: "Facebook",
     },
     { icon: MessageCircle, href: whatsappLink, label: "WhatsApp" },
@@ -42,7 +42,7 @@ export default function Footer() {
         { label: "Hakkımızda", href: "/institutional/about" },
         { label: "İletişim", href: "/contact" },
         { label: "Neden Biz", href: "/institutional/why_us" },
-        { label: "Kargo Takip", href: "/track-order" },
+        { label: "Kargo Takip", href: "/profile/cargo_tracking" },
         { label: "Çerez Politikası", href: "/institutional/cookie_policy" },
       ],
     },
@@ -73,16 +73,39 @@ export default function Footer() {
     },
   };
 
+  // Footer.tsx içindeki handleSubscribe fonksiyonunu bu şekilde güncelle:
+
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success("Ayrıcalıklı dünyamıza hoş geldiniz.");
-      setEmail("");
-    } catch (error) {
-      toast.error("Bir sorun oluştu.");
+      const response = await fetch("/api/subscribe", {
+        // API yolunun doğruluğundan emin ol
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Prisma tarafında unique kısıtlaması varsa (aynı mail tekrar girilirse)
+        if (data.error?.includes("Unique constraint failed")) {
+          toast.error("Bu e-posta zaten bültenimize kayıtlı.");
+        } else {
+          throw new Error(data.error || "Bir hata oluştu.");
+        }
+        return;
+      }
+
+      toast.success("Ayrıcalıklı dünyamıza hoş geldiniz!");
+      setEmail(""); // Formu temizle
+    } catch (error: any) {
+      toast.error(error.message || "Bir sorun oluştu. Lütfen tekrar deneyin.");
     } finally {
       setLoading(false);
     }

@@ -2,243 +2,141 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  HelpCircle,
-  Headset,
-  ChevronDown,
-  Package,
-  ShieldCheck,
-  Hammer,
-} from "lucide-react";
-import { motion } from "framer-motion";
+import { ChevronRight, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
- * Bahçe ve Balkon Mobilyaları Temalı SSS (FAQ) Bölümü
+ * Minimal & Estetik SSS (FAQ) Bölümü
+ * Odak: Tipografi, Negatif Alan ve Akışkan Geçişler
  */
 export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const toggleIndex = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
-  const primaryColor = "#7B0323";
-  const lightColor = "text-rose-600";
-
   const faqs = [
     {
-      question: "Mobilyalar dış hava koşullarına dayanıklı mı?",
-      icon: <ShieldCheck className="w-5 h-5" />,
-      answer: (
-        <>
-          <p className="mb-2">
-            Evet, BalkoLüx koleksiyonundaki tüm ürünler dış mekan kullanımına
-            uygun olarak üretilmektedir.
-          </p>
-          <ul className="list-disc list-inside space-y-1 text-gray-600">
-            <li>
-              <strong className="text-rose-700">Metal aksamlar:</strong>{" "}
-              Elektrostatik fırın boya ile paslanmaya karşı korumalıdır.
-            </li>
-            <li>
-              <strong className="text-rose-700">Rattan ve Ahşap:</strong> UV
-              ışınlarına ve suya dayanıklı materyaller seçilmiştir.
-            </li>
-            <li>
-              <strong className="text-rose-700">Minderler:</strong> Su itici
-              özelliğe sahip, kolay solmayan kumaşlar kullanılmaktadır.
-            </li>
-          </ul>
-        </>
-      ),
+      question: "Dış hava koşullarına dayanıklılık standartlarınız nelerdir?",
+      answer:
+        "Tüm ürünlerimiz dört mevsim koşullarına uyum sağlayacak şekilde; elektrostatik fırın boyalı metaller, UV korumalı sentetik rattanlar ve su itici outdoor tekstil ürünleri ile donatılmıştır.",
     },
     {
-      question: "Ürünler kurulu mu geliyor, montaj hizmetiniz var mı?",
-      icon: <Hammer className="w-5 h-5" />,
-      answer: (
-        <p>
-          Ürünlerimizin birçoğu nakliye güvenliği ve kapı geçiş kolaylığı için
-          demonte veya yarı-demonte olarak gönderilmektedir. Paket içerisinde
-          kolay kurulum şeması ve gerekli tüm aparatlar yer alır. İstanbul içi
-          siparişlerde belirli tutar üzerindeki alışverişlerinizde ücretsiz
-          montaj desteği sunmaktayız.
-        </p>
-      ),
+      question: "Kurulum ve montaj süreci nasıl işliyor?",
+      answer:
+        "Güvenli sevkiyat adına yarı-demonte gönderilen ürünlerimiz, özel bir teknik bilgi gerektirmeden ortalama 15 dakika içinde kurulabilir. İstanbul ve çevre illerde profesyonel montaj ekibimiz opsiyonel olarak destek vermektedir.",
     },
     {
-      question: "Kargo süreci ve büyük paket taşımacılığı nasıl yapılıyor?",
-      icon: <Package className="w-5 h-5" />,
-      answer: (
-        <>
-          <p className="mb-2">
-            Mobilya gibi büyük hacimli ürünler, standart kargo firmalarının yanı
-            sıra uzman lojistik firmaları ile gönderilmektedir.
-          </p>
-          <p>
-            Ürünlerimiz, darbelere dayanıklı özel kalın kartonlar ve koruyucu
-            köpükler ile paketlenerek "katınıza kadar teslim" seçeneğiyle
-            adresinize ulaştırılır.
-          </p>
-        </>
-      ),
+      question: "Lojistik ve katınıza teslimat imkanı var mı?",
+      answer:
+        "Mobilya taşımacılığında uzmanlaşmış özel lojistik partnerlerimiz ile ürünlerinizi sadece kapınıza değil, balkon veya bahçenizdeki kullanım alanına kadar titizlikle taşıyoruz.",
     },
     {
-      question: "Kışın mobilyalarımı nasıl korumalıyım?",
-      icon: <HelpCircle className="w-5 h-5" />,
-      answer: (
-        <p>
-          Ürünlerimiz dayanıklı olsa da, mobilyalarınızın ömrünü uzatmak için
-          kış aylarında koruma kılıfı kullanmanızı veya minderleri kapalı/kuru
-          bir alanda muhafaza etmenizi öneririz. Ahşap ürünler için yılda bir
-          kez yapacağınız yağ bakımı, mobilyanızın ilk günkü formunu korumasını
-          sağlayacaktır.
-        </p>
-      ),
+      question: "Kış aylarında bakım ve koruma önerileriniz nelerdir?",
+      answer:
+        "Ürünlerimiz dayanıklı olsa da, ekstrem hava koşullarında özel koruma kılıflarımızı kullanmanızı ve minderleri kuru bir alanda muhafaza etmenizi, mobilya ömrünü maksimize etmek adına tavsiye ederiz.",
     },
     {
-      question: "Özel ölçü veya renk seçeneği mevcut mu?",
-      icon: <HelpCircle className="w-5 h-5" />,
-      answer: (
-        <p>
-          Belirli model koltuk ve masa takımlarımızda kumaş rengi değişimi
-          yapabiliyoruz. Balkonunuzun ölçüsüne özel üretim talepleriniz için
-          "Canlı Destek" butonundan ekibimizle iletişime geçerek detaylı bilgi
-          alabilirsiniz.
-        </p>
-      ),
+      question: "Kişiselleştirilmiş ölçü veya renk çalışabiliyor musunuz?",
+      answer:
+        "Butik üretim anlayışımız sayesinde belirli koleksiyonlarda mimari projenize uygun kumaş kartelası değişimi ve ölçü modifikasyonları yapabiliyoruz.",
     },
   ];
 
   return (
-    <div className="bg-white font-inter">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        {/* ÜST BAŞLIK */}
-        <motion.header
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="text-center mb-12 md:mb-16"
-        >
-          <p className="text-base font-semibold tracking-widest uppercase text-rose-500">
-            Müşteri Deneyimi
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mt-2 tracking-tight">
-            Merak Edilenler
-          </h1>
-          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-            Bahçenizi ve balkonunuzu güzelleştirirken aklınıza takılan tüm
-            teknik detaylar ve süreçler hakkında bilgi alın.
-          </p>
-        </motion.header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* FAQ LİSTESİ */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="lg:col-span-2 space-y-4"
+    <div className="bg-zinc-50 text-zinc-900 font-light">
+      <div className="max-w-5xl mx-auto px-6 py-24 md:py-32">
+        {/* HEADER: Minimalist Tipografi */}
+        <header className="mb-20 space-y-4">
+          <motion.span
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            className="text-[10px] tracking-[0.5em] uppercase text-zinc-600 block mb-4"
           >
+            Bilgi Merkezi
+          </motion.span>
+          <h2 className="text-4xl md:text-5xl font-extralight tracking-tighter italic leading-tight">
+            Merak Edilen <br /> Detaylar.
+          </h2>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          {/* FAQ LİSTESİ: Çizgisel ve Sade */}
+          <div className="lg:col-span-8 border-t border-zinc-200">
             {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className={`bg-white border rounded-lg transition-all duration-300 ${
-                  openIndex === index
-                    ? "border-rose-300 ring-1 ring-rose-100 shadow-lg"
-                    : "border-gray-200 hover:border-gray-300 shadow-sm"
-                }`}
-              >
+              <div key={index} className="border-b border-zinc-100">
                 <button
-                  className="w-full p-5 sm:p-6 text-left focus:outline-none flex items-center justify-between"
-                  onClick={() => toggleIndex(index)}
+                  onClick={() =>
+                    setOpenIndex(openIndex === index ? null : index)
+                  }
+                  className="w-full py-8 flex items-center justify-between text-left group"
                 >
-                  <div className="flex items-center gap-4">
-                    <span
-                      className={`${
-                        openIndex === index ? "text-rose-600" : "text-gray-400"
-                      } transition-colors`}
-                    >
-                      {faq.icon}
-                    </span>
-                    <h3
-                      className={`text-lg font-bold ${
-                        openIndex === index ? "text-gray-900" : "text-gray-700"
-                      }`}
-                    >
-                      {faq.question}
-                    </h3>
-                  </div>
-                  <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-300 ${
+                  <span
+                    className={`text-lg transition-all duration-500 ${
                       openIndex === index
-                        ? "rotate-180 text-rose-600"
-                        : "text-gray-400"
+                        ? "pl-4 text-zinc-900 italic"
+                        : "text-zinc-500 group-hover:text-zinc-800"
+                    }`}
+                  >
+                    {faq.question}
+                  </span>
+                  <ChevronRight
+                    className={`w-4 h-4 transition-transform duration-500 text-zinc-300 ${
+                      openIndex === index ? "rotate-90 text-zinc-900" : ""
                     }`}
                   />
                 </button>
 
-                <div
-                  className={`transition-all duration-300 ease-in-out ${
-                    openIndex === index
-                      ? "max-h-[500px] opacity-100"
-                      : "max-h-0 opacity-0 overflow-hidden"
-                  }`}
-                >
-                  <div className="p-6 pt-0 text-gray-600 leading-relaxed border-t border-gray-50 mt-1">
-                    <div className="pt-4">{faq.answer}</div>
-                  </div>
-                </div>
+                <AnimatePresence>
+                  {openIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pb-8 pl-4 pr-12 text-zinc-500 leading-relaxed font-light text-sm md:text-base border-l border-zinc-900 ml-1">
+                        {faq.answer}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ))}
-          </motion.div>
+          </div>
 
-          {/* SAĞ KART: DESTEK */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="lg:col-span-1"
-          >
-            <div className="sticky top-8 bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-2xl shadow-2xl text-white overflow-hidden relative">
-              {/* Dekoratif Arka Plan İkonu */}
-              <HelpCircle className="absolute -right-8 -bottom-8 w-32 h-32 text-white/5 rotate-12" />
-
-              <div className="relative z-10">
-                <div className="bg-rose-500 w-12 h-12 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-rose-500/30">
-                  <Headset className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Size Özel Çözümler</h3>
-                <p className="text-gray-300 mb-8 leading-relaxed">
-                  Balkon ölçülerinize uygun mobilya seçimi veya kurulum desteği
-                  için uzman ekibimizle görüşebilirsiniz.
+          {/* SAĞ TARAF: Minimalist İletişim Kartı */}
+          <div className="lg:col-span-4">
+            <div className="sticky top-32 space-y-8">
+              <div className="p-8 border border-zinc-200 rounded-sm bg-white/50 backdrop-blur-sm">
+                <h3 className="text-xs tracking-[0.3em] uppercase font-medium mb-4 text-zinc-400">
+                  Özel Projeler
+                </h3>
+                <p className="text-sm text-zinc-500 leading-relaxed mb-8">
+                  Mekanınıza özel yerleşim planı ve mobilya seçimi için iç
+                  mimarlarımızdan profesyonel destek alabilirsiniz.
                 </p>
-
-                <Link href="/contact" className="block">
-                  <Button
-                    style={{ backgroundColor: primaryColor }}
-                    className="w-full rounded-xl text-white py-6 text-lg font-bold shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Mimarımıza Danışın
-                  </Button>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 text-[11px] tracking-[0.2em] uppercase font-bold text-zinc-900 group"
+                >
+                  İletişime Geçin
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-2 transition-transform duration-300" />
                 </Link>
+              </div>
 
-                <div className="mt-8 pt-8 border-t border-white/10 space-y-3">
-                  <p className="text-sm text-gray-400 flex justify-between">
-                    <span>Hafta İçi:</span>
-                    <span className="text-white">09:00 - 19:00</span>
-                  </p>
-                  <p className="text-sm text-gray-400 flex justify-between">
-                    <span>Hafta Sonu:</span>
-                    <span className="text-white">10:00 - 17:00</span>
-                  </p>
+              <div className="px-2 space-y-4">
+                <div className="flex justify-between items-end border-b border-zinc-100 pb-2">
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-widest">
+                    Çalışma Saatleri
+                  </span>
+                  <span className="text-xs text-zinc-800">09:00 — 19:00</span>
                 </div>
+                <p className="text-[10px] text-zinc-500 leading-relaxed italic">
+                  * Hafta sonları ve resmi tatillerde yanıt süreleri değişiklik
+                  gösterebilir.
+                </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

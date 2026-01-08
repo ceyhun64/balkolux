@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LogOut, User, MapPin, Package } from "lucide-react";
+import { LogOut, User, MapPin, Package, Truck } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
@@ -35,6 +35,7 @@ export default function Sidebar() {
     ],
     ALIŞVERİŞ: [
       { name: "Sipariş Geçmişi", path: "/profile/orders", icon: Package },
+      { name: "Kargo Takip", path: "/profile/cargo_tracking", icon: Truck },
     ],
   };
 
