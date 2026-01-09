@@ -13,6 +13,7 @@ import {
   Settings,
   Bell,
   ChevronRight,
+  Ticket,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -64,6 +65,12 @@ export default function AdminSidebar(): React.ReactElement {
       label: "Aboneler",
       icon: Bell,
       href: "/admin/subscribers",
+    },
+    {
+      id: "coupon",
+      label: "Kuponlar",
+      icon: Ticket,
+      href: "/admin/coupon",
     },
     {
       id: "settings",

@@ -67,8 +67,16 @@ interface CartItem {
   product: Product;
   quantity: number;
 }
+
 interface UserUser {
   user: User;
+}
+
+interface CouponData {
+  code: string;
+  type: "PERCENTAGE" | "FIXED";
+  discountAmount: number;
+  finalPrice: number;
 }
 
 export default function PaymentPage() {
@@ -90,6 +98,9 @@ export default function PaymentPage() {
   const [cvc, setCvc] = useState("");
   const [holderName, setHolderName] = useState("");
   const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
+
+  // Coupon states
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponData | null>(null);
 
   const initialAddressForm: AddressFormData & { email?: string } = {
     title: "",
@@ -158,24 +169,40 @@ export default function PaymentPage() {
       ),
     [cartItems]
   );
+
   const selectedCargoFee = useMemo(
     () => cargoOptions.find((c) => c.id === selectedCargo)?.fee || 0,
     [selectedCargo]
   );
 
-  const totalPriceWithInstallment = useMemo(() => {
-    const baseTotal = (subTotal + selectedCargoFee) * 1.1;
-    const selectedRate = installmentRates.find(
-      (r) => r.count === selectedInstallment
-    );
-    if (!selectedRate) return baseTotal;
-    return baseTotal + baseTotal * (selectedRate.rate / 100);
-  }, [subTotal, selectedCargoFee, selectedInstallment]);
-
-  const baseTotalPrice = useMemo(
+  // Kupon indirimi uygulanmadan önceki toplam (KDV dahil)
+  const baseTotalBeforeDiscount = useMemo(
     () => (subTotal + selectedCargoFee) * 1.1,
     [subTotal, selectedCargoFee]
   );
+
+  // Kupon indiriminden sonraki ara toplam
+  const baseTotalAfterDiscount = useMemo(() => {
+    if (appliedCoupon) {
+      return Math.max(
+        0,
+        baseTotalBeforeDiscount - appliedCoupon.discountAmount
+      );
+    }
+    return baseTotalBeforeDiscount;
+  }, [baseTotalBeforeDiscount, appliedCoupon]);
+
+  // Taksit hesaplaması (kupon uygulandıktan sonra)
+  const totalPriceWithInstallment = useMemo(() => {
+    const selectedRate = installmentRates.find(
+      (r) => r.count === selectedInstallment
+    );
+    if (!selectedRate) return baseTotalAfterDiscount;
+    return (
+      baseTotalAfterDiscount +
+      baseTotalAfterDiscount * (selectedRate.rate / 100)
+    );
+  }, [baseTotalAfterDiscount, selectedInstallment]);
 
   const validateAddressForm = (): boolean => {
     const required = [
@@ -278,6 +305,27 @@ export default function PaymentPage() {
       const shippingAddr =
         currentUser?.user.addresses?.[0] || (newAddressForm as Address);
 
+      // Taksit oranını bul
+      const selectedRate = installmentRates.find(
+        (r) => r.count === selectedInstallment
+      );
+
+      // 1. totalPrice: Kupon uygulanmamış + taksit dahil (liste fiyatı)
+      const totalWithoutCoupon = selectedRate
+        ? baseTotalBeforeDiscount +
+          baseTotalBeforeDiscount * (selectedRate.rate / 100)
+        : baseTotalBeforeDiscount;
+
+      // 2. paidPrice: Kupon uygulanmış + taksit dahil (gerçek ödenen)
+      const finalBaseTotalAfterDiscount = appliedCoupon
+        ? Math.max(0, baseTotalBeforeDiscount - appliedCoupon.discountAmount)
+        : baseTotalBeforeDiscount;
+
+      const finalTotalWithInstallment = selectedRate
+        ? finalBaseTotalAfterDiscount +
+          finalBaseTotalAfterDiscount * (selectedRate.rate / 100)
+        : finalBaseTotalAfterDiscount;
+
       const payload = {
         userId,
         basketItems: cartItems.map((item) => ({
@@ -310,9 +358,9 @@ export default function PaymentPage() {
           tcno: shippingAddr.tcno || "11111111111",
           district: shippingAddr.district,
         },
-        totalPrice: totalPriceWithInstallment,
-        paidPrice: totalPriceWithInstallment,
-        baseTotalPrice: baseTotalPrice,
+        totalPrice: totalWithoutCoupon, // Kupon yok + taksit var
+        paidPrice: finalTotalWithInstallment, // Kupon var + taksit var (gerçek ödenen)
+        baseTotalPrice: baseTotalBeforeDiscount, // Kupon yok + taksit yok (ara toplam)
         currency: "TRY",
         paymentMethod: "iyzipay",
         paymentCard: {
@@ -334,6 +382,8 @@ export default function PaymentPage() {
           ip: "127.0.0.1",
         },
         installment: selectedInstallment,
+        couponCode: appliedCoupon?.code || null,
+        discountAmount: appliedCoupon?.discountAmount || 0,
       };
 
       const res = await fetch("/api/order", {
@@ -416,7 +466,7 @@ export default function PaymentPage() {
                     setExpireYear={setExpireYear}
                     cvc={cvc}
                     setCvc={setCvc}
-                    totalPrice={baseTotalPrice}
+                    totalPrice={baseTotalAfterDiscount}
                     setStep={setStep}
                     handlePayment={handlePayment}
                     isProcessing={processingPayment}
@@ -452,6 +502,9 @@ export default function PaymentPage() {
               <BasketSummaryCard
                 selectedCargoFee={selectedCargoFee}
                 selectedInstallment={selectedInstallment}
+                appliedCoupon={appliedCoupon}
+                onCouponApply={setAppliedCoupon}
+                subTotal={subTotal}
               />
             </div>
 

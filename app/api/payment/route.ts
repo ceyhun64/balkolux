@@ -1,8 +1,7 @@
-// app/api/payment/route.ts - Taksit Farkı Düzeltildi
+// app/api/payment/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
-// Taksit oranları
 const INSTALLMENT_RATES: { [key: number]: number } = {
   1: 0,
   2: 3.5,
@@ -12,9 +11,8 @@ const INSTALLMENT_RATES: { [key: number]: number } = {
   12: 17.0,
 };
 
-/**
- * İyzipay için HMAC-SHA256 signature oluşturur
- */
+// --- YARDIMCI FONKSİYONLAR ---
+
 function generateIyzicoSignature(
   randomKey: string,
   uri: string,
@@ -28,18 +26,12 @@ function generateIyzicoSignature(
     .digest("hex");
 }
 
-/**
- * İyzipay authorization header'ı oluşturur
- */
 function createAuthorizationHeader(
   apiKey: string,
   secretKey: string,
   uri: string,
   requestBody: string
-): {
-  authorization: string;
-  randomKey: string;
-} {
+) {
   const randomKey = crypto.randomBytes(16).toString("hex");
   const signature = generateIyzicoSignature(
     randomKey,
@@ -47,119 +39,55 @@ function createAuthorizationHeader(
     requestBody,
     secretKey
   );
-
   const authString = `apiKey:${apiKey}&randomKey:${randomKey}&signature:${signature}`;
   const authorization = `IYZWSv2 ${Buffer.from(authString).toString("base64")}`;
-
   return { authorization, randomKey };
 }
 
-/**
- * Tarihleri İyzipay formatına çevirir
- */
 function formatDateForIyzipay(date: string | Date): string {
   const d = new Date(date);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const min = String(d.getMinutes()).padStart(2, "0");
-  const ss = String(d.getSeconds()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+  return d.toISOString().replace(/T/, " ").replace(/\..+/, "");
 }
 
-/**
- * Fiyat hesaplama ve taksit farkı ekleme
- */
-function calculatePricing(basketItems: BasketItem[], installment: number = 1) {
-  // Sepet toplamı
-  const subtotal = basketItems.reduce((sum, item) => {
-    const price =
-      typeof item.price === "string" ? parseFloat(item.price) : item.price;
-    return sum + price;
-  }, 0);
-
-  // %10 hizmet bedeli (KDV)
+function calculatePricing(
+  basketItems: any[],
+  installment: number = 1,
+  discountAmount: number = 0
+) {
+  const subtotal = basketItems.reduce(
+    (sum, item) =>
+      sum +
+      (typeof item.price === "string" ? parseFloat(item.price) : item.price),
+    0
+  );
   const serviceFee = subtotal * 0.1;
-
-  // Ara toplam (ürünler + KDV)
   const baseTotal = subtotal + serviceFee;
 
-  // Taksit farkını hesapla
-  const installmentRate = INSTALLMENT_RATES[installment] || 0;
-  const installmentFee = baseTotal * (installmentRate / 100);
+  // İndirim sonrası tutar (negatif olamaz)
+  const totalAfterDiscount = Math.max(0, baseTotal - discountAmount);
 
-  // Nihai toplam
-  const total = baseTotal + installmentFee;
+  // Taksit farkı indirimli tutar üzerinden hesaplanır
+  const installmentRate = INSTALLMENT_RATES[installment] || 0;
+  const installmentFee = totalAfterDiscount * (installmentRate / 100);
+  const finalTotal = totalAfterDiscount + installmentFee;
 
   return {
-    subtotal: parseFloat(subtotal.toFixed(2)),
-    serviceFee: parseFloat(serviceFee.toFixed(2)),
-    baseTotal: parseFloat(baseTotal.toFixed(2)),
-    installmentFee: parseFloat(installmentFee.toFixed(2)),
+    subtotal,
+    serviceFee,
+    baseTotal,
+    discountAmount,
+    totalAfterDiscount,
+    installmentFee,
     installmentRate,
-    total: parseFloat(total.toFixed(2)),
+    total: finalTotal,
   };
 }
 
-// Tipler
-interface PaymentCard {
-  cardHolderName: string;
-  cardNumber: string;
-  expireMonth: string;
-  expireYear: string;
-  cvc: string;
-}
+// --- ANA ROUTE ---
 
-interface Buyer {
-  id: string;
-  name: string;
-  surname: string;
-  email: string;
-  identityNumber: string;
-  registrationDate: string;
-  lastLoginDate: string;
-  phone: string;
-  city: string;
-  country: string;
-  zipCode: string;
-  ip: string;
-}
-
-interface Address {
-  contactName: string;
-  city: string;
-  country: string;
-  address: string;
-  zipCode: string;
-}
-
-interface BasketItem {
-  id: string | number;
-  name?: string;
-  category1?: string;
-  itemType?: string;
-  price: number | string;
-}
-
-interface PaymentRequestBody {
-  paymentCard: PaymentCard;
-  buyer: Buyer;
-  shippingAddress: Address;
-  billingAddress: Address;
-  basketItems: BasketItem[];
-  currency?: string;
-  basketId?: string;
-  installment?: number;
-}
-
-/**
- * POST /api/payment
- * İyzipay ödeme işlemini gerçekleştirir
- */
 export async function POST(req: NextRequest) {
   try {
-    const body: PaymentRequestBody = await req.json();
+    const body = await req.json();
     const {
       paymentCard,
       buyer,
@@ -169,86 +97,94 @@ export async function POST(req: NextRequest) {
       currency = "TRY",
       basketId,
       installment = 1,
+      discountAmount = 0,
+      couponCode = null,
     } = body;
 
-    // Environment variables kontrolü
     const apiKey = process.env.IYZICO_API_KEY;
     const secretKey = process.env.IYZICO_SECRET_KEY;
     const baseUrl =
       process.env.IYZICO_BASE_URL || "https://sandbox-api.iyzipay.com";
 
     if (!apiKey || !secretKey) {
-      console.error("İyzipay API credentials eksik!");
       return NextResponse.json(
-        {
-          status: "error",
-          error: "Payment configuration error. Please contact support.",
-        },
+        { status: "error", error: "API Keys missing" },
         { status: 500 }
       );
     }
 
-    // Buyer tarihlerini formatla
-    const formattedBuyer = {
-      ...buyer,
-      registrationDate: formatDateForIyzipay(buyer.registrationDate),
-      lastLoginDate: formatDateForIyzipay(buyer.lastLoginDate),
-    };
+    const pricing = calculatePricing(basketItems, installment, discountAmount);
 
-    // Fiyat hesaplaması (TAKSİT FARKI DAHİL)
-    const pricing = calculatePricing(basketItems, installment);
+    // 🎯 İNDİRİM DAĞITIM MANTIĞI
+    // İyzipay negatif fiyat kabul etmez. İndirimi her kalemin paidPrice'ına yedirmeliyiz.
+    const discountRate =
+      pricing.baseTotal > 0 ? pricing.discountAmount / pricing.baseTotal : 0;
 
-    console.log("💰 Fiyat Hesaplaması:", {
-      subtotal: pricing.subtotal,
-      serviceFee: pricing.serviceFee,
-      baseTotal: pricing.baseTotal,
-      installment: installment,
-      installmentRate: `%${pricing.installmentRate}`,
-      installmentFee: pricing.installmentFee,
-      total: pricing.total,
-    });
-
-    // Sepet ürünleri
-    const formattedBasketItems = basketItems.map((item) => {
-      const price =
+    // 1. Ürünleri Formatla
+    let formattedBasketItems: any[] = basketItems.map((item: any) => {
+      const originalPrice =
         typeof item.price === "string" ? parseFloat(item.price) : item.price;
+      const itemPaidPrice = originalPrice - originalPrice * discountRate;
+
       return {
         id: item.id.toString(),
         name: item.name || "Ürün",
         category1: item.category1 || "Genel",
-        itemType: item.itemType || "PHYSICAL",
-        price: price.toFixed(2),
+        itemType: "PHYSICAL",
+        price: originalPrice.toFixed(2), // Ürünün ham fiyatı
+        paidPrice: itemPaidPrice.toFixed(2), // Ürünün indirimli fiyatı
       };
     });
 
-    // Hizmet bedeli (KDV) ekle
+    // 2. Hizmet Bedelini Kalem Olarak Ekle
+    const serviceFeePaidPrice =
+      pricing.serviceFee - pricing.serviceFee * discountRate;
     formattedBasketItems.push({
       id: "SERVICE_FEE",
-      name: "Hizmet Bedeli (KDV %10)",
+      name: "Hizmet Bedeli",
       category1: "Hizmet",
       itemType: "VIRTUAL",
       price: pricing.serviceFee.toFixed(2),
+      paidPrice: serviceFeePaidPrice.toFixed(2),
     });
 
-    // 🔥 TAKSİT FARKI EKLE (Eğer varsa)
+    // 3. Taksit Farkını Ekle (Varsa)
     if (installment > 1 && pricing.installmentFee > 0) {
       formattedBasketItems.push({
         id: "INSTALLMENT_FEE",
-        name: `Taksit Farkı (${installment} Taksit - %${pricing.installmentRate})`,
+        name: "Taksit Farkı",
         category1: "Hizmet",
         itemType: "VIRTUAL",
         price: pricing.installmentFee.toFixed(2),
+        paidPrice: pricing.installmentFee.toFixed(2), // Taksit farkına indirim uygulanmaz
       });
     }
 
-    // İyzipay ödeme request body'si
+    // ⚖️ KURUŞ FARKI DÜZELTME
+    // Yuvarlamalardan dolayı paidPrice toplamı finalTotal'den farklı çıkabilir.
+    const currentItemsTotal = formattedBasketItems.reduce(
+      (sum, item) => sum + parseFloat(item.paidPrice),
+      0
+    );
+    const diff = parseFloat((pricing.total - currentItemsTotal).toFixed(2));
+
+    if (Math.abs(diff) > 0) {
+      const lastIndex = formattedBasketItems.length - 1;
+      const correctedPrice = (
+        parseFloat(formattedBasketItems[lastIndex].paidPrice) + diff
+      ).toFixed(2);
+      formattedBasketItems[lastIndex].paidPrice = correctedPrice;
+    }
+
+    // --- IYZICO REQUEST ---
+
     const paymentRequest = {
       locale: "tr",
       conversationId: Date.now().toString(),
-      price: pricing.total.toFixed(2), // 🔥 TAKSİT FARKLI TOPLAM
-      paidPrice: pricing.total.toFixed(2), // 🔥 TAKSİT FARKLI TOPLAM
+      price: (pricing.baseTotal + (pricing.installmentFee || 0)).toFixed(2), // Brüt toplam
+      paidPrice: pricing.total.toFixed(2), // Müşterinin ödeyeceği net tutar
       currency,
-      installment: installment,
+      installment,
       basketId: basketId || `B${Date.now()}`,
       paymentChannel: "WEB",
       paymentCard: {
@@ -259,26 +195,17 @@ export async function POST(req: NextRequest) {
         cvc: paymentCard.cvc,
         registerCard: 0,
       },
-      buyer: formattedBuyer,
-      shippingAddress: {
-        contactName: shippingAddress.contactName,
-        city: shippingAddress.city,
-        country: shippingAddress.country,
-        address: shippingAddress.address,
-        zipCode: shippingAddress.zipCode,
+      buyer: {
+        ...buyer,
+        registrationDate: formatDateForIyzipay(buyer.registrationDate),
+        lastLoginDate: formatDateForIyzipay(buyer.lastLoginDate),
       },
-      billingAddress: {
-        contactName: billingAddress.contactName,
-        city: billingAddress.city,
-        country: billingAddress.country,
-        address: billingAddress.address,
-        zipCode: billingAddress.zipCode,
-      },
+      shippingAddress,
+      billingAddress,
       basketItems: formattedBasketItems,
     };
 
     const requestBody = JSON.stringify(paymentRequest);
-
     const uri = "/payment/auth";
     const { authorization, randomKey } = createAuthorizationHeader(
       apiKey,
@@ -287,84 +214,38 @@ export async function POST(req: NextRequest) {
       requestBody
     );
 
-    console.log("📤 İyzipay ödeme isteği gönderiliyor...", {
-      endpoint: `${baseUrl}${uri}`,
-      subtotal: pricing.subtotal,
-      serviceFee: pricing.serviceFee,
-      installmentFee: pricing.installmentFee,
-      total: pricing.total,
-      installment: installment,
-      itemCount: formattedBasketItems.length,
-    });
-
-    // İyzipay API'ye istek gönder
     const response = await fetch(`${baseUrl}${uri}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: authorization,
         "x-iyzi-rnd": randomKey,
-        Accept: "application/json",
       },
       body: requestBody,
     });
 
     const result = await response.json();
 
-    // Başarılı ödeme kontrolü
     if (result.status === "success") {
-      console.log("✅ İyzipay ödeme başarılı:", {
-        paymentId: result.paymentId,
-        conversationId: result.conversationId,
-        amount: pricing.total,
-        installment: installment,
-        installmentFee: pricing.installmentFee,
-      });
-
       return NextResponse.json({
         status: "success",
-        paymentId: result.paymentId,
-        conversationId: result.conversationId,
-        fraudStatus: result.fraudStatus,
-        installment: installment,
-        pricing: {
-          subtotal: pricing.subtotal,
-          serviceFee: pricing.serviceFee,
-          baseTotal: pricing.baseTotal,
-          installmentFee: pricing.installmentFee,
-          installmentRate: pricing.installmentRate,
-          total: pricing.total,
-        },
+        pricing: pricing, // Frontend'de göstermek istersen
         ...result,
       });
+    } else {
+      return NextResponse.json(
+        {
+          status: "error",
+          error: result.errorMessage,
+          errorCode: result.errorCode,
+        },
+        { status: 400 }
+      );
     }
-
-    // Hatalı ödeme
-    console.error("❌ İyzipay ödeme hatası:", {
-      errorCode: result.errorCode,
-      errorMessage: result.errorMessage,
-      errorGroup: result.errorGroup,
-    });
-
-    return NextResponse.json(
-      {
-        status: "error",
-        error: result.errorMessage || "Ödeme işlemi başarısız oldu",
-        errorCode: result.errorCode,
-        errorGroup: result.errorGroup,
-      },
-      { status: 400 }
-    );
   } catch (error: any) {
-    console.error("💥 Payment API kritik hata:", error);
-
+    console.error("Payment Error:", error);
     return NextResponse.json(
-      {
-        status: "error",
-        error: "Ödeme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.",
-        details:
-          process.env.NODE_ENV === "development" ? error.message : undefined,
-      },
+      { status: "error", error: error.message },
       { status: 500 }
     );
   }

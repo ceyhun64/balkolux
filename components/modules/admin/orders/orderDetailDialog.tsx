@@ -19,6 +19,8 @@ import {
   MapPin,
   Phone,
   User,
+  Tag,
+  Receipt,
 } from "lucide-react";
 import { FormattedOrder } from "@/types/order";
 
@@ -64,10 +66,8 @@ export default function OrderDetailDialog({
     return order.items.reduce((sum, item) => sum + (item.quantity || 1), 0);
   };
 
-  console.log("order", order);
- 
   return (
-    <DialogContent className="bg-white text-gray-900 max-w-[95vw] sm:max-w-[600px] lg:max-w-[900px] max-h-[90vh] overflow-y-auto p-0">
+    <DialogContent className="bg-white text-gray-900 max-w-[95vw] sm:max-w-[600px] lg:max-w-[900px] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl">
       {/* Header */}
       <DialogHeader className="p-6 pb-4 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-purple-50">
         <div className="flex items-start justify-between">
@@ -91,125 +91,135 @@ export default function OrderDetailDialog({
       </DialogHeader>
 
       <div className="p-6 space-y-6">
-        {/* Ödeme Bilgileri */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-5 border border-blue-100">
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800 mb-4">
-            <Wallet className="w-5 h-5 text-indigo-600" /> Ödeme Bilgileri
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white/60 rounded-md p-3 backdrop-blur-sm">
-              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                <Package className="w-3 h-3" />
-                Toplam Tutar
-              </div>
-              <div className="text-xl font-bold text-gray-800">
-                {order.totalPrice.toLocaleString("tr-TR")} ₺
-              </div>
-            </div>
-            <div className="bg-white/60 rounded-md p-3 backdrop-blur-sm">
-              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                <CreditCard className="w-3 h-3" />
-                Ödenen Tutar
-              </div>
-              <div className="text-xl font-bold text-indigo-600">
-                {order.paidPrice.toLocaleString("tr-TR")} ₺
-              </div>
-            </div>
-            <div className="bg-white/60 rounded-md p-3 backdrop-blur-sm">
-              <div className="text-xs text-gray-500 mb-1">Ödeme Yöntemi</div>
-              <div className="text-sm font-medium text-gray-700 capitalize">
+        {/* Ödeme ve Kupon Bilgileri */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+              <Wallet className="w-5 h-5 text-indigo-600" /> Ödeme Özeti
+            </h3>
+            {order.paymentMethod && (
+              <span className="text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 px-2 py-1 rounded">
                 {order.paymentMethod}
-              </div>
-            </div>
-            <div className="bg-white/60 rounded-md p-3 backdrop-blur-sm">
-              <div className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                <Hash className="w-3 h-3" />
-                İşlem ID
-              </div>
-              <div className="text-sm font-medium text-gray-700 font-mono">
-                {order.transactionId || "-"}
-              </div>
-            </div>
-            {order.installment && order.installment > 1 && (
-              <div className="bg-white/60 rounded-md p-3 backdrop-blur-sm">
-                <div className="text-xs text-gray-500 mb-1">Taksit</div>
-                <div className="text-sm font-medium text-gray-700">
-                  {order.installment} Taksit
-                </div>
-              </div>
+              </span>
             )}
-            <div className="bg-white/60 rounded-md p-3 backdrop-blur-sm">
-              <div className="text-xs text-gray-500 mb-1">Para Birimi</div>
-              <div className="text-sm font-medium text-gray-700">
-                {order.currency}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Sol Kolon: Fiyatlandırma Detayı */}
+            <div className="md:col-span-2 space-y-3">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Brüt Toplam:</span>
+                <span className="font-medium">
+                  {order.totalPrice.toLocaleString("tr-TR")} ₺
+                </span>
+              </div>
+
+              {/* Kupon Satırı */}
+              <div className="flex justify-between text-sm">
+                <div className="flex items-center gap-2 text-green-600 font-medium">
+                  <Tag className="w-4 h-4" />
+                  <span>
+                    İndirim{" "}
+                    {order.couponCode ? `(${order.couponCode})` : "Uygulanmadı"}
+                    :
+                  </span>
+                </div>
+                <span className="text-green-600 font-bold">
+                  -{order.discountAmount?.toLocaleString("tr-TR") || "0,00"} ₺
+                </span>
+              </div>
+
+              <div className="pt-2 border-t border-blue-200 flex justify-between items-center">
+                <span className="text-base font-semibold text-gray-800">
+                  Net Ödenen Tutar:
+                </span>
+                <span className="text-2xl font-black text-indigo-700">
+                  {order.paidPrice.toLocaleString("tr-TR")} ₺
+                </span>
+              </div>
+            </div>
+
+            {/* Sağ Kolon: Teknik Detaylar */}
+            <div className="bg-white/50 rounded-lg p-3 space-y-3 text-xs border border-blue-100/50">
+              <div>
+                <span className="text-gray-500 block mb-0.5">
+                  İşlem (Transaction) ID:
+                </span>
+                <span className="font-mono font-medium text-gray-700 break-all">
+                  {order.transactionId || "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Taksit:</span>
+                <span className="font-bold text-gray-700">
+                  {order.installment && order.installment > 1
+                    ? `${order.installment} Taksit`
+                    : "Tek Çekim"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Para Birimi:</span>
+                <span className="font-bold text-gray-700">
+                  {order.currency}
+                </span>
               </div>
             </div>
           </div>
 
           {nextStatus && order.status !== "cancelled" && (
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-6">
               <Button
-                className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 shadow-md"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 shadow-lg transition-all active:scale-95"
                 onClick={() => onUpdateStatus(order.id, order.status)}
               >
                 <ArrowRight className="w-4 h-4" />
-                {getStatusInTurkish(nextStatus)}'ye Geç
+                Siparişi {getStatusInTurkish(nextStatus)} Aşamasına Taşı
               </Button>
             </div>
           )}
         </div>
 
         {/* Sipariş Ürünleri */}
-        <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+        <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
-              <Package className="w-5 h-5 text-gray-600" /> Sipariş Ürünleri
+              <Package className="w-5 h-5 text-gray-600" /> Sipariş İçeriği
             </h3>
-            <div className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full border border-gray-200">
-              <span className="font-semibold">{getTotalQuantity()}</span> Adet ·{" "}
-              <span className="font-semibold">{order.items.length}</span> Kalem
+            <div className="text-xs font-medium text-gray-500 bg-white px-3 py-1 rounded-full border border-gray-200 shadow-sm">
+              {getTotalQuantity()} Parça Ürün
             </div>
           </div>
-          <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+          <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
             {order.items.map((item, idx) => (
               <div
                 key={idx}
-                className="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+                className="flex items-center gap-4 p-3 bg-white border border-gray-100 rounded-lg hover:border-indigo-200 transition-colors"
               >
                 <img
                   src={item.product.mainImage}
                   alt={item.product.title}
-                  className="w-20 h-20 object-cover rounded-md border border-gray-200 flex-shrink-0"
+                  className="w-16 h-16 object-cover rounded-md border border-gray-100 flex-shrink-0"
                 />
-                <div className="flex-1 min-w-0 space-y-2">
-                  <p className="font-semibold text-gray-800 text-sm leading-tight">
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-800 text-sm truncate">
                     {item.product.title}
                   </p>
-                  {item.product.description && (
-                    <p className="text-xs text-gray-500 line-clamp-2">
-                      {item.product.description}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-4 text-xs text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-500">Birim Fiyat:</span>
-                      <span className="font-medium">
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs text-gray-500">
+                      Adet: <b className="text-gray-700">{item.quantity}</b>
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Birim:{" "}
+                      <b className="text-gray-700">
                         {item.unitPrice.toLocaleString("tr-TR")} ₺
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-500">Adet:</span>
-                      <span className="font-medium">{item.quantity}</span>
-                    </div>
+                      </b>
+                    </span>
                   </div>
-                  <div className="pt-1 border-t border-gray-100">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">Toplam:</span>
-                      <span className="font-bold text-indigo-600">
-                        {item.totalPrice.toLocaleString("tr-TR")} ₺
-                      </span>
-                    </div>
-                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-indigo-600">
+                    {item.totalPrice.toLocaleString("tr-TR")} ₺
+                  </p>
                 </div>
               </div>
             ))}
@@ -219,110 +229,59 @@ export default function OrderDetailDialog({
         {/* Adres Bilgileri */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Kargo Adresi */}
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-5 border border-green-100">
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800 mb-3">
-              <Truck className="w-5 h-5 text-green-600" /> Kargo Adresi
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-5 border border-emerald-100">
+            <h3 className="text-md font-bold flex items-center gap-2 text-emerald-800 mb-3">
+              <Truck className="w-5 h-5" /> Teslimat Bilgileri
             </h3>
             {shippingAddress ? (
-              <div className="bg-white/70 rounded-md p-4 space-y-2.5 text-sm backdrop-blur-sm">
-                <div className="flex items-start gap-2">
-                  <User className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="font-semibold text-gray-800">
-                      {shippingAddress.firstName} {shippingAddress.lastName}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      TC: {shippingAddress.tcno}
-                    </div>
-                  </div>
+              <div className="space-y-2 text-sm">
+                <p className="font-bold text-gray-800">
+                  {shippingAddress.firstName} {shippingAddress.lastName}
+                </p>
+                <div className="flex items-start gap-2 text-gray-600 italic">
+                  <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>
+                    {shippingAddress.address} <br /> {shippingAddress.district}{" "}
+                    / {shippingAddress.city}
+                  </span>
                 </div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-gray-700 leading-relaxed">
-                    {shippingAddress.address}
-                    <br />
-                    {shippingAddress.district && (
-                      <>
-                        {shippingAddress.district} / {shippingAddress.city}
-                        <br />
-                      </>
-                    )}
-                    {shippingAddress.zip && `${shippingAddress.zip} `}
-                    {shippingAddress.country}
-                  </div>
-                </div>
-                {shippingAddress.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <div className="text-gray-700 font-medium">
-                      {shippingAddress.phone}
-                    </div>
-                  </div>
-                )}
+                <p className="flex items-center gap-2 text-gray-700 font-medium">
+                  <Phone className="w-3 h-3" /> {shippingAddress.phone}
+                </p>
               </div>
             ) : (
-              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
-                Kargo adresi bulunamadı
-              </div>
+              <p className="text-xs text-red-500">Adres bilgisi bulunamadı.</p>
             )}
           </div>
 
           {/* Fatura Adresi */}
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg p-5 border border-orange-100">
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800 mb-3">
-              <CreditCard className="w-5 h-5 text-orange-600" /> Fatura Adresi
+          <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl p-5 border border-gray-200">
+            <h3 className="text-md font-bold flex items-center gap-2 text-gray-700 mb-3">
+              <Receipt className="w-5 h-5" /> Fatura Bilgileri
             </h3>
             {billingAddress ? (
-              <div className="bg-white/70 rounded-md p-4 space-y-2.5 text-sm backdrop-blur-sm">
-                <div className="flex items-start gap-2">
-                  <User className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <div className="font-semibold text-gray-800">
-                      {billingAddress.firstName} {billingAddress.lastName}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      TC: {billingAddress.tcno}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-gray-700 leading-relaxed">
-                    {billingAddress.address}
-                    <br />
-                    {billingAddress.district && (
-                      <>
-                        {billingAddress.district} / {billingAddress.city}
-                        <br />
-                      </>
-                    )}
-                    {billingAddress.zip && `${billingAddress.zip} `}
-                    {billingAddress.country}
-                  </div>
-                </div>
-                {billingAddress.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <div className="text-gray-700 font-medium">
-                      {billingAddress.phone}
-                    </div>
-                  </div>
-                )}
+              <div className="space-y-2 text-sm text-gray-600">
+                <p className="font-bold text-gray-800">
+                  {billingAddress.firstName} {billingAddress.lastName}
+                </p>
+                <p>TC: {billingAddress.tcno || "Belirtilmemiş"}</p>
+                <p className="text-xs">{billingAddress.address}</p>
+                <p className="text-xs font-bold">
+                  {billingAddress.district} / {billingAddress.city}
+                </p>
               </div>
             ) : (
-              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
-                Fatura adresi bulunamadı
-              </div>
+              <p className="text-xs text-gray-400">Gönderim adresi ile aynı.</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="flex justify-end gap-3 p-6 pt-4 border-t border-gray-100 bg-gray-50">
+      <div className="flex justify-end p-6 bg-gray-50 border-t border-gray-100">
         <Button
           onClick={() => setSelectedOrder(null)}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-6"
+          className="bg-gray-800 hover:bg-black text-white px-8 rounded-lg transition-colors"
         >
           Kapat
         </Button>

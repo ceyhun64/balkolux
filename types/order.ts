@@ -42,4 +42,6 @@ export interface FormattedOrder {
   addresses: Address[];
   currency: string;
   installment?: number;
+  discountAmount?: number;
+  couponCode?: string;
 }

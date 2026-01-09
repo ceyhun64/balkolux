@@ -1,4 +1,4 @@
-// app/api/order/route.ts - Taksit Desteği Eklendi
+// app/api/order/route.ts - Kupon İndirimini Payment API'ye Geçir
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 
@@ -32,7 +32,7 @@ interface CreateOrderBody {
   billingAddress: Address;
   totalPrice: number;
   paidPrice: number;
-  baseTotalPrice?: number; // Taksitsiz toplam
+  baseTotalPrice?: number;
   currency?: string;
   paymentMethod?: string;
   transactionId?: string;
@@ -41,7 +41,9 @@ interface CreateOrderBody {
   email?: string;
   paymentCard: any;
   buyer: any;
-  installment?: number; // Taksit sayısı
+  installment?: number;
+  couponCode?: string; // 🎟️ KUPON KODU
+  discountAmount?: number; // 🎟️ İNDİRİM TUTARI
 }
 
 interface UpdateOrderBody {
@@ -80,7 +82,9 @@ export async function POST(req: NextRequest) {
       lastName,
       email,
       paymentCard,
-      installment = 1, // Varsayılan: tek çekim
+      installment = 1,
+      couponCode = null, // 🎟️ KUPON KODU
+      discountAmount = 0, // 🎟️ İNDİRİM TUTARI
     } = body;
 
     if (!userId || !basketItems || basketItems.length === 0) {
@@ -143,7 +147,7 @@ export async function POST(req: NextRequest) {
       cvc: paymentCard.cvc,
     };
 
-    // Payment API payload (taksit bilgisi eklendi)
+    // 🎟️ Payment API payload (KUPON BİLGİSİ DAHİL)
     const paymentPayload = {
       paymentCard: paymentCardFormatted,
       buyer,
@@ -152,7 +156,9 @@ export async function POST(req: NextRequest) {
       basketItems: basketItemsFormatted,
       currency: currency ?? "TRY",
       basketId: "B" + Date.now(),
-      installment: installment, // Taksit sayısı
+      installment: installment,
+      discountAmount: discountAmount, // 🎟️ İNDİRİM TUTARI
+      couponCode: couponCode, // 🎟️ KUPON KODU
     };
 
     // Payment API çağrısı
@@ -162,6 +168,8 @@ export async function POST(req: NextRequest) {
 
     console.log("🔄 Payment API çağrılıyor:", `${baseUrl}/api/payment`);
     console.log("💳 Taksit sayısı:", installment);
+    console.log("🎟️ Kupon kodu:", couponCode || "YOK");
+    console.log("💰 İndirim tutarı:", discountAmount);
 
     const paymentRes = await fetch(`${baseUrl}/api/payment`, {
       method: "POST",
@@ -203,6 +211,24 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ Ödeme başarılı! Sipariş oluşturuluyor...");
 
+    // 🎟️ Kupon kullanımını güncelle (eğer kupon varsa)
+    if (couponCode && discountAmount > 0) {
+      try {
+        await prisma.coupon.update({
+          where: { code: couponCode },
+          data: {
+            usedCount: {
+              increment: 1,
+            },
+          },
+        });
+        console.log(`✅ Kupon kullanım sayısı güncellendi: ${couponCode}`);
+      } catch (couponError) {
+        console.error("⚠️ Kupon güncelleme hatası:", couponError);
+        // Kupon güncellenemese bile sipariş devam etsin
+      }
+    }
+
     // Veritabanına kaydet
     const order = await prisma.order.create({
       data: {
@@ -213,7 +239,9 @@ export async function POST(req: NextRequest) {
         currency: currency || "TRY",
         paymentMethod: paymentMethod || "iyzipay",
         transactionId: paymentResult?.paymentId || null,
-        installment: installment, // Taksit sayısı veritabanına kaydediliyor
+        installment: installment,
+        couponCode: couponCode, // 🎟️ KUPON KODU
+        discountAmount: discountAmount, // 🎟️ İNDİRİM TUTARI
         items: {
           create: basketItems.map((item) => ({
             product: {
@@ -294,6 +322,13 @@ ${
     ? `* **Aylık Ödeme:** ${formatPrice(monthlyPayment)} ${currency}`
     : ""
 }
+${
+  couponCode
+    ? `* **Kullanılan Kupon:** ${couponCode} (-${formatPrice(
+        discountAmount
+      )} ${currency})`
+    : ""
+}
 * **Toplam Tutar (KDV Dahil):** ${formatPrice(totalPrice)} ${currency || "TRY"}
 * **Ödenen Tutar (KDV Dahil):** ${formatPrice(paidPrice)} ${currency || "TRY"}
 ${
@@ -329,6 +364,14 @@ ${
     : ""
 }
 
+${
+  couponCode
+    ? `\n**İndirim Bilgisi:**\n${couponCode} kupon koduyla ${formatPrice(
+        discountAmount
+      )} ${currency} indirim kazandınız!`
+    : ""
+}
+
 Siparişinizin tüm aşamaları hakkında e-posta ile bilgilendirileceksiniz.
 
 Bizi tercih ettiğiniz için teşekkür eder, iyi günler dileriz.
@@ -356,6 +399,13 @@ Web sitesi üzerinden yeni bir sipariş başarıyla alınmış ve ödemesi onayl
 ${
   monthlyPayment
     ? `* **Aylık Ödeme:** ${formatPrice(monthlyPayment)} ${currency}`
+    : ""
+}
+${
+  couponCode
+    ? `* **Kullanılan Kupon:** ${couponCode} (-${formatPrice(
+        discountAmount
+      )} ${currency})`
     : ""
 }
 * **Ödenen Tutar:** ${formatPrice(paidPrice)} ${currency || "TRY"}
