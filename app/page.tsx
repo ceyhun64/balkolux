@@ -1,4 +1,3 @@
-import Topbar from "@/components/layout/topbar";
 import Navbar from "@/components/layout/navbar";
 import CategoriesSection from "@/components/modules/home/categories";
 import HeroSection from "@/components/modules/home/carousel";
