@@ -43,7 +43,6 @@ interface CargoData {
   }>;
   listOfMovements: CargoMovement[];
 }
-
 export default function HorozCargoTracking() {
   const [requestNumber, setRequestNumber] = useState("");
   const [cargoData, setCargoData] = useState<CargoData | null>(null);
@@ -52,32 +51,20 @@ export default function HorozCargoTracking() {
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!requestNumber.trim()) {
-      setError("Lütfen sipariş numarası giriniz");
+      setError("Lütfen bir takip numarası giriniz.");
       return;
     }
-
     setLoading(true);
     setError("");
-    setCargoData(null);
-
     try {
       const response = await fetch(
         `/api/cargo-tracking?requestNumber=${encodeURIComponent(
           requestNumber.trim()
-        )}`,
-        {
-          method: "GET",
-        }
+        )}`
       );
-
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Kargo bulunamadı");
-      }
-
+      if (!response.ok) throw new Error(result.error || "Kargo bulunamadı");
       setCargoData(result.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Bir hata oluştu");
@@ -86,324 +73,173 @@ export default function HorozCargoTracking() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    const statusMap: { [key: string]: string } = {
-      TESLİM: "bg-green-100 text-green-800 border-green-300",
-      ÇIKIŞ: "bg-blue-100 text-blue-800 border-blue-300",
-      GİRİŞ: "bg-indigo-100 text-indigo-800 border-indigo-300",
-      BEKLİYOR: "bg-yellow-100 text-yellow-800 border-yellow-300",
-      "TESLİM SORUN": "bg-red-100 text-red-800 border-red-300",
-    };
-
-    return statusMap[status] || "bg-gray-100 text-gray-800 border-gray-300";
-  };
-
-  const getStatusIcon = (status: string) => {
-    const iconMap: { [key: string]: string } = {
-      TESLİM: "✅",
-      ÇIKIŞ: "🚛",
-      GİRİŞ: "📦",
-      BEKLİYOR: "⏳",
-      "TESLİM SORUN": "⚠️",
-    };
-
-    return iconMap[status] || "📋";
-  };
-
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#FBFBFB] text-zinc-900">
       <Sidebar />
 
       <main className="flex-1 px-4 py-10 md:px-12 lg:px-20">
         <div className="max-w-5xl mx-auto">
-          <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-100 pb-8">
-            <div>
-              <h1 className="text-3xl font-light tracking-tight mb-2 italic">
+          {/* Header Section */}
+          <header className="mb-16 border-b border-zinc-100 pb-10">
+            <div className="max-w-fit">
+              <h1 className="text-4xl font-light tracking-tight mb-3 italic text-zinc-800">
                 Kargo Takip
               </h1>
-              <p className="text-zinc-500 text-[11px] uppercase tracking-[0.2em] font-light">
-                Sipariş numaranızı girerek kargonuzun durumunu öğrenin
+              <p className="text-zinc-400 text-[13px] font-extralight tracking-widest italic leading-relaxed">
+                Siparişinizin yolculuğunu ve teslimat detaylarını{" "}
+                <br className="hidden md:block" />
+                buradan şeffaf bir şekilde izleyebilirsiniz.
               </p>
             </div>
           </header>
 
-          {/* Arama Formu */}
-          <form onSubmit={handleTrack} className="mb-8">
-            <div className="flex gap-4">
+          {/* Search Section */}
+          <section className="mb-16">
+            <form onSubmit={handleTrack} className="relative group">
               <input
                 type="text"
                 value={requestNumber}
                 onChange={(e) => setRequestNumber(e.target.value)}
-                placeholder="Sipariş numaranızı giriniz"
-                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+                placeholder="Sipariş veya Takip Numarası"
+                className="w-full bg-transparent border-b-2 border-zinc-200 py-4 pr-32 text-xl font-light focus:outline-none focus:border-zinc-600 transition-colors placeholder:text-zinc-300 placeholder:text-sm"
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all font-semibold shadow-md"
+                className="absolute right-0 bottom-3 px-6 py-2 text-sm font-medium tracking-widest uppercase text-zinc-600 hover:text-zinc-800 transition-colors disabled:text-zinc-400"
               >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <span className="animate-spin">⏳</span>
-                    Sorgulanıyor...
-                  </span>
-                ) : (
-                  "🔍 Sorgula"
-                )}
+                {loading ? "Sorgulanıyor..." : "Sorgula"}
               </button>
-            </div>
-            <p className="text-sm text-gray-500 mt-2">
-              ⚠️ Aynı siparişi 1 saat içinde sadece 1 kez sorgulayabilirsiniz
-            </p>
-          </form>
+            </form>
+            {error && (
+              <p className="mt-4 text-red-500 text-xs tracking-wide uppercase">
+                {error}
+              </p>
+            )}
+          </section>
 
-          {/* Hata Mesajı */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl">❌</span>
-                <div>
-                  <p className="font-semibold text-red-800">Hata</p>
-                  <p className="text-red-700 text-sm mt-1">{error}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Kargo Bilgileri */}
           {cargoData && (
-            <div className="space-y-6">
-              {/* Teslimat Durumu */}
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border-2 border-orange-200">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  📦 Teslimat Bilgileri
-                </h2>
-
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-white p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Sipariş No</p>
-                    <p className="font-bold text-gray-900">
-                      {cargoData.shippingDeliveryState.requestNumber}
-                    </p>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Kargo Takip No</p>
-                    <p className="font-bold text-orange-600 font-mono">
-                      {cargoData.shippingDeliveryState.cargoTrackingNumber}
-                    </p>
-                    <a
-                      href={`https://www.horoz.com.tr/kargo-takip?trackingNumber=${cargoData.shippingDeliveryState.cargoTrackingNumber}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline mt-1 inline-block"
-                    >
-                      Horoz.com.tr'de takip et →
-                    </a>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">ATF Numarası</p>
-                    <p className="font-semibold text-gray-900">
-                      {cargoData.shippingDeliveryState.atfNumber}
-                    </p>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Toplam Parça</p>
-                    <p className="font-semibold text-gray-900">
-                      {cargoData.shippingDeliveryState.totalPieces} Adet
-                    </p>
-                  </div>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+              {/* Ana Özet Kartı */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 pb-12 border-b border-zinc-100">
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">
+                    Durum
+                  </span>
+                  <p className="text-lg font-medium text-zinc-800">
+                    {cargoData.shippingDeliveryState.deliveryStatus ||
+                      "İşlem Görmekte"}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">
+                    Takip No
+                  </span>
+                  <p className="text-lg font-mono text-zinc-600">
+                    {cargoData.shippingDeliveryState.cargoTrackingNumber}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">
+                    Tahmini Varış
+                  </span>
+                  <p className="text-lg font-medium text-zinc-800">
+                    Şehir: {cargoData.shippingDeliveryState.receiverCity}
+                  </p>
                 </div>
               </div>
 
-              {/* Gönderen ve Alıcı Bilgileri */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Gönderen */}
-                <div className="bg-blue-50 p-5 rounded-lg border border-blue-200">
-                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    📤 Gönderen Bilgileri
+              {/* Detaylar İki Sütun */}
+              <div className="grid md:grid-cols-2 gap-16 mb-20">
+                <section>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-6">
+                    Sevkiyat Detayı
                   </h3>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="text-gray-600">Ad:</span>{" "}
-                      <span className="font-medium">
-                        {cargoData.shippingDeliveryState.senderName}
-                      </span>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Telefon:</span>{" "}
-                      <span className="font-medium">
-                        {cargoData.shippingDeliveryState.senderPhone}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Alıcı */}
-                <div className="bg-green-50 p-5 rounded-lg border border-green-200">
-                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    📥 Alıcı Bilgileri
-                  </h3>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      <span className="text-gray-600">Ad:</span>{" "}
+                  <div className="space-y-4 text-sm">
+                    <div className="flex justify-between py-2 border-b border-zinc-50">
+                      <span className="text-zinc-500">Alıcı</span>
                       <span className="font-medium">
                         {cargoData.shippingDeliveryState.receiverName}
                       </span>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Telefon:</span>{" "}
+                    </div>
+                    <div className="flex justify-between py-2 border-b border-zinc-50">
+                      <span className="text-zinc-500">Toplam Parça</span>
                       <span className="font-medium">
-                        {cargoData.shippingDeliveryState.receiverPhone}
+                        {cargoData.shippingDeliveryState.totalPieces} Adet
                       </span>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Adres:</span>{" "}
-                      <span className="font-medium">
+                    </div>
+                    <div className="flex flex-col py-2">
+                      <span className="text-zinc-500 mb-1">
+                        Teslimat Adresi
+                      </span>
+                      <span className="font-medium text-zinc-700 leading-relaxed">
                         {cargoData.shippingDeliveryState.receiverAddress}
                       </span>
-                    </p>
-                    <p>
-                      <span className="text-gray-600">Şehir:</span>{" "}
-                      <span className="font-medium">
-                        {cargoData.shippingDeliveryState.receiverCity} /{" "}
-                        {cargoData.shippingDeliveryState.receiverDistrict}
-                      </span>
-                    </p>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </section>
 
-              {/* Ürün Listesi */}
-              {cargoData.listOfShipments.length > 0 && (
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                  <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                    📋 Gönderi İçeriği
+                <section>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-6">
+                    Kargo Yolculuğu
                   </h3>
-                  <div className="space-y-3">
-                    {cargoData.listOfShipments.map((item, index) => (
-                      <div
-                        key={index}
-                        className="bg-white p-4 rounded-lg flex justify-between items-center"
-                      >
-                        <div>
-                          <p className="font-semibold text-gray-800">
-                            {item.productName}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Ürün Kodu: {item.productCode}
-                          </p>
-                        </div>
-                        <div className="text-right text-sm">
-                          <p className="text-gray-700">
-                            Adet:{" "}
-                            <span className="font-semibold">
-                              {item.quantity}
-                            </span>
-                          </p>
-                          <p className="text-gray-700">
-                            Ağırlık:{" "}
-                            <span className="font-semibold">
-                              {item.weight} kg
-                            </span>
-                          </p>
-                          <p className="text-gray-700">
-                            Desi:{" "}
-                            <span className="font-semibold">{item.desi}</span>
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Kargo Hareketleri */}
-              <div>
-                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  🚚 Kargo Hareketleri
-                </h2>
-
-                <div className="relative">
-                  {/* Timeline çizgisi */}
-                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-300"></div>
-
-                  <div className="space-y-4">
+                  <div className="space-y-8 relative before:absolute before:inset-0 before:left-[5px] before:w-[1px] before:bg-zinc-100">
                     {cargoData.listOfMovements.map((movement, index) => (
-                      <div key={index} className="relative pl-16">
-                        {/* Timeline noktası */}
+                      <div key={index} className="relative pl-8 group">
+                        {/* Nokta */}
                         <div
-                          className={`absolute left-3 top-4 w-6 h-6 rounded-full border-4 border-white shadow-md flex items-center justify-center text-xs ${
-                            movement.status === "TESLİM"
-                              ? "bg-green-500"
-                              : movement.status === "TESLİM SORUN"
-                              ? "bg-red-500"
-                              : movement.status === "ÇIKIŞ"
-                              ? "bg-blue-500"
-                              : movement.status === "GİRİŞ"
-                              ? "bg-indigo-500"
-                              : "bg-yellow-500"
+                          className={`absolute left-0 top-1.5 w-[11px] h-[11px] rounded-full border-2 border-white ring-1 ${
+                            index === 0
+                              ? "bg-zinc-600 ring-zinc-600 shadow-lg shadow-zinc-200"
+                              : "bg-zinc-300 ring-zinc-300"
                           }`}
-                        >
-                          <span className="text-white">
-                            {getStatusIcon(movement.status)}
+                        />
+
+                        <div className="flex flex-col">
+                          <span
+                            className={`text-xs font-semibold tracking-wide ${
+                              index === 0 ? "text-zinc-600" : "text-zinc-500"
+                            }`}
+                          >
+                            {movement.status}
                           </span>
-                        </div>
-
-                        <div
-                          className={`bg-white p-5 rounded-lg border-2 shadow-sm ${getStatusColor(
-                            movement.status
-                          )}`}
-                        >
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3">
-                              <span
-                                className={`px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(
-                                  movement.status
-                                )}`}
-                              >
-                                {movement.status}
-                              </span>
-                              {movement.deliveryProblem && (
-                                <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
-                                  ⚠️ {movement.deliveryProblem}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-600 font-medium whitespace-nowrap">
-                              {movement.statusDate}
-                            </p>
-                          </div>
-
-                          <div className="grid md:grid-cols-3 gap-3 text-sm">
-                            <div>
-                              <p className="text-gray-600">ATF No</p>
-                              <p className="font-semibold text-gray-900">
-                                {movement.atfNumber}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-gray-600">Teslimat Tipi</p>
-                              <p className="font-semibold text-gray-900">
-                                {movement.deliveryType}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-gray-600">Adet / Desi</p>
-                              <p className="font-semibold text-gray-900">
-                                {movement.quantity} / {movement.desi}
-                              </p>
-                            </div>
-                          </div>
+                          <span className="text-[11px] text-zinc-400 mt-0.5">
+                            {movement.statusDate}
+                          </span>
+                          {movement.deliveryProblem && (
+                            <span className="mt-2 text-[11px] text-red-500 bg-red-50 self-start px-2 py-0.5 rounded">
+                              {movement.deliveryProblem}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
                   </div>
-                </div>
+                </section>
               </div>
+
+              {/* Ürünler - Basit Liste */}
+              <section className="bg-zinc-50 rounded-2xl p-8">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-6 text-center">
+                  Paket İçeriği
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {cargoData.listOfShipments.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-white p-4 rounded-xl border border-zinc-100 flex justify-between items-center"
+                    >
+                      <span className="text-sm font-medium text-zinc-700">
+                        {item.productName}
+                      </span>
+                      <span className="text-xs text-zinc-400">
+                        {item.quantity} Adet
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </section>
             </div>
           )}
         </div>
