@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 const heroes = [
@@ -13,38 +12,6 @@ const heroes = [
     subtitle: "Premium Rattan & İroko Koleksiyonu",
     desktopImage: "/heroes/1.0.avif",
     mobileImage: "/heroes/2.0.avif", // Mobilde görünecek
-    href: "/products",
-  },
-  {
-    id: 2,
-    title: "Yıldızların Altında Akşam Yemeği",
-    subtitle: "Modern Sandalye ve Mobilya Takımları",
-    desktopImage: "/heroes/1.1.avif",
-    mobileImage: "/heroes/2.1.avif", // Mobilde görünecek
-    href: "/products",
-  },
-  {
-    id: 3,
-    title: "Doğayla Bütünleşen Tasarımlar",
-    subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
-    desktopImage: "/heroes/1.2.avif",
-    mobileImage: "/heroes/2.2.avif", // Mobilde görünecek
-    href: "/products",
-  },
-  {
-    id: 4,
-    title: "Güneşin Keyfini Sürün",
-    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
-    desktopImage: "/heroes/1.3.avif",
-    mobileImage: "/heroes/2.3.avif", // Mobilde görünecek
-    href: "/products",
-  },
-  {
-    id: 5,
-    title: "Güneşin Keyfini Sürün",
-    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
-    desktopImage: "/heroes/1.4.avif",
-    mobileImage: "/heroes/2.4.avif", // Mobilde görünecek
     href: "/products",
   },
 ];
@@ -142,20 +109,6 @@ export default function HeroSection() {
           </button>
         ))}
       </div>
-
-      <style jsx global>{`
-        @keyframes subtle-zoom {
-          from {
-            transform: scale(1);
-          }
-          to {
-            transform: scale(1.1);
-          }
-        }
-        .animate-subtle-zoom {
-          animation: subtle-zoom 20s infinite alternate ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }
