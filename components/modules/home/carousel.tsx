@@ -40,11 +40,11 @@ const heroes = [
   },
   {
     id: 5,
-    title: "Güneşin Keyfini Sürün",
-    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
+    title: "Zamanı Durduran Detaylar", // Değişen başlık
+    subtitle: "Yeni Sezon: Akdeniz Esintili Aksesuarlar", // Değişen alt başlık
     desktopImage: "/heroes/1.4.avif",
-    mobileImage: "/heroes/2.4.avif", // Mobilde görünecek
-    href: "/products",
+    mobileImage: "/heroes/2.4.avif",
+    href: "/collections/new-season", // İstersen linki de özelleştirebilirsin
   },
 ];
 
