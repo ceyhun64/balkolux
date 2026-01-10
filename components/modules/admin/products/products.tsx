@@ -29,8 +29,9 @@ import {
   Trash2,
   Filter,
   PackageOpen,
-  LayoutGrid,
   Loader2,
+  TrendingUp,
+  Package,
 } from "lucide-react";
 
 interface Product {
@@ -61,7 +62,6 @@ export default function Products(): React.ReactElement {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ===================== API FETCH =====================
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
@@ -80,7 +80,6 @@ export default function Products(): React.ReactElement {
     fetchProducts();
   }, [fetchProducts]);
 
-  // ===================== FILTRELEME & PAGINATION =====================
   const categories = [
     "Oturma Takımları",
     "Masa Takımları",
@@ -105,7 +104,6 @@ export default function Products(): React.ReactElement {
     return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredProducts, currentPage]);
 
-  // ===================== HANDLERS =====================
   const handleSubmitProduct = async (
     formData: ProductFormData,
     mainFile: File | null,
@@ -171,102 +169,126 @@ export default function Products(): React.ReactElement {
     );
   };
 
+  // Stats calculations
+  const totalProducts = products.length;
+  const totalValue = products.reduce((sum, p) => sum + p.price, 0);
+
   return (
-    <div className="flex min-h-screen bg-[#F8F9FB] font-sans selection:bg-indigo-100">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 font-sans selection:bg-indigo-100">
       <Sidebar />
       <main
-        className={`flex-1 p-6 lg:p-12 transition-all duration-300 ${
-          isMobile ? "mt-14" : "md:ml-72"
+        className={`flex-1 transition-all duration-300 ${
+          isMobile
+            ? "pt-16 sm:pt-20 px-3 sm:px-4 pb-6"
+            : "md:ml-[240px] lg:ml-[280px] p-4 sm:p-6 lg:p-12"
         }`}
       >
         {/* Header Section */}
-        <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="h-1 w-8 bg-indigo-600 rounded-full" />
-              <span className="text-xs font-bold uppercase tracking-widest text-indigo-600">
-                Yönetim Paneli
-              </span>
+        <header className="mb-6 sm:mb-8 lg:mb-10">
+          <div className="flex flex-col gap-4 sm:gap-5">
+            {/* Title & Breadcrumb */}
+            <div>
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <div className="h-1 w-8 sm:w-10 bg-gradient-to-r from-indigo-600 to-indigo-400 rounded-full"></div>
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.15em] text-indigo-600">
+                  Yönetim Paneli
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent mb-2">
+                Ürün Yönetimi
+              </h1>
+              <p className="text-slate-500 text-xs sm:text-sm font-medium max-w-2xl">
+                Ürün kataloğunuzu yönetin, düzenleyin ve performansı takip edin
+              </p>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
-              Ürün Yönetimi
-            </h1>
-            <p className="text-slate-500 text-sm mt-1 font-medium">
-              İşletmenizin performansını gerçek zamanlı izleyin.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {selectedIds.length > 0 && (
-              <Button
-                variant="destructive"
-                className="rounded-xl gap-2 shadow-sm animate-in fade-in zoom-in duration-200 font-bold h-11"
-                onClick={() => {
-                  setProductToDelete(null);
-                  setDeleteDialogOpen(true);
-                }}
-              >
-                <Trash2 size={16} />
-                Seçilenleri Sil ({selectedIds.length})
-              </Button>
-            )}
-            <ProductDialog
-              onSubmit={handleSubmitProduct}
-              product={selectedProduct ?? undefined}
-            />
+
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              {selectedIds.length > 0 && (
+                <Button
+                  variant="destructive"
+                  className="rounded-xl gap-2 shadow-lg shadow-red-100 font-semibold h-11 sm:h-12 text-sm w-full sm:w-auto transition-all hover:scale-105"
+                  onClick={() => {
+                    setProductToDelete(null);
+                    setDeleteDialogOpen(true);
+                  }}
+                >
+                  <Trash2 size={16} />
+                  <span className="hidden sm:inline">Seçilenleri Sil</span>
+                  <span className="sm:hidden">Sil</span>
+                  <span className="ml-1">({selectedIds.length})</span>
+                </Button>
+              )}
+              <ProductDialog
+                onSubmit={handleSubmitProduct}
+                product={selectedProduct ?? undefined}
+                className="w-full sm:w-auto"
+              />
+            </div>
           </div>
         </header>
 
-        {/* Toolbar */}
-        <div className="bg-white p-2 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col md:flex-row gap-2 mb-8">
-          <div className="relative flex-1 group">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
-              size={18}
-            />
-            <Input
-              placeholder="Ürün adı ile ara..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
+        {/* Search & Filter Toolbar */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 group">
+              <Search
+                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+                size={18}
+              />
+              <Input
+                placeholder="Ürün adı ile ara..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="pl-10 sm:pl-12 bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 text-sm h-11 sm:h-12 font-medium transition-all"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <Select
+              onValueChange={(val) => {
+                setFilter(val);
                 setCurrentPage(1);
               }}
-              className="pl-12 bg-transparent border-none rounded-xl focus-visible:ring-0 text-sm h-12 w-full font-medium"
-            />
-          </div>
-
-          <div className="h-8 w-[1px] bg-slate-100 self-center hidden md:block" />
-
-          <Select
-            onValueChange={(val) => {
-              setFilter(val);
-              setCurrentPage(1);
-            }}
-            defaultValue="all"
-          >
-            <SelectTrigger className="w-full md:w-64 border-none bg-transparent rounded-xl text-slate-600 font-bold h-12 shadow-none focus:ring-0">
-              <div className="flex items-center gap-2">
-                <Filter size={14} className="text-slate-400" />
-                <SelectValue placeholder="Kategori Filtresi" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-slate-100 shadow-xl">
-              <SelectItem value="all" className="font-medium">
-                Tüm Kategoriler
-              </SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat} className="font-medium">
-                  {cat}
+              defaultValue="all"
+            >
+              <SelectTrigger className="w-full sm:w-64 border-slate-200 bg-slate-50 rounded-xl text-slate-700 font-semibold h-11 sm:h-12 focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 text-sm transition-all">
+                <div className="flex items-center gap-2">
+                  <Filter size={16} className="text-slate-400" />
+                  <SelectValue placeholder="Kategori Filtresi" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-slate-100 shadow-xl">
+                <SelectItem value="all" className="font-medium rounded-lg">
+                  Tüm Kategoriler
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                {categories.map((cat) => (
+                  <SelectItem
+                    key={cat}
+                    value={cat}
+                    className="font-medium rounded-lg"
+                  >
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Table Content */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden min-h-[500px] relative">
+        {/* Products Table/Grid */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-slate-100 overflow-hidden min-h-[400px] sm:min-h-[500px] relative">
           {loading ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[2px] z-10">
-              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm z-10">
+              <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-indigo-500 animate-spin mb-4" />
+              <p className="text-sm sm:text-base font-semibold text-slate-600">
+                Yükleniyor...
+              </p>
             </div>
           ) : (
             <>
@@ -293,19 +315,20 @@ export default function Products(): React.ReactElement {
               />
 
               {filteredProducts.length === 0 && (
-                <div className="py-32 flex flex-col items-center justify-center text-slate-400 animate-in fade-in slide-in-from-bottom-4">
-                  <div className="p-5 bg-slate-50 rounded-full mb-4">
+                <div className="py-16 sm:py-24 lg:py-32 flex flex-col items-center justify-center text-slate-400 px-4">
+                  <div className="p-5 sm:p-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl sm:rounded-3xl mb-4 sm:mb-5">
                     <PackageOpen
                       size={48}
-                      strokeWidth={1}
-                      className="text-slate-300"
+                      strokeWidth={1.5}
+                      className="text-slate-300 w-10 h-10 sm:w-12 sm:h-12"
                     />
                   </div>
-                  <p className="text-sm font-bold text-slate-600">
+                  <p className="text-sm sm:text-base font-bold text-slate-600 mb-2">
                     Ürün Bulunamadı
                   </p>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">
-                    Arama kriterlerinizi değiştirmeyi deneyin.
+                  <p className="text-xs sm:text-sm text-slate-400 font-medium text-center max-w-sm">
+                    Arama kriterlerinizi değiştirmeyi veya filtreleri
+                    temizlemeyi deneyin
                   </p>
                 </div>
               )}
@@ -315,7 +338,7 @@ export default function Products(): React.ReactElement {
 
         {/* Pagination */}
         {!loading && filteredProducts.length > ITEMS_PER_PAGE && (
-          <div className="mt-10 flex justify-center">
+          <div className="mt-6 sm:mt-8 lg:mt-10 flex justify-center">
             <DefaultPagination
               totalItems={filteredProducts.length}
               itemsPerPage={ITEMS_PER_PAGE}
@@ -327,45 +350,47 @@ export default function Products(): React.ReactElement {
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <DialogContent className="sm:max-w-[400px] rounded-[32px] border-none p-8 gap-6 shadow-2xl">
-            <DialogHeader className="items-center text-center">
-              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-2 animate-bounce">
-                <Trash2 size={32} />
+          <DialogContent className="sm:max-w-[440px] rounded-2xl sm:rounded-[28px] border-none p-6 sm:p-8 gap-5 sm:gap-6 shadow-2xl max-w-[92vw] mx-auto">
+            <DialogHeader className="items-center text-center space-y-3 sm:space-y-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-50 to-red-100 text-red-500 rounded-2xl sm:rounded-3xl flex items-center justify-center animate-bounce shadow-lg shadow-red-100">
+                <Trash2 size={32} className="sm:w-10 sm:h-10" />
               </div>
-              <DialogTitle className="text-2xl font-bold text-slate-900 leading-tight">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
                 Emin misiniz?
               </DialogTitle>
-              <DialogDescription className="text-slate-500 font-medium pt-2">
+              <DialogDescription className="text-slate-600 font-medium text-sm sm:text-base leading-relaxed">
                 {productToDelete ? (
                   <>
-                    <span className="text-slate-900 font-bold">
+                    <span className="text-slate-900 font-bold block mb-1">
                       "{productToDelete.title}"
-                    </span>{" "}
-                    ürünü kalıcı olarak silinecek.
+                    </span>
+                    ürünü kalıcı olarak silinecektir.
                   </>
                 ) : (
                   <>
                     <span className="text-slate-900 font-bold">
                       {selectedIds.length} adet ürün
                     </span>{" "}
-                    toplu olarak silinecek.
+                    toplu olarak silinecektir.
                   </>
                 )}
                 <br />
-                Bu işlem geri alınamaz.
+                <span className="text-red-600 font-semibold">
+                  Bu işlem geri alınamaz.
+                </span>
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter className="flex flex-row gap-3 sm:justify-center">
+            <DialogFooter className="flex flex-col sm:flex-row gap-3 sm:gap-3 sm:justify-center pt-2">
               <Button
                 variant="ghost"
-                className="flex-1 rounded-xl font-bold text-slate-500 h-12"
+                className="flex-1 sm:flex-none rounded-xl font-semibold text-slate-600 hover:bg-slate-100 h-11 sm:h-12 order-2 sm:order-1 min-w-[120px]"
                 onClick={() => setDeleteDialogOpen(false)}
               >
                 Vazgeç
               </Button>
               <Button
                 variant="destructive"
-                className="flex-1 rounded-xl font-bold h-12 shadow-lg shadow-red-100"
+                className="flex-1 sm:flex-none rounded-xl font-semibold h-11 sm:h-12 shadow-lg shadow-red-200 hover:shadow-xl order-1 sm:order-2 min-w-[120px] bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
                 onClick={handleDelete}
               >
                 Evet, Sil

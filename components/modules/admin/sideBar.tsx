@@ -98,9 +98,9 @@ export default function AdminSidebar(): React.ReactElement {
   };
 
   const NavContent = (isMobile = false) => (
-    <div className="flex flex-col h-full bg-white px-5 py-8">
+    <div className="flex flex-col h-full bg-white px-4 sm:px-5 py-6 sm:py-8">
       {/* Brand Logo */}
-      <div className="px-3 mb-12">
+      <div className="px-2 sm:px-3 mb-8 sm:mb-12">
         <Link
           href="/admin/dashboard"
           className="inline-block hover:opacity-80 transition-opacity"
@@ -108,10 +108,10 @@ export default function AdminSidebar(): React.ReactElement {
           <Image
             src="/logo/logoblack.webp"
             alt="BalkoLüx Logo"
-            width={140}
-            height={36}
+            width={120}
+            height={30}
             priority
-            className="h-auto w-auto"
+            className="h-auto w-auto sm:w-[140px]"
           />
         </Link>
       </div>
@@ -125,7 +125,7 @@ export default function AdminSidebar(): React.ReactElement {
               key={id}
               href={href}
               onClick={() => isMobile && setIsOpen(false)}
-              className={`relative flex items-center justify-between group px-4 py-3 rounded-2xl transition-all duration-300 ${
+              className={`relative flex items-center justify-between group px-3 sm:px-4 py-3 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all duration-300 ${
                 isActive
                   ? "text-zinc-950"
                   : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50"
@@ -135,24 +135,24 @@ export default function AdminSidebar(): React.ReactElement {
               {isActive && (
                 <motion.div
                   layoutId="activeNav"
-                  className="absolute inset-0 bg-zinc-100/80 rounded-2xl z-0"
+                  className="absolute inset-0 bg-zinc-100/80 rounded-xl sm:rounded-2xl z-0"
                   initial={false}
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
 
-              <div className="flex items-center gap-3.5 z-10">
+              <div className="flex items-center gap-3 sm:gap-3.5 z-10 min-w-0">
                 <Icon
-                  size={20}
-                  strokeWidth={isActive ? 2.5 : 2}
-                  className={
+                  size={18}
+                  className={`flex-shrink-0 sm:w-5 sm:h-5 ${
                     isActive
                       ? "text-zinc-950"
                       : "text-zinc-400 group-hover:text-zinc-600 transition-colors"
-                  }
+                  }`}
+                  strokeWidth={isActive ? 2.5 : 2}
                 />
                 <span
-                  className={`text-[13.5px] tracking-tight ${
+                  className={`text-xs sm:text-[13.5px] tracking-tight truncate ${
                     isActive ? "font-bold" : "font-medium"
                   }`}
                 >
@@ -164,7 +164,7 @@ export default function AdminSidebar(): React.ReactElement {
                 <motion.div
                   initial={{ opacity: 0, x: -5 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="z-10"
+                  className="z-10 flex-shrink-0"
                 >
                   <ChevronRight size={14} className="text-zinc-400" />
                 </motion.div>
@@ -175,16 +175,16 @@ export default function AdminSidebar(): React.ReactElement {
       </nav>
 
       {/* Profile & Logout Section */}
-      <div className="mt-auto pt-6 border-t border-zinc-100">
-        <div className="flex items-center gap-3 px-3 mb-6">
-          <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-xs">
+      <div className="mt-auto pt-4 sm:pt-6 border-t border-zinc-100">
+        <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 mb-4 sm:mb-6">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
             AD
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-zinc-900 leading-none">
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-bold text-zinc-900 leading-none truncate">
               Yönetici
             </span>
-            <span className="text-[11px] text-zinc-400 mt-1 font-medium">
+            <span className="text-[10px] sm:text-[11px] text-zinc-400 mt-1 font-medium truncate">
               BalkoLüx Admin Panel
             </span>
           </div>
@@ -192,12 +192,12 @@ export default function AdminSidebar(): React.ReactElement {
 
         <button
           onClick={handleLogout}
-          className="group flex items-center gap-3 w-full px-4 py-3.5 text-sm font-semibold text-zinc-500 hover:text-red-600 hover:bg-red-50/50 rounded-2xl transition-all duration-200"
+          className="group flex items-center gap-2 sm:gap-3 w-full px-3 sm:px-4 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-zinc-500 hover:text-red-600 hover:bg-red-50/50 rounded-xl sm:rounded-2xl transition-all duration-200"
         >
-          <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center group-hover:bg-red-50 transition-colors">
-            <LogOut size={16} />
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-zinc-50 flex items-center justify-center group-hover:bg-red-50 transition-colors flex-shrink-0">
+            <LogOut size={14} className="sm:w-4 sm:h-4" />
           </div>
-          <span>Oturumu Kapat</span>
+          <span className="truncate">Oturumu Kapat</span>
         </button>
       </div>
     </div>
@@ -206,18 +206,24 @@ export default function AdminSidebar(): React.ReactElement {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 w-[280px] h-screen bg-white border-r border-zinc-100 hidden md:block z-50">
+      <aside className="fixed left-0 top-0 w-[240px] sm:w-[280px] h-screen bg-white border-r border-zinc-100 hidden md:block z-50">
         {NavContent()}
       </aside>
 
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 w-full bg-white/70 backdrop-blur-xl border-b border-zinc-100 px-6 py-4 z-40 flex justify-between items-center">
-        <Image src="/logo/logoblack.webp" alt="logo" width={100} height={26} />
+      <div className="md:hidden fixed top-0 left-0 w-full bg-white/70 backdrop-blur-xl border-b border-zinc-100 px-4 sm:px-6 py-3 sm:py-4 z-40 flex justify-between items-center">
+        <Image
+          src="/logo/logoblack.webp"
+          alt="logo"
+          width={90}
+          height={24}
+          className="sm:w-[100px] sm:h-[26px]"
+        />
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsOpen(true)}
-          className="rounded-xl bg-zinc-50 hover:bg-zinc-100"
+          className="rounded-xl bg-zinc-50 hover:bg-zinc-100 h-10 w-10"
         >
           <Menu size={20} className="text-zinc-900" />
         </Button>
@@ -239,16 +245,16 @@ export default function AdminSidebar(): React.ReactElement {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 220 }}
-              className="fixed left-0 top-0 w-[300px] h-screen bg-white z-[70] md:hidden shadow-2xl border-r border-zinc-100"
+              className="fixed left-0 top-0 w-[280px] sm:w-[300px] h-screen bg-white z-[70] md:hidden shadow-2xl border-r border-zinc-100"
             >
-              <div className="absolute top-8 right-6">
+              <div className="absolute top-6 sm:top-8 right-4 sm:right-6">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="rounded-full hover:bg-zinc-100"
+                  className="rounded-full hover:bg-zinc-100 h-9 w-9"
                   onClick={() => setIsOpen(false)}
                 >
-                  <X size={20} className="text-zinc-500" />
+                  <X size={18} className="text-zinc-500" />
                 </Button>
               </div>
               {NavContent(true)}
