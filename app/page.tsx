@@ -10,7 +10,7 @@ import Testimonials from "@/components/layout/testimonial";
 
 export default function Home() {
   return (
-    <div>
+    <>
       <Navbar />
       <HeroSection />
       <CategoriesSection />
@@ -20,6 +20,6 @@ export default function Home() {
       <Testimonials />
       <ProductsRow />
       <Footer />
-    </div>
+    </>
   );
 }

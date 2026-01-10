@@ -51,6 +51,15 @@ const heroes = [
 
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Ekran boyutunu kontrol et
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // İlk yüklemede çalıştır
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const nextSlide = useCallback(() => {
     setCurrent((prev) => (prev === heroes.length - 1 ? 0 : prev + 1));
@@ -62,90 +71,72 @@ export default function HeroSection() {
   }, [nextSlide]);
 
   return (
-    <div className="relative w-full h-[100dvh] overflow-hidden bg-black">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={current}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          className="absolute inset-0"
-        >
-          {/* MASAÜSTÜ RESMİ (Sadece md ekranlarda görünür) */}
-          <div className="hidden md:block relative w-full h-full">
-            <Image
-              src={heroes[current].desktopImage}
-              alt={heroes[current].title}
-              fill
-              className="object-cover scale-105 animate-subtle-zoom"
-              priority={current === 0}
-              sizes="100vw"
-              quality={85}
-            />
-          </div>
+    <div className="relative w-full h-[100dvh] overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="relative w-full h-full">
+          <Image
+            // Ekran boyutuna göre resmi seç
+            src={
+              isMobile
+                ? heroes[current].mobileImage
+                : heroes[current].desktopImage
+            }
+            alt={heroes[current].title}
+            fill
+            className="object-cover scale-105 animate-subtle-zoom"
+            // ÖNEMLİ: Sadece ilk slide (index 0) priority olsun, puanı artırır
+            priority={current === 0}
+            sizes="100vw"
+            quality={85}
+          />
+          {/* Karartma katmanı (yazıların okunması için) */}
+          <div className="absolute inset-0 bg-black/30" />
+        </div>
 
-          {/* MOBİL RESMİ (md altı ekranlarda görünür) */}
-          <div className="block md:hidden relative w-full h-full">
-            <Image
-              src={heroes[current].mobileImage}
-              alt={heroes[current].title}
-              fill
-              className="object-cover scale-105 animate-subtle-zoom"
-              priority={current === 0} // Mobilde de ilk resim en hızlı şekilde inmeli
-              sizes="100vw"
-              quality={75} // Mobilde 75 kalite yeterlidir, dosya boyutunu %40 düşürür
-            />
-          </div>
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
+          <span className="text-white text-[10px] md:text-xs tracking-[0.5em] uppercase mb-6 font-medium">
+            {heroes[current].subtitle}
+          </span>
 
-          <div className="absolute inset-0 bg-black/35" />
+          <h1 className="text-white text-4xl md:text-7xl lg:text-8xl font-extralight tracking-tight leading-[1.1] max-w-4xl mb-12">
+            {heroes[current].title.split(" ").map((word, i) => (
+              <span key={i} className={i === 1 ? "font-normal italic" : ""}>
+                {word}{" "}
+              </span>
+            ))}
+          </h1>
 
-          {/* İÇERİK: Mobilde animasyonları sadeleştirdik */}
-          <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-white text-[10px] md:text-xs tracking-[0.5em] uppercase mb-6 font-medium"
-            >
-              {heroes[current].subtitle}
-            </motion.span>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 15 }} // Mobilde 30px yerine 15px (daha az CPU tüketir)
-              animate={{ opacity: 1, y: 0 }}
-              className="text-white text-4xl md:text-8xl font-extralight tracking-tight leading-[1.1] max-w-4xl mb-12"
-            >
-              {heroes[current].title}
-            </motion.h1>
-
-            {/* CTA butonu mobilde direkt görünebilir veya çok hafif bir delay ile gelebilir */}
+          <div>
             <Link
               href={heroes[current].href}
-              className="group flex items-center gap-4 text-white"
+              className="group flex items-center gap-4 text-white hover:text-white/80 transition-all"
             >
-              <span className="text-xs tracking-[0.3em] font-medium uppercase border-b border-white/40 pb-1">
+              <span className="text-xs tracking-[0.3em] font-medium uppercase border-b border-white/40 pb-1 group-hover:border-white transition-all">
                 Koleksiyonu Keşfet
               </span>
-              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-500">
                 <ArrowRight className="w-4 h-4" />
               </div>
             </Link>
           </div>
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      </div>
 
-      {/* Navigasyon Çubukları (Z-Index ve Tıklama Alanı Optimize Edildi) */}
-      <div className="absolute bottom-12 left-0 right-0 flex justify-center items-center gap-4 z-30">
+      {/* Navigasyon Çubukları */}
+      <div className="absolute bottom-12 left-0 right-0 flex justify-center items-center gap-4 md:gap-8 z-20">
         {heroes.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className="p-2" // Tıklama alanı mobilde parmak için büyütüldü
-            aria-label="Slayt değiştir"
+            className="group relative py-4"
+            // Kullanıcıya kaçıncı slaytta olduğunu ve ne yapacağını söyler
+            aria-label={`${i + 1}. slayta git`}
           >
             <div
-              className={`h-[1px] transition-all duration-500 ${
-                current === i ? "w-10 bg-white" : "w-5 bg-white/30"
+              className={`h-[1px] transition-all duration-700 ${
+                current === i
+                  ? "w-12 md:w-16 bg-white"
+                  : "w-6 md:w-8 bg-white/30 group-hover:bg-white/60"
               }`}
             />
           </button>
@@ -158,12 +149,11 @@ export default function HeroSection() {
             transform: scale(1);
           }
           to {
-            transform: scale(1.08);
+            transform: scale(1.1);
           }
         }
         .animate-subtle-zoom {
-          animation: subtle-zoom 15s infinite alternate ease-in-out;
-          will-change: transform; /* Performans için tarayıcıya önceden bildiriyoruz */
+          animation: subtle-zoom 20s infinite alternate ease-in-out;
         }
       `}</style>
     </div>
