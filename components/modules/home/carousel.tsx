@@ -39,7 +39,7 @@ const heroes = [
     mobileImage: "/heroes/2.3.avif", // Mobilde görünecek
     href: "/products",
   },
-   {
+  {
     id: 5,
     title: "Güneşin Keyfini Sürün",
     subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
@@ -152,6 +152,7 @@ export default function HeroSection() {
             key={i}
             onClick={() => setCurrent(i)}
             className="group relative py-4"
+            aria-label={`${i + 1}. slayta git`}
           >
             <div
               className={`h-[1px] transition-all duration-700 ${
