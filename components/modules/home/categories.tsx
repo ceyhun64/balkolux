@@ -17,7 +17,7 @@ const initialCategories: CategoryData[] = [
   {
     id: 1,
     name: "BAHÇE MOBİLYALARI",
-    image: "/categories/garden.jpg", // Bu isimde bir görseliniz olduğundan emin olun
+    image: "/categories/garden.avif", // Bu isimde bir görseliniz olduğundan emin olun
     href: "/products/seating_sets",
   },
   {
