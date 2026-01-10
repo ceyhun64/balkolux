@@ -14,6 +14,38 @@ const heroes = [
     mobileImage: "/heroes/2.0.avif", // Mobilde görünecek
     href: "/products",
   },
+  {
+    id: 2,
+    title: "Yıldızların Altında Akşam Yemeği",
+    subtitle: "Modern Sandalye ve Mobilya Takımları",
+    desktopImage: "/heroes/1.1.avif",
+    mobileImage: "/heroes/2.1.avif", // Mobilde görünecek
+    href: "/products",
+  },
+  {
+    id: 3,
+    title: "Doğayla Bütünleşen Tasarımlar",
+    subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
+    desktopImage: "/heroes/1.2.avif",
+    mobileImage: "/heroes/2.2.avif", // Mobilde görünecek
+    href: "/products",
+  },
+  {
+    id: 4,
+    title: "Güneşin Keyfini Sürün",
+    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
+    desktopImage: "/heroes/1.3.avif",
+    mobileImage: "/heroes/2.3.avif", // Mobilde görünecek
+    href: "/products",
+  },
+  {
+    id: 5,
+    title: "Güneşin Keyfini Sürün",
+    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
+    desktopImage: "/heroes/1.4.avif",
+    mobileImage: "/heroes/2.4.avif", // Mobilde görünecek
+    href: "/products",
+  },
 ];
 
 export default function HeroSection() {
@@ -57,7 +89,7 @@ export default function HeroSection() {
             quality={85}
           />
           {/* Karartma katmanı (yazıların okunması için) */}
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-transparent md:from-transparent md:via-black/30 md:to-transparent " />
         </div>
 
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
