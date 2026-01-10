@@ -11,34 +11,55 @@ const heroes = [
     id: 1,
     title: "Dış Mekanda Konfor Sanatı",
     subtitle: "Premium Rattan & İroko Koleksiyonu",
-    image: "/heroes/1001.webp",
+    desktopImage: "/heroes/1.0.avif",
+    mobileImage: "/heroes/2.0.jpg", // Mobilde görünecek
     href: "/products",
   },
   {
     id: 2,
     title: "Yıldızların Altında Akşam Yemeği",
     subtitle: "Modern Sandalye ve Mobilya Takımları",
-    image: "/heroes/1002.webp",
+    desktopImage: "/heroes/1.1.jpg",
+    mobileImage: "/heroes/2.1.jpg", // Mobilde görünecek
     href: "/products",
   },
   {
     id: 3,
     title: "Doğayla Bütünleşen Tasarımlar",
     subtitle: "Minimalist Bahçe Mobilyalarında %30 İndirim",
-    image: "/heroes/1003.webp",
+    desktopImage: "/heroes/1.2.jpg",
+    mobileImage: "/heroes/2.2.jpg", // Mobilde görünecek
     href: "/products",
   },
   {
     id: 4,
     title: "Güneşin Keyfini Sürün",
     subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
-    image: "/heroes/1004.webp",
+    desktopImage: "/heroes/1.3.jpg",
+    mobileImage: "/heroes/2.3.jpg", // Mobilde görünecek
+    href: "/products",
+  },
+   {
+    id: 5,
+    title: "Güneşin Keyfini Sürün",
+    subtitle: "Dayanıklı ve Şık Yemek Masası Takımları",
+    desktopImage: "/heroes/1.4.jpg",
+    mobileImage: "/heroes/2.4.jpg", // Mobilde görünecek
     href: "/products",
   },
 ];
 
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Ekran boyutunu kontrol et
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile(); // İlk yüklemede çalıştır
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const nextSlide = useCallback(() => {
     setCurrent((prev) => (prev === heroes.length - 1 ? 0 : prev + 1));
@@ -51,30 +72,35 @@ export default function HeroSection() {
 
   return (
     <div className="relative w-full h-[100dvh] overflow-hidden">
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         <motion.div
           key={current}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          {/* Arka Plan Görseli - Kenarlarda hafif vinyet ile */}
           <div className="relative w-full h-full">
             <Image
-              src={heroes[current].image}
+              // Ekran boyutuna göre resmi seç
+              src={
+                isMobile
+                  ? heroes[current].mobileImage
+                  : heroes[current].desktopImage
+              }
               alt={heroes[current].title}
               fill
               className="object-cover scale-105 animate-subtle-zoom"
-              priority
+              // ÖNEMLİ: Sadece ilk slide (index 0) priority olsun, puanı artırır
+              priority={current === 0}
+              sizes="100vw"
+              quality={85}
             />
-
-
-            {/* 2. Katman: Dinamik Gradyan (Metinlerin olduğu orta ve alt kısmı daha çok vurgular) */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-transparent" />
+            {/* Karartma katmanı (yazıların okunması için) */}
+            <div className="absolute inset-0 bg-black/30" />
           </div>
-          {/* İçerik Alanı */}
+
           <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
             <motion.span
               initial={{ opacity: 0, y: 20 }}
@@ -89,7 +115,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-white text-5xl md:text-7xl lg:text-8xl font-extralight tracking-tight leading-[1.1] max-w-4xl mb-12"
+              className="text-white text-4xl md:text-7xl lg:text-8xl font-extralight tracking-tight leading-[1.1] max-w-4xl mb-12"
             >
               {heroes[current].title.split(" ").map((word, i) => (
                 <span key={i} className={i === 1 ? "font-normal italic" : ""}>
@@ -119,8 +145,8 @@ export default function HeroSection() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Modern Progress Bar Navigasyon */}
-      <div className="absolute bottom-12 left-0 right-0 flex justify-center items-center gap-8 z-20">
+      {/* Navigasyon Çubukları */}
+      <div className="absolute bottom-12 left-0 right-0 flex justify-center items-center gap-4 md:gap-8 z-20">
         {heroes.map((_, i) => (
           <button
             key={i}
@@ -130,19 +156,10 @@ export default function HeroSection() {
             <div
               className={`h-[1px] transition-all duration-700 ${
                 current === i
-                  ? "w-16 bg-white"
-                  : "w-8 bg-white/30 group-hover:bg-white/60"
+                  ? "w-12 md:w-16 bg-white"
+                  : "w-6 md:w-8 bg-white/30 group-hover:bg-white/60"
               }`}
             />
-            <span
-              className={`absolute -top-4 left-0 text-[10px] font-medium transition-all ${
-                current === i
-                  ? "opacity-100 text-white"
-                  : "opacity-0 text-white/50"
-              }`}
-            >
-              0{i + 1}
-            </span>
           </button>
         ))}
       </div>
