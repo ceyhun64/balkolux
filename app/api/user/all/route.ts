@@ -13,11 +13,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Opsiyonel: admin kontrolü
-    // if (!session.user.isAdmin) {
-    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    // }
-
     const users = await prisma.user.findMany({
       include: { addresses: true },
       orderBy: { createdAt: "desc" },
