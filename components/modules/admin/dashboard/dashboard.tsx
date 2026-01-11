@@ -100,6 +100,7 @@ export default function AdminDashboard() {
       const blogs = await blogRes.json();
       const subscribers = await subsRes.json();
 
+
       setKpiData([
         {
           id: "products",
@@ -163,9 +164,12 @@ export default function AdminDashboard() {
     }
   };
 
+  
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  console.log(recentOrders)
 
   if (loading)
     return (
@@ -266,7 +270,7 @@ export default function AdminDashboard() {
                       <td className="px-4 sm:px-6 py-4">
                         <div className="flex flex-col">
                           <span className="text-xs sm:text-sm font-semibold text-slate-800">
-                            #{order.id.toString().slice(-5)}
+                        {order.user.name} {order.user.surname}
                           </span>
                           <span className="text-[10px] sm:text-xs text-slate-400">
                             {new Date(order.createdAt).toLocaleDateString(
@@ -320,7 +324,7 @@ export default function AdminDashboard() {
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <p className="text-xs font-bold text-slate-900">
-                        #{order.id.toString().slice(-5)}
+                        {order.user.name} {order.user.surname}
                       </p>
                       <p className="text-[10px] text-slate-400">
                         {new Date(order.createdAt).toLocaleDateString("tr-TR")}

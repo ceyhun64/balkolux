@@ -22,12 +22,14 @@ export default function CartItem({
   const { product, quantity } = item;
   const finalPrice = (product.price || 0) * quantity;
 
+  console.log("product", item);
+
   return (
     <div className="group flex flex-row w-full gap-6 py-8 bg-white border-b border-zinc-100 last:border-0 transition-all">
       {/* Ürün Görseli - Daha Keskin ve Sade */}
       <Link
         href={`/products/${product.id}`}
-        className="relative w-28 h-36 md:w-64 md:h-40 flex-shrink-0 bg-zinc-50 overflow-hidden"
+        className="relative w-32 h-20 md:w-64 md:h-40 flex-shrink-0 bg-zinc-50 overflow-hidden"
       >
         <Image
           src={product.mainImage}
@@ -48,7 +50,7 @@ export default function CartItem({
               </h3>
             </Link>
             <p className="text-[11px] tracking-widest text-zinc-400 uppercase">
-              {product.category || "Koleksiyon"}
+              Koleksiyon
             </p>
           </div>
 
