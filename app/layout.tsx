@@ -67,6 +67,7 @@ export const metadata: Metadata = {
   creator: "BalkoLüx",
   publisher: "BalkoLüx",
 
+  // ✅ OG ve Twitter Image kısımlarını kaldırdık, Next.js dosyadan otomatik alacak.
   openGraph: {
     type: "website",
     locale: "tr_TR",
@@ -75,14 +76,6 @@ export const metadata: Metadata = {
     title: "BalkoLüx | Dış Mekan Yaşamında Lüks ve Konfor",
     description:
       "Oturma takımlarından barbekülere, dış mekan dair her şey. BalkoLüx premium koleksiyonunu keşfedin.",
-    images: [
-      {
-        url: "https://balkolux.com/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "BalkoLüx Lüks Bahçe Mobilyaları",
-      },
-    ],
   },
 
   twitter: {
@@ -90,11 +83,16 @@ export const metadata: Metadata = {
     title: "BalkoLüx | Lüks Bahçe ve Balkon Mobilyaları",
     description:
       "Bahçenize zarafet katan oturma grupları ve salıncak modelleri BalkoLüx'te.",
-    images: ["https://balkolux.com/og-image.png"],
   },
 
   alternates: {
     canonical: "https://balkolux.com",
+  },
+
+  // ✅ Favicon'ları metadata içine taşıdık (Head içindeki link etiketlerine gerek kalmadı)
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 
   category: "furniture",
