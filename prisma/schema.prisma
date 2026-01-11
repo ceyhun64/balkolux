@@ -188,17 +188,19 @@ model SubCategory {
 }
 
 model product {
-  id          Int     @id @default(autoincrement())
-  title       String
-  price       Int
-  rating      Int
-  reviewCount Int?
-  mainImage   String  @default("default-image.jpg")
-  subImage    String?
-  subImage2   String?
-  subImage3   String?
-  subImage4   String?
-  description String
+  id                 Int     @id @default(autoincrement())
+  title              String
+  price              Int
+  oldPrice           Int? // Eski fiyat (indirimden önceki fiyat)
+  discountPercentage Int? // İndirim yüzdesi (örn: 30 = %30 indirim)
+  rating             Int
+  reviewCount        Int?
+  mainImage          String  @default("default-image.jpg")
+  subImage           String?
+  subImage2          String?
+  subImage3          String?
+  subImage4          String?
+  description        String
 
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])

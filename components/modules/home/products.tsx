@@ -12,6 +12,8 @@ interface ProductData {
   title: string;
   mainImage: string;
   price: number;
+  oldPrice?: number;
+  discountPercentage?: number;
   category: string;
 }
 
@@ -61,7 +63,6 @@ export default function Products() {
   return (
     <div className="min-h-screen text-stone-900 px-6 py-24 lg:py-32 relative">
       <div className="max-w-[1400px] mx-auto">
-        
         {/* Header - Minimalist & Elite */}
         <header className="max-w-3xl mb-24 space-y-6">
           <div className="flex items-center gap-3">
@@ -70,13 +71,14 @@ export default function Products() {
               Küratörlü Koleksiyon
             </span>
           </div>
-          
+
           <h2 className="text-4xl md:text-6xl font-serif italic tracking-tight text-stone-900">
             Dış Mekanda <br /> Rafine Dokunuşlar
           </h2>
-          
+
           <p className="text-stone-500 text-sm md:text-base font-light max-w-lg leading-relaxed">
-            Oturma gruplarından lüks barbekülere, bahçenizdeki her detay için özenle seçilmiş tasarım harikaları.
+            Oturma gruplarından lüks barbekülere, bahçenizdeki her detay için
+            özenle seçilmiş tasarım harikaları.
           </p>
         </header>
 

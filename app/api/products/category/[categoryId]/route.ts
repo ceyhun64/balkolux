@@ -6,6 +6,8 @@ interface ProductData {
   id: number;
   title: string;
   price: number;
+  oldPrice?: number;
+  discountPercentage?: number;
   rating?: number;
   reviewCount?: number;
   description?: string;
@@ -28,7 +30,7 @@ export async function GET(
 
     const products = await prisma.product.findMany({
       where: { categoryId: Number(categoryId) },
-      include: { category: true, subCategory: true,  },
+      include: { category: true, subCategory: true },
       orderBy: { createdAt: "desc" },
     });
 
@@ -36,6 +38,8 @@ export async function GET(
       id: p.id,
       title: p.title,
       price: p.price,
+      oldPrice: p.oldPrice ?? undefined,
+      discountPercentage: p.discountPercentage ?? undefined,
       rating: p.rating,
       reviewCount: p.reviewCount ?? undefined,
       description: p.description,

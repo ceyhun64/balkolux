@@ -10,6 +10,7 @@ import ProductSkeleton from "./productSkeleton";
 import { SlidersHorizontal, X } from "lucide-react";
 import MobileFilter from "./mobileFilter";
 
+
 export default function Products() {
   const [colorFilter, setColorFilter] = useState<string>("all");
   const [maxPrice, setMaxPrice] = useState<number>(300000);

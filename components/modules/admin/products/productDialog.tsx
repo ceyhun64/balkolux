@@ -20,12 +20,14 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, Calculator } from "lucide-react";
 
 export interface ProductFormData {
   title: string;
   description: string;
   price: number;
+  oldPrice?: number;
+  discountPercentage?: number;
   rating: number;
   reviewCount: number;
   category: string;
@@ -37,6 +39,8 @@ interface Product {
   title: string;
   description: string;
   price: number;
+  oldPrice?: number;
+  discountPercentage?: number;
   rating: number;
   reviewCount?: number;
   category: string;
@@ -71,6 +75,8 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
       title: "",
       description: "",
       price: 0,
+      oldPrice: undefined,
+      discountPercentage: undefined,
       rating: 0,
       reviewCount: 0,
       category: "",
@@ -106,6 +112,8 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
           title: product.title,
           description: product.description,
           price: product.price,
+          oldPrice: product.oldPrice,
+          discountPercentage: product.discountPercentage,
           rating: product.rating,
           reviewCount: product.reviewCount || 0,
           category: product.category,
@@ -132,13 +140,45 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
+
       setProductData((prev) => ({
         ...prev,
         [name]:
-          name === "price" || name === "rating" || name === "reviewCount"
-            ? Number(value)
+          name === "price" ||
+          name === "oldPrice" ||
+          name === "rating" ||
+          name === "reviewCount" ||
+          name === "discountPercentage"
+            ? value === ""
+              ? name === "oldPrice" || name === "discountPercentage"
+                ? undefined
+                : 0
+              : Number(value)
             : value,
       }));
+    };
+
+    // Otomatik indirim yüzdesi hesaplama
+    const calculateDiscount = () => {
+      const { price, oldPrice } = productData;
+      if (oldPrice && oldPrice > price && price > 0) {
+        const discount = Math.round(((oldPrice - price) / oldPrice) * 100);
+        setProductData((prev) => ({ ...prev, discountPercentage: discount }));
+      }
+    };
+
+    // Eski fiyattan otomatik yeni fiyat hesaplama
+    const calculatePriceFromDiscount = () => {
+      const { oldPrice, discountPercentage } = productData;
+      if (
+        oldPrice &&
+        discountPercentage &&
+        discountPercentage > 0 &&
+        discountPercentage < 100
+      ) {
+        const newPrice = Math.round(oldPrice * (1 - discountPercentage / 100));
+        setProductData((prev) => ({ ...prev, price: newPrice }));
+      }
     };
 
     const handleFile = (
@@ -154,6 +194,8 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
         title: "",
         description: "",
         price: 0,
+        oldPrice: undefined,
+        discountPercentage: undefined,
         rating: 0,
         reviewCount: 0,
         category: "",
@@ -303,47 +345,104 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <InputGroup
-                        label="Fiyat (₺)"
-                        value={productData.price}
-                        name="price"
-                        onChange={handleChange}
-                        type="number"
-                        min={0}
-                        placeholder="0.00"
-                        required
-                      />
-
-                      <div>
-                        <Label className="text-sm font-semibold text-slate-700 mb-2 block">
-                          Kategori
-                        </Label>
-                        <Select
-                          value={productData.category}
-                          onValueChange={(val) =>
-                            setProductData((prev) => ({
-                              ...prev,
-                              category: val,
-                            }))
-                          }
-                        >
-                          <SelectTrigger className="w-full h-11 rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100">
-                            <SelectValue placeholder="Kategori seçin" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-xl">
-                            {categories.map((cat) => (
-                              <SelectItem
-                                key={cat}
-                                value={cat}
-                                className="rounded-lg"
-                              >
-                                {cat}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    {/* Fiyat ve İndirim Bölümü */}
+                    <div className="space-y-4 p-4 bg-gradient-to-br from-amber-50 to-white rounded-lg border border-amber-100">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calculator size={16} className="text-amber-600" />
+                        <h4 className="text-sm font-semibold text-slate-700">
+                          Fiyatlandırma & İndirim
+                        </h4>
                       </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <InputGroup
+                          label="Güncel Fiyat (₺)"
+                          value={productData.price}
+                          name="price"
+                          onChange={handleChange}
+                          type="number"
+                          min={0}
+                          step="any"
+                          placeholder="0.00"
+                          required
+                        />
+                        <InputGroup
+                          label="Eski Fiyat (₺)"
+                          value={productData.oldPrice ?? ""}
+                          name="oldPrice"
+                          onChange={handleChange}
+                          onBlur={calculateDiscount}
+                          type="number"
+                          min={0}
+                          step="any"
+                          placeholder="İndirim varsa girin"
+                        />
+                      </div>
+
+                      <div className="relative">
+                        <InputGroup
+                          label="İndirim Yüzdesi (%)"
+                          value={productData.discountPercentage ?? ""}
+                          name="discountPercentage"
+                          onChange={handleChange}
+                          onBlur={calculatePriceFromDiscount}
+                          type="number"
+                          min={0}
+                          max={100}
+                          placeholder="Otomatik hesaplanır"
+                        />
+                        {productData.oldPrice && productData.price > 0 && (
+                          <button
+                            type="button"
+                            onClick={calculateDiscount}
+                            className="absolute right-2 top-8 text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full hover:bg-indigo-200 transition-colors"
+                          >
+                            Hesapla
+                          </button>
+                        )}
+                      </div>
+
+                      {productData.oldPrice &&
+                        productData.price > 0 &&
+                        productData.oldPrice > productData.price && (
+                          <div className="text-xs text-green-700 bg-green-50 p-2 rounded-lg border border-green-200">
+                            ✓ İndirim:{" "}
+                            {productData.oldPrice.toLocaleString("tr-TR")} TL →{" "}
+                            {productData.price.toLocaleString("tr-TR")} TL
+                            {productData.discountPercentage &&
+                              ` (-%${productData.discountPercentage})`}
+                          </div>
+                        )}
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-semibold text-slate-700 mb-2 block">
+                        Kategori
+                      </Label>
+                      <Select
+                        value={productData.category}
+                        onValueChange={(val) =>
+                          setProductData((prev) => ({
+                            ...prev,
+                            category: val,
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="w-full h-11 rounded-xl border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100">
+                          <SelectValue placeholder="Kategori seçin" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          {categories.map((cat) => (
+                            <SelectItem
+                              key={cat}
+                              value={cat}
+                              className="rounded-lg"
+                            >
+                              {cat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
@@ -456,11 +555,32 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                           {productData.description || "Açıklama girilmedi"}
                         </p>
                         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                          <span className="text-2xl font-bold text-indigo-600">
-                            {productData.price > 0
-                              ? `₺${productData.price.toLocaleString("tr-TR")}`
-                              : "Fiyat belirtilmedi"}
-                          </span>
+                          <div className="space-y-1">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-2xl font-bold text-indigo-600">
+                                {productData.price > 0
+                                  ? `₺${productData.price.toLocaleString(
+                                      "tr-TR"
+                                    )}`
+                                  : "Fiyat belirtilmedi"}
+                              </span>
+                              {productData.oldPrice &&
+                                productData.oldPrice > productData.price && (
+                                  <span className="text-sm text-slate-400 line-through">
+                                    ₺
+                                    {productData.oldPrice.toLocaleString(
+                                      "tr-TR"
+                                    )}
+                                  </span>
+                                )}
+                            </div>
+                            {productData.discountPercentage &&
+                              productData.discountPercentage > 0 && (
+                                <span className="text-xs font-bold text-amber-600">
+                                  -%{productData.discountPercentage}
+                                </span>
+                              )}
+                          </div>
                           {productData.category && (
                             <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold">
                               {productData.category}

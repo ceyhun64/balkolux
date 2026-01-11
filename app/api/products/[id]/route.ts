@@ -99,6 +99,12 @@ export async function PUT(
 
     const title = formData.get("title")?.toString();
     const price = parseFloat(formData.get("price") as string);
+    const oldPrice = formData.get("oldPrice")
+      ? parseFloat(formData.get("oldPrice") as string)
+      : null;
+    const discountPercentage = formData.get("discountPercentage")
+      ? parseInt(formData.get("discountPercentage") as string)
+      : null;
     const rating = parseInt(formData.get("rating") as string);
     const reviewCount = formData.get("reviewCount")
       ? parseInt(formData.get("reviewCount") as string)
@@ -190,6 +196,8 @@ export async function PUT(
       data: {
         title,
         price,
+        oldPrice,
+        discountPercentage,
         description,
         rating,
         reviewCount,

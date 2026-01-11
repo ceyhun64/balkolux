@@ -12,6 +12,8 @@ interface ProductData {
   subImage4?: string;
   description: string;
   price: number;
+  oldPrice?: number;
+  discountPercentage?: number;
   rating: number;
   reviewCount?: number;
   category: string;
@@ -35,6 +37,8 @@ export async function GET() {
       id: p.id,
       title: p.title,
       price: p.price,
+      oldPrice: p.oldPrice ?? undefined,
+      discountPercentage: p.discountPercentage ?? undefined,
       rating: p.rating,
       reviewCount: p.reviewCount ?? undefined,
       description: p.description,
@@ -113,6 +117,12 @@ export async function POST(request: Request) {
     // Form fields
     const title = formData.get("title") as string;
     const price = parseFloat(formData.get("price") as string);
+    const oldPrice = formData.get("oldPrice")
+      ? parseFloat(formData.get("oldPrice") as string)
+      : undefined;
+    const discountPercentage = formData.get("discountPercentage")
+      ? parseInt(formData.get("discountPercentage") as string)
+      : undefined;
     const description = formData.get("description") as string;
     const rating = parseFloat(formData.get("rating") as string);
     const reviewCount = formData.get("reviewCount")
@@ -121,7 +131,6 @@ export async function POST(request: Request) {
 
     const categoryName = formData.get("category") as string;
     const subCategoryName = formData.get("subCategory") as string | null;
-    const roomName = formData.get("room") as string | null; // 🆕 room field
 
     // Find main category
     const category = await prisma.category.findFirst({
@@ -157,6 +166,8 @@ export async function POST(request: Request) {
       data: {
         title,
         price,
+        oldPrice,
+        discountPercentage,
         rating,
         reviewCount,
         description,
@@ -178,6 +189,8 @@ export async function POST(request: Request) {
       id: newProduct.id,
       title: newProduct.title,
       price: newProduct.price,
+      oldPrice: newProduct.oldPrice ?? undefined,
+      discountPercentage: newProduct.discountPercentage ?? undefined,
       rating: newProduct.rating,
       reviewCount: newProduct.reviewCount ?? undefined,
       description: newProduct.description,

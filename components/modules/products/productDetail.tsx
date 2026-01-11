@@ -84,7 +84,7 @@ export default function ProductDetailPage() {
 
     // Misafir kullanıcı için sepete ekle
     if (!isLoggedIn) {
-      addToGuestCart(item, quantity); // ✅ quantity parametresi eklendi
+      addToGuestCart(item, quantity);
       toast.success(
         `${quantity} adet ürün sepete eklendi! Toplam: ₺${(
           product.price * quantity
@@ -99,7 +99,7 @@ export default function ProductDetailPage() {
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...item, quantity }), // ✅ quantity eklendi
+        body: JSON.stringify({ ...item, quantity }),
         credentials: "include",
       });
 
@@ -134,7 +134,6 @@ export default function ProductDetailPage() {
         console.error("Paylaşım hatası:", error);
       }
     } else {
-      // Web Share API desteklenmiyorsa linki kopyala
       try {
         await navigator.clipboard.writeText(window.location.href);
         toast.success("Ürün bağlantısı panoya kopyalandı.");
@@ -159,6 +158,10 @@ export default function ProductDetailPage() {
     product.subImage3,
     product.subImage4,
   ].filter(Boolean);
+
+  // Database'den gelen değerleri kullan
+  const hasDiscount = product.oldPrice && product.oldPrice > product.price;
+  const discountPercentage = product.discountPercentage;
 
   return (
     <div className="min-h-screen bg-zinc-50 text-stone-800">
@@ -224,9 +227,16 @@ export default function ProductDetailPage() {
                   <span className="text-3xl font-light tracking-tighter text-stone-900">
                     {product.price.toLocaleString("tr-TR")} TL
                   </span>
-                  <span className="text-sm text-stone-400 line-through font-light">
-                    {(product.price * 1.4).toLocaleString("tr-TR")} TL
-                  </span>
+                  {hasDiscount && (
+                    <span className="text-sm text-stone-400 line-through font-light">
+                      {product.oldPrice.toLocaleString("tr-TR")} TL
+                    </span>
+                  )}
+                  {discountPercentage && discountPercentage > 0 && (
+                    <span className="text-sm font-bold text-amber-600">
+                      -%{discountPercentage}
+                    </span>
+                  )}
                 </div>
                 <p className="text-[10px] uppercase tracking-widest text-green-600 font-semibold">
                   Ücretsiz Kargo & 9 Taksit
@@ -282,7 +292,6 @@ export default function ProductDetailPage() {
                     />
                     {isFavorited(product.id) ? "Favorilerde" : "Favoriye Ekle"}
                   </button>
-                  {/* Eski halini bununla değiştirin */}
                   <button
                     onClick={handleShare}
                     className="w-12 h-12 border border-stone-200 flex items-center justify-center hover:border-stone-800 transition-all active:scale-95"
