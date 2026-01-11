@@ -69,9 +69,8 @@ export default function Contact() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          recipients: ["balkoluxofficial@gmail.com"], // Mailin gideceği adres
+          recipients: ["balkoluxofficial@gmail.com"],
           subject: `Yeni Form Bildirimi: ${formData.name}`,
-          // API içindeki HTML şablonda "${message}" kısmına gidecek metin:
           message: `Müşteri Adı: ${formData.name}\nTelefon: ${formData.phone}\nE-posta: ${formData.email}\n\nMesaj: ${formData.message}`,
         }),
       });
@@ -137,7 +136,6 @@ export default function Contact() {
           <section className="lg:col-span-7">
             <form onSubmit={handleSubmit} className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
-                {/* İsim */}
                 <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
                   <label
                     htmlFor="name"
@@ -156,7 +154,6 @@ export default function Contact() {
                     required
                   />
                 </div>
-                {/* Telefon (Yeni Eklenen Alan) */}
                 <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
                   <label
                     htmlFor="phone"
@@ -178,7 +175,6 @@ export default function Contact() {
               </div>
 
               <div className="grid grid-cols-1 gap-y-12">
-                {/* E-posta */}
                 <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
                   <label
                     htmlFor="email"
@@ -199,7 +195,6 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* Mesaj */}
               <div className="group relative border-b border-stone-200 focus-within:border-stone-800 transition-colors">
                 <label
                   htmlFor="message"
@@ -241,17 +236,14 @@ export default function Contact() {
         </div>
 
         {/* HARİTA SECTION */}
-        <section className="mt-32 transition-all duration-1000 overflow-hidden border border-stone-100">
-          <div className="aspect-video md:aspect-[21/9] w-full bg-stone-100 relative">
+        <section className="mt-32 overflow-hidden rounded-2xl border border-stone-200 shadow-sm">
+          <div className="relative w-full aspect-video md:aspect-[21/9] bg-stone-100">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3184.4447738241474!2d35.253046!3d37.04683!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15288f6916849427%3A0x6006456f917df9a0!2zRXNlbnRlcGUsIFByb2YuIERyLiBOZWNtZXR0aW4gRXJiYWthbiBCdWx2LiBObzozNTMsIDAxMTUwIMOHdWt1cm92YS9BZGFuYQ!5e0!3m2!1str!2str!4v1700000000000"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen={true}
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3183.9685387949653!2d35.23500959999999!3d37.05823290000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15288937bb30296f%3A0xba1e46a2a25b37f5!2sBalkoL%C3%BCX%20Balkon%20ve%20Bah%C3%A7e%20Mobilyalar%C4%B1!5e0!3m2!1str!2str!4v1768113624881!5m2!1str!2str"
+              className="absolute inset-0 w-full h-full border-0"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="BalkoLüx Adres"
+              allowFullScreen
             />
           </div>
         </section>

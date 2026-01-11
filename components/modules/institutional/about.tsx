@@ -164,13 +164,13 @@ export default function AboutPage() {
           <SectionTitle subtitle="Bize Ulaşın" title="Bir Hayaliniz mi Var?" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: Phone, label: "Telefon", val: "+90 546 225 56 59" },
-              { icon: Mail, label: "E-Posta", val: "hello@balkolux.com" },
-              { icon: Instagram, label: "Sosyal Medya", val: "@balkolux" },
-              { icon: MapPin, label: "Showroom", val: "Nizip, Gaziantep" },
+              { icon: Phone, label: "Telefon", val: "+90 546 225 56 59" , href: "tel:+905462255659"},
+              { icon: Mail, label: "E-Posta", val: "balkoluxofficial@gmail.com", href: "mailto:balkoluxofficial@gmail.com" },
+              { icon: Instagram, label: "Sosyal Medya", val: "@balkolux" , href: "https://www.instagram.com/balkolux" },
+              { icon: MapPin, label: "Showroom", val: "Esentepe Bulvarı Prof Necmettin Erbakan Bulvarı No353, 01150 Çukurova/Adana", href: "https://www.google.com/maps/place/Balk%C3%B6lux/@36.9995129,35.4018642,15z/data=!4m5!3m4!1s0x0:0x0!8m2!3d36.9995129!4d35.4018642" },
             ].map((item, i) => (
               <a
-                href="#"
+                href={item.href}
                 key={i}
                 className="group flex flex-col gap-2 p-4 hover:bg-stone-50 transition-colors"
               >
