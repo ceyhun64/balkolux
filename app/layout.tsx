@@ -77,7 +77,7 @@ export const metadata: Metadata = {
       "Oturma takımlarından barbekülere, dış mekan dair her şey. BalkoLüx premium koleksiyonunu keşfedin.",
     images: [
       {
-        url: "https://balkolux.com/og-image.ico",
+        url: "https://balkolux.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "BalkoLüx Lüks Bahçe Mobilyaları",
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
     title: "BalkoLüx | Lüks Bahçe ve Balkon Mobilyaları",
     description:
       "Bahçenize zarafet katan oturma grupları ve salıncak modelleri BalkoLüx'te.",
-    images: ["https://balkolux.com/og-image.ico"],
+    images: ["https://balkolux.com/og-image.png"],
   },
 
   alternates: {
@@ -111,8 +111,8 @@ export default function RootLayout({
     name: "BalkoLüx",
     description: "Premium Bahçe, Balkon ve Teras Mobilyaları Mağazası.",
     url: "https://balkolux.com",
-    logo: "https://balkolux.com/logo/og-image.ico",
-    image: "https://balkolux.com/og-image.ico",
+    logo: "https://balkolux.com/logo/og-image.png",
+    image: "https://balkolux.com/og-image.png",
     telephone: "+90-276-XXX-XXXX",
     email: "balkoluxofficial@gmail.com",
     address: {
