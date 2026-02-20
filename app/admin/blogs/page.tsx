@@ -20,3 +20,4 @@ export default async function AdminBlogsPage() {
     </div>
   );
 }
+

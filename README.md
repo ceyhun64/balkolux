@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BalkoLüx – Bahçe & Balkon Mobilyaları
 
-## Getting Started
+Dış mekan mobilya koleksiyonlarının dijital sergilenmesi ve ürün detay yönetimi.
 
-First, run the development server:
+BalkoLüx platformu, bahçe, teras ve balkonlar için özel olarak tasarlanan dış mekan mobilyalarının teknik özelliklerini ve estetik detaylarını bir araya getiren bir dijital katalogdur. Kullanıcılar; hava koşullarına dayanıklı kumaş yapıları, alüminyum veya ahşap iskelet detayları ve ergonomik tasarım ölçüleri gibi ürün bilgilerine erişebilir. Oturma gruplarından yemek masalarına, dış mekan aksesuarlarından konfor odaklı bahçe mobilyalarına kadar farklı kategorilerdeki ürünlerin yüksek çözünürlüklü görselleri ve materyal bilgileri listelenmektedir.
+
+## Özellikler
+
+- 🌿 Ürün kataloğu — kategori bazlı filtreleme ve model karşılaştırma
+- 🖼️ Yüksek çözünürlüklü görsel galerisi ve materyal detayları
+- 🔍 Teknik özellik sayfaları (kumaş yapısı, iskelet malzemesi, ölçüler)
+- 📱 Mobil uyumlu, kullanıcı dostu arayüz
+- ⚡ Next.js SSR/SSG ile hızlı sayfa yükleme ve SEO optimizasyonu
+
+## Teknolojiler
+
+- [Next.js](https://nextjs.org) — SSR & SSG
+- React, TypeScript
+- Tailwind CSS
+- Node.js / Express.js
+- PostgreSQL & Prisma
+- Docker, Nginx, VPS
+
+## Kurulum
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Uygulama [http://localhost:3000](http://localhost:3000) adresinde çalışır.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Geliştirme
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`app/page.tsx` dosyasını düzenleyerek başlayabilirsiniz. Değişiklikler otomatik olarak yansır.
 
-## Learn More
+## Dağıtım
 
-To learn more about Next.js, take a look at the following resources:
+Proje VPS üzerinde Docker + Nginx ile production ortamına deploy edilmiştir.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> Modern yaşam alanları için fonksiyonel dış mekan çözümleri. 🌞
