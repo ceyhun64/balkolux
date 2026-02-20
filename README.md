@@ -192,7 +192,7 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 ## 👥 Yazar
 
-- **BalkoLüx Ekibi** - [Website](https://balkolux.com)
+- **Ceyhun Türkmen** - [Website](https://balkolux.com)
 
 ---
 
