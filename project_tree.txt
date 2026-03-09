@@ -1,0 +1,466 @@
+├── .gitignore
+├── .vscode
+│   └── settings.json
+├── README.md
+├── app
+│   ├── admin
+│   │   ├── banner
+│   │   │   └── page.tsx
+│   │   ├── blogs
+│   │   │   └── page.tsx
+│   │   ├── coupon
+│   │   │   └── page.tsx
+│   │   ├── dashboard
+│   │   │   └── page.tsx
+│   │   ├── orders
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── products
+│   │   │   └── page.tsx
+│   │   ├── subscribers
+│   │   │   └── page.tsx
+│   │   └── users
+│   │       └── page.tsx
+│   ├── api
+│   │   ├── account
+│   │   │   ├── check
+│   │   │   │   └── route.ts
+│   │   │   ├── forgot_password
+│   │   │   │   └── route.ts
+│   │   │   ├── register
+│   │   │   │   └── route.ts
+│   │   │   └── reset_password
+│   │   │       └── route.ts
+│   │   ├── address
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── auth
+│   │   │   ├── [...nextauth]
+│   │   │   │   └── route.ts
+│   │   │   └── logout
+│   │   │       └── route.ts
+│   │   ├── banner
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── blog
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── cargo-tracking
+│   │   │   └── route.ts
+│   │   ├── cart
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── coupon
+│   │   │   ├── route.ts
+│   │   │   └── validate
+│   │   │       └── route.ts
+│   │   ├── favorites
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── location
+│   │   │   ├── ilceler
+│   │   │   │   └── [ilId]
+│   │   │   │       └── route.ts
+│   │   │   └── mahalleler
+│   │   │       └── [ilceId]
+│   │   │           └── route.ts
+│   │   ├── order
+│   │   │   ├── route.ts
+│   │   │   └── user
+│   │   │       └── route.ts
+│   │   ├── payment
+│   │   │   └── route.ts
+│   │   ├── products
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   ├── category
+│   │   │   │   └── [categoryId]
+│   │   │   │       └── route.ts
+│   │   │   └── route.ts
+│   │   ├── review
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── send-mail
+│   │   │   └── route.ts
+│   │   ├── subscribe
+│   │   │   ├── [id]
+│   │   │   │   └── route.js
+│   │   │   └── route.js
+│   │   ├── upload
+│   │   │   └── route.ts
+│   │   └── user
+│   │       ├── all
+│   │       │   ├── [id]
+│   │       │   │   └── route.ts
+│   │       │   └── route.ts
+│   │       └── route.ts
+│   ├── blog
+│   │   ├── [id]
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── cart
+│   │   └── page.tsx
+│   ├── checkout
+│   │   ├── page.tsx
+│   │   ├── success
+│   │   │   └── page.tsx
+│   │   └── unsuccess
+│   │       └── page.tsx
+│   ├── contact
+│   │   └── page.tsx
+│   ├── contracts
+│   │   ├── distance_sale
+│   │   │   └── page.tsx
+│   │   ├── kvkk
+│   │   │   └── page.tsx
+│   │   ├── payment_options
+│   │   │   └── page.tsx
+│   │   └── personal_data
+│   │       └── page.tsx
+│   ├── faq
+│   │   └── page.tsx
+│   ├── favicon.ico
+│   ├── favorites
+│   │   └── page.tsx
+│   ├── forgot-password
+│   │   └── page.tsx
+│   ├── globals.css
+│   ├── institutional
+│   │   ├── about
+│   │   │   └── page.tsx
+│   │   ├── cookie_policy
+│   │   │   └── page.tsx
+│   │   └── why_us
+│   │       └── page.tsx
+│   ├── layout.tsx
+│   ├── login
+│   │   └── page.tsx
+│   ├── not-found.tsx
+│   ├── page.tsx
+│   ├── products
+│   │   ├── [id]
+│   │   │   └── page.tsx
+│   │   ├── barbecue
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── seating_sets
+│   │   │   └── page.tsx
+│   │   ├── sunbed
+│   │   │   └── page.tsx
+│   │   ├── swing
+│   │   │   └── page.tsx
+│   │   ├── table_sets
+│   │   │   └── page.tsx
+│   │   └── umbrella
+│   │       └── page.tsx
+│   ├── profile
+│   │   ├── addresses
+│   │   │   └── page.tsx
+│   │   ├── cargo_tracking
+│   │   │   └── page.tsx
+│   │   ├── orders
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── register
+│   │   └── page.tsx
+│   ├── reset-password
+│   │   └── page.tsx
+│   └── search
+│       └── page.tsx
+├── components.json
+├── components
+│   ├── layout
+│   │   ├── ClientLayoutWrapper.tsx
+│   │   ├── cartDropdown.tsx
+│   │   ├── cartItem.tsx
+│   │   ├── collectionMegaMenu.tsx
+│   │   ├── contact.tsx
+│   │   ├── cookieConsent.tsx
+│   │   ├── faq.tsx
+│   │   ├── footer.tsx
+│   │   ├── navbar.tsx
+│   │   ├── pagination.tsx
+│   │   ├── scrollToTop.tsx
+│   │   ├── socialSidebar.tsx
+│   │   ├── testimonial.tsx
+│   │   └── userMegaMenu.tsx
+│   ├── modules
+│   │   ├── admin
+│   │   │   ├── banner
+│   │   │   │   └── banner.tsx
+│   │   │   ├── blogs
+│   │   │   │   ├── addBlog.tsx
+│   │   │   │   ├── blogs.tsx
+│   │   │   │   └── updateBlog.tsx
+│   │   │   ├── coupon
+│   │   │   │   └── coupon.tsx
+│   │   │   ├── dashboard
+│   │   │   │   └── dashboard.tsx
+│   │   │   ├── login
+│   │   │   │   └── login.tsx
+│   │   │   ├── orders
+│   │   │   │   ├── orderDetailDialog.tsx
+│   │   │   │   └── orders.tsx
+│   │   │   ├── products
+│   │   │   │   ├── productDialog.tsx
+│   │   │   │   ├── productTable.tsx
+│   │   │   │   └── products.tsx
+│   │   │   ├── sideBar.tsx
+│   │   │   ├── subscribers
+│   │   │   │   └── subscribers.tsx
+│   │   │   └── users
+│   │   │       └── users.tsx
+│   │   ├── auth
+│   │   │   ├── forgot-password.tsx
+│   │   │   ├── login.tsx
+│   │   │   ├── register.tsx
+│   │   │   └── reset-password.tsx
+│   │   ├── blog
+│   │   │   ├── blog.tsx
+│   │   │   └── blogDetail.tsx
+│   │   ├── cart
+│   │   │   ├── cart.tsx
+│   │   │   ├── cartItem.tsx
+│   │   │   └── cartSummary.tsx
+│   │   ├── checkout
+│   │   │   ├── cartSummary.tsx
+│   │   │   ├── checkout.tsx
+│   │   │   ├── paymentStepper.tsx
+│   │   │   ├── stepAddress.tsx
+│   │   │   ├── stepPayment.tsx
+│   │   │   ├── success.tsx
+│   │   │   └── unsuccess.tsx
+│   │   ├── contracts
+│   │   │   ├── distanceSale.tsx
+│   │   │   ├── kvkk.tsx
+│   │   │   ├── paymentOptions.tsx
+│   │   │   └── personalData.tsx
+│   │   ├── favorites
+│   │   │   ├── favorites.tsx
+│   │   │   └── productCard.tsx
+│   │   ├── home
+│   │   │   ├── banner.tsx
+│   │   │   ├── carousel.tsx
+│   │   │   ├── categories.tsx
+│   │   │   ├── newArrivals.tsx
+│   │   │   ├── products.tsx
+│   │   │   └── services.tsx
+│   │   ├── institutional
+│   │   │   ├── about.tsx
+│   │   │   ├── security_cookie.tsx
+│   │   │   └── why_us.tsx
+│   │   ├── products
+│   │   │   ├── allProducts.tsx
+│   │   │   ├── category
+│   │   │   │   ├── barbecue.tsx
+│   │   │   │   ├── seating_sets.tsx
+│   │   │   │   ├── sunbed.tsx
+│   │   │   │   ├── swing.tsx
+│   │   │   │   ├── table_sets.tsx
+│   │   │   │   └── umbrella.tsx
+│   │   │   ├── filter.tsx
+│   │   │   ├── imageZoom.tsx
+│   │   │   ├── mobileFilter.tsx
+│   │   │   ├── productCard.tsx
+│   │   │   ├── productDetail.tsx
+│   │   │   ├── productDetailSkeleton.tsx
+│   │   │   ├── productSkeleton.tsx
+│   │   │   ├── productTabs.tsx
+│   │   │   ├── productTopbar.tsx
+│   │   │   ├── recommended.tsx
+│   │   │   └── subCategory
+│   │   │       └── laserCut.tsx
+│   │   ├── profile
+│   │   │   ├── addressForm.tsx
+│   │   │   ├── addresses.tsx
+│   │   │   ├── cargoTracking.tsx
+│   │   │   ├── myPersonalInformation.tsx
+│   │   │   ├── orders.tsx
+│   │   │   └── sideBar.tsx
+│   │   └── search
+│   │       └── search.tsx
+│   └── ui
+│       ├── accordion.tsx
+│       ├── alert-dialog.tsx
+│       ├── alert.tsx
+│       ├── aspect-ratio.tsx
+│       ├── avatar.tsx
+│       ├── badge.tsx
+│       ├── breadcrumb.tsx
+│       ├── button-group.tsx
+│       ├── button.tsx
+│       ├── calendar.tsx
+│       ├── card.tsx
+│       ├── carousel.tsx
+│       ├── chart.tsx
+│       ├── checkbox.tsx
+│       ├── collapsible.tsx
+│       ├── command.tsx
+│       ├── context-menu.tsx
+│       ├── dialog.tsx
+│       ├── drawer.tsx
+│       ├── dropdown-menu.tsx
+│       ├── empty.tsx
+│       ├── field.tsx
+│       ├── form.tsx
+│       ├── hover-card.tsx
+│       ├── input-group.tsx
+│       ├── input-otp.tsx
+│       ├── input.tsx
+│       ├── item.tsx
+│       ├── kbd.tsx
+│       ├── label.tsx
+│       ├── menubar.tsx
+│       ├── navigation-menu.tsx
+│       ├── pagination.tsx
+│       ├── popover.tsx
+│       ├── progress.tsx
+│       ├── radio-group.tsx
+│       ├── resizable.tsx
+│       ├── scroll-area.tsx
+│       ├── select.tsx
+│       ├── separator.tsx
+│       ├── shadcn-io
+│       │   ├── gradient-text
+│       │   │   └── index.tsx
+│       │   └── image-zoom
+│       │       └── index.tsx
+│       ├── sheet.tsx
+│       ├── sidebar.tsx
+│       ├── skeleton.tsx
+│       ├── slider.tsx
+│       ├── sonner.tsx
+│       ├── spinner.tsx
+│       ├── switch.tsx
+│       ├── table.tsx
+│       ├── tabs.tsx
+│       ├── textarea.tsx
+│       ├── toggle-group.tsx
+│       ├── toggle.tsx
+│       └── tooltip.tsx
+├── contexts
+│   ├── cartContext.tsx
+│   └── favoriteContext.tsx
+├── data
+│   └── products.json
+├── fix.sql
+├── hooks
+│   └── use-mobile.ts
+├── lib
+│   ├── auth.ts
+│   ├── cargo-utils.ts
+│   ├── db.ts
+│   ├── session.ts
+│   └── utils.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── prisma
+│   ├── migrations
+│   │   ├── 20251118065807_init
+│   │   │   └── migration.sql
+│   │   ├── 20251119065034_add_sub_images_and_description
+│   │   │   └── migration.sql
+│   │   ├── 20251119135918_add_room_to_products
+│   │   │   └── migration.sql
+│   │   ├── 20251122061547_add_tcno_to_address
+│   │   │   └── migration.sql
+│   │   ├── 20251122092416_add_tcno_to_addresses
+│   │   │   └── migration.sql
+│   │   ├── 20260102110224_cart_item
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   ├── schema.prisma
+│   └── seed.ts
+├── public
+│   ├── about
+│   │   ├── 1.webp
+│   │   └── 2.webp
+│   ├── cards
+│   │   ├── axess.svg
+│   │   ├── bankkartcombo.svg
+│   │   ├── bonus.svg
+│   │   ├── maximum.svg
+│   │   ├── paraf.svg
+│   │   └── world.svg
+│   ├── categories
+│   │   ├── balcony.avif
+│   │   └── garden.avif
+│   ├── city.json
+│   ├── heroes
+│   │   ├── 1.0.avif
+│   │   ├── 1.1.avif
+│   │   ├── 1.2.avif
+│   │   ├── 1.3.avif
+│   │   ├── 1.4.avif
+│   │   ├── 2.0.avif
+│   │   ├── 2.1.avif
+│   │   ├── 2.2.avif
+│   │   ├── 2.3.avif
+│   │   └── 2.4.avif
+│   ├── iyzico
+│   │   ├── iyzico_ile_ode_colored.webp
+│   │   ├── iyzico_ile_ode_colored_horizontal.webp
+│   │   └── logo_band_colored@3x.webp
+│   ├── logo
+│   │   ├── logo.webp
+│   │   ├── logobg.webp
+│   │   ├── logoblack.webp
+│   │   ├── logoicon.ico
+│   │   └── logoicon.webp
+│   ├── megaMenu
+│   │   └── megaMenu.webp
+│   ├── og-image.png
+│   ├── products
+│   │   ├── 1.webp
+│   │   ├── 10.webp
+│   │   ├── 11.webp
+│   │   ├── 12.webp
+│   │   ├── 13.webp
+│   │   ├── 14.webp
+│   │   ├── 15.webp
+│   │   ├── 16.webp
+│   │   ├── 17.webp
+│   │   ├── 18.jpg
+│   │   ├── 18.webp
+│   │   ├── 19.webp
+│   │   ├── 2.webp
+│   │   ├── 20.webp
+│   │   ├── 21.jpg
+│   │   ├── 21.webp
+│   │   ├── 22.webp
+│   │   ├── 3.webp
+│   │   ├── 4.webp
+│   │   ├── 5.webp
+│   │   ├── 6.webp
+│   │   ├── 7.webp
+│   │   ├── 8.webp
+│   │   └── 9.webp
+│   ├── socialMedia
+│   │   ├── facebook.webp
+│   │   ├── instagram.webp
+│   │   ├── phone.webp
+│   │   └── whatsapp.webp
+│   └── why_us
+│       ├── 1.webp
+│       └── 2.webp
+├── tailwind.config.ts
+├── tsconfig.json
+├── types
+│   ├── bcrypt.d.ts
+│   ├── formidable.d.ts
+│   ├── horoz-cargo.ts
+│   ├── iyzipay.d.ts
+│   ├── next-auth.d.ts
+│   ├── nodemailer.d.ts
+│   ├── order.ts
+│   └── product.ts
+└── utils
+    └── cart.ts
