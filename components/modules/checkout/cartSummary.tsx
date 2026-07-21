@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { getCart, GuestCartItem } from "@/utils/cart";
+import { getSafeImagePath } from "@/lib/utils";
 import {
   ShoppingCart,
   Edit3,
@@ -268,7 +269,7 @@ export default function BasketSummaryCard({
               <div key={item.id} className="flex gap-4 group">
                 <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-zinc-100 bg-white">
                   <Image
-                    src={item.product.mainImage}
+                    src={getSafeImagePath(item.product.mainImage)}
                     alt={item.product.title}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"

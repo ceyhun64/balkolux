@@ -30,6 +30,7 @@ export interface ProductFormData {
   discountPercentage?: number;
   rating: number;
   reviewCount: number;
+  stock: number;
   category: string;
   subCategory?: string;
 }
@@ -43,6 +44,7 @@ interface Product {
   discountPercentage?: number;
   rating: number;
   reviewCount?: number;
+  stock?: number;
   category: string;
   subCategory?: string;
   mainImage: string;
@@ -79,6 +81,7 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
       discountPercentage: undefined,
       rating: 0,
       reviewCount: 0,
+      stock: 0,
       category: "",
       subCategory: "",
     });
@@ -116,6 +119,7 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
           discountPercentage: product.discountPercentage,
           rating: product.rating,
           reviewCount: product.reviewCount || 0,
+          stock: product.stock ?? 0,
           category: product.category,
           subCategory: product.subCategory || "",
         });
@@ -148,6 +152,7 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
           name === "oldPrice" ||
           name === "rating" ||
           name === "reviewCount" ||
+          name === "stock" ||
           name === "discountPercentage"
             ? value === ""
               ? name === "oldPrice" || name === "discountPercentage"
@@ -198,6 +203,7 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
         discountPercentage: undefined,
         rating: 0,
         reviewCount: 0,
+        stock: 0,
         category: "",
         subCategory: "",
       });
@@ -414,6 +420,18 @@ const ProductDialog = forwardRef<HTMLDivElement, ProductDialogProps>(
                           </div>
                         )}
                     </div>
+
+                    <InputGroup
+                      label="Stok Adedi"
+                      value={productData.stock}
+                      name="stock"
+                      onChange={handleChange}
+                      type="number"
+                      min={0}
+                      step={1}
+                      placeholder="0"
+                      required
+                    />
 
                     <div>
                       <Label className="text-sm font-semibold text-slate-700 mb-2 block">

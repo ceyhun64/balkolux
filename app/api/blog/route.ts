@@ -1,6 +1,7 @@
 // app/api/blog/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { uploadImage } from "@/lib/cloudinary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import type { NextRequest } from "next/server";
@@ -40,27 +41,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
-    // Dosyayı upload et
-    const uploadForm = new FormData();
-    uploadForm.append("file", file);
-    uploadForm.append("folderName", "blogs");
-
-    const uploadRes = await fetch(`${baseUrl}/api/upload`, {
-      method: "POST",
-      body: uploadForm,
-    });
-
-    const uploadData = await uploadRes.json();
-    if (!uploadRes.ok || !uploadData.path) {
+    let imagePath: string;
+    try {
+      imagePath = await uploadImage(file, "blogs");
+    } catch (uploadErr) {
+      console.error("Blog görsel yükleme hatası:", uploadErr);
       return NextResponse.json(
         { message: "Resim yükleme başarısız." },
         { status: 500 }
       );
     }
-
-    const imagePath = uploadData.path;
 
     // Blog oluştur
     const blog = await prisma.blog.create({

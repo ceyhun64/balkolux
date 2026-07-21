@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import prisma from "@/lib/db";
+import { uploadImage } from "@/lib/cloudinary";
 import fs from "fs/promises";
 import path from "path";
 
@@ -109,6 +110,9 @@ export async function PUT(
     const reviewCount = formData.get("reviewCount")
       ? parseInt(formData.get("reviewCount") as string)
       : 0;
+    const stock = formData.get("stock")
+      ? parseInt(formData.get("stock") as string)
+      : 0;
 
     const mainCategoryName = formData.get("category") as string;
     const subCategoryName = formData.get("subCategory") as string | null;
@@ -161,18 +165,7 @@ export async function PUT(
       file: File | null
     ): Promise<string | undefined> => {
       if (!file) return undefined;
-      const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-      const uploadForm = new FormData();
-      uploadForm.append("file", file);
-      uploadForm.append("folderName", "products");
-
-      const res = await fetch(`${baseUrl}/api/upload`, {
-        method: "POST",
-        body: uploadForm,
-      });
-      const data = await res.json();
-      return data.path;
+      return uploadImage(file, "products");
     };
 
     const mainImagePath = mainFile
@@ -201,6 +194,7 @@ export async function PUT(
         description,
         rating,
         reviewCount,
+        stock,
         mainImage: mainImagePath,
         subImage: subImagePath,
         subImage2: subImage2Path,

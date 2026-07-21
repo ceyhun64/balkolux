@@ -13,7 +13,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, getSafeImagePath } from "@/lib/utils";
 import { CustomImageZoom } from "./imageZoom";
 import ProductTabs from "./productTabs";
 import ProductDetailSkeleton from "./productDetailSkeleton";
@@ -157,7 +157,9 @@ export default function ProductDetailPage() {
     product.subImage2,
     product.subImage3,
     product.subImage4,
-  ].filter(Boolean);
+  ]
+    .filter(Boolean)
+    .map((img) => getSafeImagePath(img));
 
   // Database'den gelen değerleri kullan
   const hasDiscount = product.oldPrice && product.oldPrice > product.price;

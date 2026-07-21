@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useFavorite } from "@/contexts/favoriteContext";
 import { motion } from "framer-motion";
+import { getSafeImagePath } from "@/lib/utils";
 
 interface ProductData {
   id: number;
@@ -66,7 +67,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
             {/* İlk Resim */}
             <div className="relative h-full w-1/2 p-2">
               <Image
-                src={product.mainImage}
+                src={getSafeImagePath(product.mainImage)}
                 alt={product.title}
                 fill
                 className="object-contain"
@@ -77,7 +78,7 @@ export default function ProductCard({ product }: { product: ProductData }) {
             {/* İkinci Resim */}
             <div className="relative h-full w-1/2 p-2">
               <Image
-                src={product.subImage || product.mainImage}
+                src={getSafeImagePath(product.subImage || product.mainImage)}
                 alt={`${product.title} detay`}
                 fill
                 className="object-contain"

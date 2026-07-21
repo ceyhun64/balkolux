@@ -196,6 +196,7 @@ model product {
   discountPercentage Int? // İndirim yüzdesi (örn: 30 = %30 indirim)
   rating             Int
   reviewCount        Int?
+  stock              Int     @default(0)
   mainImage          String  @default("default-image.jpg")
   subImage           String?
   subImage2          String?

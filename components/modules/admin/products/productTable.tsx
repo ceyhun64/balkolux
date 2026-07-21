@@ -20,6 +20,7 @@ import {
   MessageSquare,
   ImageOff,
   Calendar,
+  Boxes,
 } from "lucide-react";
 
 export interface Product {
@@ -29,6 +30,7 @@ export interface Product {
   price: number;
   rating: number;
   reviewCount?: number;
+  stock?: number;
   mainImage: string;
   category: string;
   subCategory?: string;
@@ -100,6 +102,9 @@ export default function ProductTable({
               </TableHead>
               <TableHead className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 py-5 px-4">
                 Fiyat
+              </TableHead>
+              <TableHead className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 py-5 px-4">
+                Stok
               </TableHead>
               <TableHead className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500 py-5 px-4">
                 Performans
@@ -176,6 +181,20 @@ export default function ProductTable({
                         style: "currency",
                         currency: "TRY",
                       }).format(product.price)}
+                    </TableCell>
+
+                    <TableCell className="px-4">
+                      <Badge
+                        className={`text-[10px] px-2.5 py-1 rounded-lg font-bold border shadow-none ${
+                          !product.stock
+                            ? "bg-red-50 text-red-600 border-red-200"
+                            : product.stock <= 5
+                            ? "bg-amber-50 text-amber-700 border-amber-200"
+                            : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        }`}
+                      >
+                        {product.stock ?? 0} adet
+                      </Badge>
                     </TableCell>
 
                     <TableCell className="px-4">
@@ -308,9 +327,23 @@ export default function ProductTable({
                     </div>
                   </div>
 
-                  {/* Price */}
-                  <div className="text-xl font-black text-transparent bg-gradient-to-r from-indigo-600 to-indigo-700 bg-clip-text">
-                    {product.price.toLocaleString("tr-TR")} ₺
+                  {/* Price & Stock */}
+                  <div className="flex items-center justify-between">
+                    <div className="text-xl font-black text-transparent bg-gradient-to-r from-indigo-600 to-indigo-700 bg-clip-text">
+                      {product.price.toLocaleString("tr-TR")} ₺
+                    </div>
+                    <Badge
+                      className={`flex items-center gap-1 text-[10px] px-2.5 py-1 rounded-lg font-bold border shadow-none ${
+                        !product.stock
+                          ? "bg-red-50 text-red-600 border-red-200"
+                          : product.stock <= 5
+                          ? "bg-amber-50 text-amber-700 border-amber-200"
+                          : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                      }`}
+                    >
+                      <Boxes size={11} />
+                      {product.stock ?? 0} adet
+                    </Badge>
                   </div>
 
                   {/* Action Buttons */}

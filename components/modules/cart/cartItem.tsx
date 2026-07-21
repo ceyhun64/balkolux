@@ -5,6 +5,7 @@ import { X, Plus, Minus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { CartItemType } from "./cart";
+import { getSafeImagePath } from "@/lib/utils";
 
 interface CartItemProps {
   item: CartItemType;
@@ -32,7 +33,7 @@ export default function CartItem({
         className="relative w-32 h-20 md:w-64 md:h-40 flex-shrink-0 bg-zinc-50 overflow-hidden"
       >
         <Image
-          src={product.mainImage}
+          src={getSafeImagePath(product.mainImage)}
           alt={product.title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"

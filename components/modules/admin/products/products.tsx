@@ -41,6 +41,7 @@ interface Product {
   price: number;
   rating: number;
   reviewCount?: number;
+  stock?: number;
   mainImage: string;
   category: string;
   subCategory?: string;

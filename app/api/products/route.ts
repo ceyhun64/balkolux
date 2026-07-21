@@ -1,6 +1,7 @@
 // app/api/products/route.ts
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { uploadImage } from "@/lib/cloudinary";
 
 interface ProductData {
   id: number;
@@ -16,6 +17,7 @@ interface ProductData {
   discountPercentage?: number;
   rating: number;
   reviewCount?: number;
+  stock: number;
   category: string;
   subCategory?: string;
 }
@@ -41,6 +43,7 @@ export async function GET() {
       discountPercentage: p.discountPercentage ?? undefined,
       rating: p.rating,
       reviewCount: p.reviewCount ?? undefined,
+      stock: p.stock,
       description: p.description,
       mainImage: p.mainImage,
       subImage: p.subImage ?? undefined,
@@ -83,35 +86,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
-    // Upload helper
-    async function uploadFile(file: File, folder: string) {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("folderName", folder);
-
-      const res = await fetch(`${baseUrl}/api/upload`, {
-        method: "POST",
-        body: fd,
-      });
-      const data = await res.json();
-      return data.path as string;
-    }
-
-    // Upload all images
-    const mainImagePath = await uploadFile(mainFile, "products");
+    // Upload all images (doğrudan Cloudinary'ye, kendi API'sine HTTP isteği atmadan)
+    const mainImagePath = await uploadImage(mainFile, "products");
     const subImagePath = subFile
-      ? await uploadFile(subFile, "products")
+      ? await uploadImage(subFile, "products")
       : undefined;
     const subImage2Path = subFile2
-      ? await uploadFile(subFile2, "products")
+      ? await uploadImage(subFile2, "products")
       : undefined;
     const subImage3Path = subFile3
-      ? await uploadFile(subFile3, "products")
+      ? await uploadImage(subFile3, "products")
       : undefined;
     const subImage4Path = subFile4
-      ? await uploadFile(subFile4, "products")
+      ? await uploadImage(subFile4, "products")
       : undefined;
 
     // Form fields
@@ -128,6 +115,9 @@ export async function POST(request: Request) {
     const reviewCount = formData.get("reviewCount")
       ? parseInt(formData.get("reviewCount") as string)
       : undefined;
+    const stock = formData.get("stock")
+      ? parseInt(formData.get("stock") as string)
+      : 0;
 
     const categoryName = formData.get("category") as string;
     const subCategoryName = formData.get("subCategory") as string | null;
@@ -170,6 +160,7 @@ export async function POST(request: Request) {
         discountPercentage,
         rating,
         reviewCount,
+        stock,
         description,
         mainImage: mainImagePath,
         subImage: subImagePath,
@@ -193,6 +184,7 @@ export async function POST(request: Request) {
       discountPercentage: newProduct.discountPercentage ?? undefined,
       rating: newProduct.rating,
       reviewCount: newProduct.reviewCount ?? undefined,
+      stock: newProduct.stock,
       description: newProduct.description,
       mainImage: newProduct.mainImage,
       subImage: newProduct.subImage ?? undefined,

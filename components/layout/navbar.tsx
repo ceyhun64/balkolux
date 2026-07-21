@@ -11,6 +11,7 @@ import CartDropdown from "./cartDropdown";
 import { useFavorite } from "@/contexts/favoriteContext";
 import CollectionMegaMenu from "./collectionMegaMenu";
 import UserMegaMenu from "./userMegaMenu";
+import { getSafeImagePath } from "@/lib/utils";
 
 interface Product {
   id: number;
@@ -247,7 +248,7 @@ export default function Navbar() {
                               {/* Ürün Görseli - Mobil Stili gibi kare/dikdörtgen temiz yapı */}
                               <div className="relative aspect-square w-23 h-16 bg-white overflow-hidden shrink-0">
                                 <Image
-                                  src={product.mainImage}
+                                  src={getSafeImagePath(product.mainImage)}
                                   alt={product.title}
                                   fill
                                   className="object-contain group-hover:scale-110 transition-transform duration-500"
@@ -397,7 +398,7 @@ export default function Navbar() {
                         >
                           <div className="relative h-full w-1/5 p-4">
                             <Image
-                              src={product.mainImage}
+                              src={getSafeImagePath(product.mainImage)}
                               alt={product.title}
                               fill
                               className="object-contain bg-white"
